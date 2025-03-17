@@ -1,0 +1,98 @@
+<div class="login-container">
+  <div class="login-form-container">
+    <h1 class="login-title">
+      تسجيل الدخول إلى حساب<br />
+      الخاص بك
+    </h1>
+    <p class="login-subtitle">
+      قم بتسجيل الدخول باستخدام بريدك الإلكتروني وكلمة السر.
+    </p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="email">البريد الإلكتروني</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="أدخل البريد الإلكتروني"
+          [class.is-invalid]="emailControl.invalid && emailControl.touched"
+        />
+        <div
+          class="error-message"
+          *ngIf="emailControl.invalid && emailControl.touched"
+        >
+          <span *ngIf="emailControl.errors?.['required']"
+            >البريد الإلكتروني مطلوب</span
+          >
+          <span *ngIf="emailControl.errors?.['email']"
+            >يرجى إدخال بريد إلكتروني صالح</span
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">كلمة المرور</label>
+        <div class="password-input-container">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            placeholder="أدخل كلمة المرور"
+            [class.is-invalid]="
+              passwordControl.invalid && passwordControl.touched
+            "
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+          >
+            <span class="material-icons">{{
+              showPassword() ? "visibility_off" : "visibility"
+            }}</span>
+          </button>
+        </div>
+        <div
+          class="error-message"
+          *ngIf="passwordControl.invalid && passwordControl.touched"
+        >
+          <span *ngIf="passwordControl.errors?.['required']"
+            >كلمة المرور مطلوبة</span
+          >
+          <span *ngIf="passwordControl.errors?.['minlength']"
+            >يجب أن تتكون كلمة المرور من 6 أحرف على الأقل</span
+          >
+        </div>
+      </div>
+
+      <div class="form-options">
+        <div class="remember-me">
+          <input type="checkbox" id="rememberMe" formControlName="rememberMe" />
+          <label for="rememberMe">تذكرني</label>
+        </div>
+        <a routerLink="/auth/forgot-password" class="forgot-password"
+          >نسيت كلمة المرور؟</a
+        >
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+
+      <button
+        type="submit"
+        class="login-button"
+        [disabled]="loginForm.invalid || isLoading()"
+      >
+        {{ isLoading() ? "جاري تسجيل الدخول..." : "تسجيل الدخول" }}
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>
+        ليس لديك حساب؟ <a routerLink="/contact-admin">اتصل بمسؤول النظام</a>
+      </p>
+    </div>
+  </div>
+</div>
