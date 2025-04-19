@@ -1,0 +1,225 @@
+<!-- Notification -->
+<div
+  *ngIf="notification()"
+  class="notification"
+  [ngClass]="notification()?.type"
+>
+  <span class="material-icons">{{
+    getNotificationIcon(notification()!.type)
+  }}</span>
+  {{ notification()?.message }}
+</div>
+<div class="holidays-header">
+  <h2>العطل الرسمية</h2>
+  <button class="add-btn" (click)="openAddModal()">
+    <span class="material-icons">add</span>
+    إضافة عطلة جديدة
+  </button>
+</div>
+<!-- Filters -->
+<div class="filters">
+  <label for="yearFilter">السنة:</label>
+  <select
+    id="yearFilter"
+    [ngModel]="yearFilter()"
+    (ngModelChange)="onYearFilterChange($event)"
+  >
+    <option [value]="undefined">جميع السنوات</option>
+    <option *ngFor="let year of getYearOptions()" [value]="year">
+      {{ year }}
+    </option>
+  </select>
+
+  <label for="search">البحث:</label>
+  <input
+    id="search"
+    type="text"
+    [ngModel]="searchTerm()"
+    (ngModelChange)="onSearchChange($event)"
+    placeholder="ابحث بالاسم"
+  />
+
+  <button (click)="resetFilters()">جميع العطل الرسمية</button>
+</div>
+
+<!-- Holidays List -->
+<div class="holidays-list">
+  <table *ngIf="filteredHolidays().length > 0; else noHolidays">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>اسم العطلة</th>
+        <th>التاريخ</th>
+        <th>الإجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let holiday of filteredHolidays(); let i = index">
+        <td data-label="المعرف">{{ i + 1 }}</td>
+        <td data-label="اسم العطلة">{{ holiday.vacationName }}</td>
+        <td data-label="التاريخ">{{ formatDate(holiday.vacationDay) }}</td>
+        <td data-label="الإجراءات" class="actions-cell">
+          <button class="edit-btn" (click)="openEditModal(holiday)">
+            <span class="material-icons">edit</span>
+          </button>
+          <button class="delete-btn" (click)="openDeleteModal(holiday)">
+            <span class="material-icons">delete</span>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #noHolidays>
+    <div class="empty-state">
+      <span class="material-icons">event_busy</span>
+      <p>لا توجد عطلات رسمية لعرضها</p>
+    </div>
+  </ng-template>
+</div>
+
+<!-- Add Modal -->
+<div class="modal" *ngIf="isAddModalOpen()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>
+        <span class="material-icons">add_circle</span>
+        إضافة عطلة جديدة
+      </h2>
+      <button class="close-btn" (click)="closeAddModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <form>
+      <div class="form-group">
+        <label for="newName">اسم العطلة:</label>
+        <div class="input-with-icon">
+          <span class="material-icons">event</span>
+          <input
+            id="newName"
+            type="text"
+            [(ngModel)]="newHoliday.vacationName"
+            name主
+            name="newName"
+            required
+            (input)="nameError.set(null)"
+          />
+        </div>
+        <p class="error-message" *ngIf="nameError()">{{ nameError() }}</p>
+      </div>
+
+      <div class="form-group">
+        <label for="newDate">التاريخ:</label>
+        <div class="input-with-icon">
+          <span class="material-icons">calendar_today</span>
+          <input
+            id="newDate"
+            type="date"
+            [(ngModel)]="newHoliday.vacationDay"
+            name="newDate"
+            required
+            (input)="dateError.set(null)"
+          />
+        </div>
+        <p class="error-message" *ngIf="dateError()">{{ dateError() }}</p>
+      </div>
+    </form>
+    <div class="modal-actions">
+      <button class="save-btn" (click)="addHoliday()">
+        <span class="material-icons">save</span>
+        حفظ
+      </button>
+      <button class="cancel-btn" (click)="closeAddModal()">
+        <span class="material-icons">cancel</span>
+        إلغاء
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal" *ngIf="isEditModalOpen()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>
+        <span class="material-icons">edit</span>
+        تعديل العطلة
+      </h2>
+      <button class="close-btn" (click)="closeEditModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <form>
+      <div class="form-group">
+        <label for="editName">اسم العطلة:</label>
+        <div class="input-with-icon">
+          <span class="material-icons">event</span>
+          <input
+            id="editName"
+            type="text"
+            [(ngModel)]="selectedHoliday()!.vacationName"
+            name="editName"
+            required
+            (input)="nameError.set(null)"
+          />
+        </div>
+        <p class="error-message" *ngIf="nameError()">{{ nameError() }}</p>
+      </div>
+
+      <div class="form-group">
+        <label for="editDate">التاريخ:</label>
+        <div class="input-with-icon">
+          <span class="material-icons">calendar_today</span>
+          <input
+            id="editDate"
+            type="date"
+            [(ngModel)]="selectedHoliday()!.vacationDay"
+            name="editDate"
+            required
+            (input)="dateError.set(null)"
+          />
+        </div>
+        <p class="error-message" *ngIf="dateError()">{{ dateError() }}</p>
+      </div>
+    </form>
+    <div class="modal-actions">
+      <button class="save-btn" (click)="updateHoliday()">
+        <span class="material-icons">save</span>
+        حفظ
+      </button>
+      <button class="cancel-btn" (click)="closeEditModal()">
+        <span class="material-icons">cancel</span>
+        إلغاء
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal" *ngIf="isDeleteModalOpen()">
+  <div class="modal-content delete-modal">
+    <div class="modal-header">
+      <h2>
+        <span class="material-icons">warning</span>
+        تأكيد الحذف
+      </h2>
+      <button class="close-btn" (click)="closeDeleteModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <p>
+      هل أنت متأكد من حذف العطلة "{{ selectedHoliday()?.vacationName }}"
+      (المعرف: {{ selectedHoliday()?.id }}) في تاريخ
+      {{ formatDate(selectedHoliday()?.vacationDay || "") }}؟
+    </p>
+    <div class="modal-actions">
+      <button class="delete-btn" (click)="deleteHoliday()">
+        <span class="material-icons">delete</span>
+        نعم
+      </button>
+      <button class="cancel-btn" (click)="closeDeleteModal()">
+        <span class="material-icons">cancel</span>
+        لا
+      </button>
+    </div>
+  </div>
+</div>

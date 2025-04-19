@@ -1,0 +1,158 @@
+<div class="edit-section" *ngIf="addEmployee; else loadingOrError">
+  <h3>تعديل الموظف</h3>
+  <form>
+    <div class="form-group">
+      <label class="required">الاسم</label>
+      <input
+        type="text"
+        [(ngModel)]="addEmployee.name"
+        name="name"
+        required
+        placeholder="أدخل اسم الموظف"
+        #nameInput="ngModel"
+      />
+      <div
+        class="error-message"
+        *ngIf="nameInput?.invalid && nameInput?.touched"
+      >
+        الاسم مطلوب
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="required">البريد الإلكتروني</label>
+      <input
+        type="email"
+        [(ngModel)]="addEmployee.email"
+        name="email"
+        required
+        placeholder="example@company.com"
+        #emailInput="ngModel"
+      />
+      <div
+        class="error-message"
+        *ngIf="emailInput?.invalid && emailInput?.touched"
+      >
+        البريد الإلكتروني مطلوب
+      </div>
+    </div>
+    <!-- <div class="form-group">
+      <label class="required">اسم المستخدم</label>
+      <input
+        type="text"
+        [(ngModel)]="addEmployee.userName"
+        name="userName"
+        required
+        placeholder="أدخل اسم المستخدم"
+        #userNameInput="ngModel"
+      />
+      <div
+        class="error-message"
+        *ngIf="userNameInput?.invalid && userNameInput?.touched"
+      >
+        اسم المستخدم مطلوب
+      </div>
+    </div> -->
+    <div class="form-group">
+      <label class="required">الراتب</label>
+      <input
+        type="number"
+        [(ngModel)]="addEmployee.baseSalary"
+        name="salary"
+        required
+        placeholder="أدخل الراتب"
+        #salaryInput="ngModel"
+      />
+      <div
+        class="error-message"
+        *ngIf="salaryInput?.invalid && salaryInput?.touched"
+      >
+        الراتب مطلوب
+      </div>
+    </div>
+    <div class="form-group">
+      <label>رقم الهاتف</label>
+      <input
+        type="text"
+        [(ngModel)]="addEmployee.phoneNumber"
+        name="phoneNumber"
+        placeholder="أدخل رقم الهاتف"
+      />
+    </div>
+    <div class="form-group">
+      <label>العنوان</label>
+      <input
+        type="text"
+        [(ngModel)]="addEmployee.address"
+        name="address"
+        placeholder="أدخل العنوان"
+      />
+    </div>
+    <div class="form-group">
+      <label>الرقم الوطني</label>
+      <input
+        type="text"
+        [(ngModel)]="addEmployee.nationalId"
+        name="nationalId"
+        placeholder="أدخل الرقم الوطني"
+      />
+    </div>
+    <div class="form-group">
+      <label for="branch">الفرع</label>
+      <select
+        id="branch"
+        [(ngModel)]="addEmployee.branchId"
+        name="branch"
+      >
+        <option value="" disabled>اختر الفرع</option>
+        <option *ngFor="let branch of branches" [value]="branch.id">
+          {{ branch.name }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>الجنس</label>
+      <select [(ngModel)]="addEmployee.gender" name="gender">
+        <option value="" disabled>اختر الجنس</option>
+        <option value="Male">ذكر</option>
+        <option value="Female">أنثى</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>تاريخ بدء العمل</label>
+      <input
+        type="date"
+        [(ngModel)]="addEmployee.hiringDate"
+        name="dateOfWork"
+      />
+    </div>
+    <div class="form-group">
+      <label>تاريخ الميلاد</label>
+      <input
+        type="date"
+        [(ngModel)]="addEmployee.dateOfBarth"
+        name="dateOfBirth"
+      />
+    </div>
+    <div class="form-actions">
+      <button type="button" (click)="saveaddEmployee()">حفظ</button>
+      <button type="button" (click)="cancelEdit()">إلغاء</button>
+    </div>
+  </form>
+
+  <!-- Notification -->
+  <div class="notification" *ngIf="notification" [ngClass]="notification.type">
+    <p>{{ notification.message }}</p>
+  </div>
+</div>
+
+<ng-template #loadingOrError>
+  <div class="loading-error" *ngIf="errorMessage; else loading">
+    <p>{{ errorMessage }}</p>
+    <button class="back-btn" (click)="cancelEdit()">رجوع</button>
+  </div>
+  <ng-template #loading>
+    <div class="loading">
+      <p>جاري تحميل بيانات الموظف...</p>
+    </div>
+  </ng-template>
+</ng-template>

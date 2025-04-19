@@ -1,0 +1,52 @@
+<div class="role-select-container">
+  <div class="role-select-card">
+    <div class="card-header">
+      <img src="balsm.png" alt="balsm" class="logo" />
+      <h1 class="title">اختر نوع الحساب</h1>
+      <p class="subtitle">
+        لديك صلاحيات متعددة، يرجى اختيار نوع الحساب الذي ترغب في استخدامه
+      </p>
+    </div>
+
+    <div class="role-options">
+      <div
+        class="role-option"
+        *ngIf="authService.isAdmin()"
+        (click)="selectRole('admin')"
+      >
+        <div class="role-icon">
+          <span class="material-icons">admin_panel_settings</span>
+        </div>
+        <div class="role-details">
+          <h2 class="role-title">مدير النظام</h2>
+          <p class="role-description">
+            الوصول إلى لوحة تحكم المدير وإدارة النظام
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="role-option"
+        *ngIf="authService.isEmployee()"
+        (click)="selectRole('employee')"
+      >
+        <div class="role-icon">
+          <span class="material-icons">person</span>
+        </div>
+        <div class="role-details">
+          <h2 class="role-title">موظف</h2>
+          <p class="role-description">
+            الوصول إلى لوحة تحكم الموظف وإدارة ملفك الشخصي
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <button class="logout-button" (click)="authService.logout()">
+        <span class="material-icons">logout</span>
+        تسجيل الخروج
+      </button>
+    </div>
+  </div>
+</div>

@@ -50,7 +50,6 @@ export class LoginComponent {
   togglePasswordVisibility() {
     this.showPassword.update((current) => !current);
   }
-
   onSubmit() {
     if (this.loginForm.invalid) return;
 
@@ -66,16 +65,32 @@ export class LoginComponent {
       .pipe(
         exhaustMap(() =>
           this.authService.login(email, password).pipe(
-            tap((result) => {
-              this.isLoading.set(false); // Reset on success
-              this.router.navigate(['/']);
+            tap(() => {
+              this.isLoading.set(false);
+              const roles = this.authService.getRoles();
+              const isAdmin = this.authService.isAdmin();
+              const isEmployee = this.authService.isEmployee();
+
+              if (isAdmin && !isEmployee) {
+                // Admin only
+                this.router.navigate(['/app']);
+              } else if (isEmployee && !isAdmin) {
+                // User/Employee only
+                this.router.navigate(['/app/userDashboard']);
+              } else if (isAdmin && isEmployee) {
+                // Both roles
+                this.router.navigate(['/app/role-select']);
+              } else {
+                // Fallback (shouldn’t happen with default 'User')
+                this.router.navigate(['/app']);
+              }
             })
           )
         )
       )
       .subscribe({
         error: (err) => {
-          this.isLoading.set(false); // Reset on error
+          this.isLoading.set(false);
           this.errorMessage.set(
             'فشل تسجيل الدخول. تحقق من بياناتك وحاول مرة أخرى.'
           );

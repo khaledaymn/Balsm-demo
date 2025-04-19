@@ -1,0 +1,114 @@
+<div class="shifts-container">
+  <header class="shifts-header">
+    <h1>مناوبات الموظفين</h1>
+    <div class="header-actions">
+      <button
+        class="refresh-btn"
+        (click)="refreshShifts()"
+        [disabled]="isLoading"
+      >
+        <span class="material-icons">refresh</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="shifts-content">
+    <div *ngIf="isLoading" class="loading">Loading...</div>
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+    <div class="employees-list" *ngIf="!isLoading && !errorMessage">
+      <div class="employee-row" *ngFor="let employee of employees">
+        <div class="employee-info">
+          <div class="employee-avatar">
+            {{ employee.name?.charAt(0) || "" }}
+          </div>
+          <span class="employee-name">{{ employee.name }}</span>
+        </div>
+
+        <div class="shifts-timeline">
+          <div
+            *ngFor="let shift of employee.shift"
+            [class]="'shift-block ' + getShiftClass(shift.startTime)"
+          >
+            <span class="shift-time"
+              >{{ shift.startTime }} - {{ shift.endTime }}</span
+            >
+            <button
+              class="delete-shift-btn"
+              (click)="startDeleteShift(employee.id, shift)"
+              [disabled]="isLoading"
+            >
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+
+          <!-- Inline Add Shift Form -->
+          <div
+            class="add-shift-form"
+            *ngIf="addingShiftForEmployeeId === employee.id"
+          >
+            <input
+              type="text"
+              [(ngModel)]="newShiftStartTime"
+              placeholder="Start Time (HH:MM)"
+              class="time-input"
+            />
+            <input
+              type="text"
+              [(ngModel)]="newShiftEndTime"
+              placeholder="End Time (HH:MM)"
+              class="time-input"
+            />
+            <button
+              class="save-btn"
+              (click)="addShift(employee.id)"
+              [disabled]="isLoading"
+            >
+              حفظ
+            </button>
+            <button
+              class="cancel-btn"
+              (click)="cancelAddShift()"
+              [disabled]="isLoading"
+            >
+              الغاء
+            </button>
+          </div>
+
+          <!-- Add Shift Button (shown when not adding) -->
+          <button
+            class="add-shift-btn"
+            (click)="startAddShift(employee.id)"
+            [disabled]="isLoading || addingShiftForEmployeeId"
+          >
+            <span class="material-icons">add</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Overlay -->
+    <div class="delete-confirmation" *ngIf="deletingShift">
+      <div class="confirmation-box">
+        <p>
+          هل انت متاكد من حذف فترة العمل {{ deletingShift.shift.startTime }} الي
+          {{ deletingShift.shift.endTime }}؟
+        </p>
+        <button
+          class="confirm-btn"
+          (click)="confirmDeleteShift()"
+          [disabled]="isLoading"
+        >
+          نعم
+        </button>
+        <button
+          class="cancel-btn"
+          (click)="cancelDeleteShift()"
+          [disabled]="isLoading"
+        >
+          لا
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

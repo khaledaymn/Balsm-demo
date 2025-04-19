@@ -1,88 +1,63 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  ReactiveFormsModule,
   FormBuilder,
   FormGroup,
   Validators,
-  FormControl,
+  ReactiveFormsModule,
 } from '@angular/forms';
-import { Router } from '@angular/router';
-import { inject } from '@angular/core';
-import { exhaustMap, tap } from 'rxjs/operators';
-import { of } from 'rxjs';
-
-// Assuming a service to handle forgot password requests
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-
-// Define a typed interface for the form
-interface ForgotPasswordForm {
-  email: FormControl<string | null>;
-}
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
 })
 export class ForgotPasswordComponent {
-  forgotPasswordForm: FormGroup<ForgotPasswordForm>;
-  isLoading = signal(false);
-  isSubmitted = signal(false);
-  errorMessage = signal<string>('');
-  successMessage = signal(
-    'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني!'
-  );
+  forgotPasswordForm: FormGroup;
+  isSubmitted = false;
+  isLoading = false;
+  errorMessage = '';
+  successMessage = '';
 
-  private fb = inject(FormBuilder);
-  private authService = inject(AuthService); // Using AuthService for password reset
-  private router = inject(Router);
-
-  constructor() {
-    this.forgotPasswordForm = this.fb.group<ForgotPasswordForm>({
-      email: this.fb.control('', [Validators.required, Validators.email]),
+  constructor(
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private authService: AuthService // ضيف الـ Service هنا
+  ) {
+    this.forgotPasswordForm = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]],
     });
   }
 
   onSubmit() {
-    if (this.forgotPasswordForm.invalid) return;
+    if (this.forgotPasswordForm.valid) {
+      this.isLoading = true;
+      this.errorMessage = '';
+      this.successMessage = '';
 
-    this.isLoading.set(true);
-    this.errorMessage.set('');
+      const email = this.forgotPasswordForm.get('email')?.value;
 
-    const { email } = this.forgotPasswordForm.value as { email: string };
-
-    of(null)
-      .pipe(
-        exhaustMap(() =>
-          this.authService.requestPasswordReset(email).pipe(
-            tap(() => {
-              this.isLoading.set(false);
-              this.isSubmitted.set(true);
-              this.forgotPasswordForm.reset();
-            })
-          )
-        )
-      )
-      .subscribe({
+      this.authService.forgotPassword(email).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          this.isSubmitted = true;
+          this.successMessage =
+            'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني';
+          // this.successMessage = response.message || 'تم إرسال الرابط بنجاح';
+        },
         error: (err) => {
-          this.isLoading.set(false);
-          this.errorMessage.set(
-            'فشل إرسال الرابط. تحقق من البريد الإلكتروني وحاول مرة أخرى.'
-          );
-          console.error('Password reset error:', err);
+          this.isLoading = false;
+          this.errorMessage = err.error?.message || 'حدث خطأ، حاول مرة أخرى';
         },
       });
+    }
   }
 
   backToLogin() {
-    this.router.navigate(['/auth/login']);
-  }
-
-  // Getter for template access
-  get emailControl(): FormControl<string | null> {
-    return this.forgotPasswordForm.controls.email;
+    this.router.navigate(['/login']);
   }
 }

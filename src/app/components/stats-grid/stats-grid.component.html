@@ -1,0 +1,25 @@
+<div class="stats-grid">
+  <div
+    *ngFor="let stat of stats"
+    class="stat-card"
+    [style.--card-color]="stat.color"
+  >
+    <div class="stat-icon">
+      <span class="material-icons">{{ stat.icon }}</span>
+    </div>
+    <div class="stat-content">
+      <h3 class="stat-title">{{ stat.title }}</h3>
+      <div class="stat-value">{{ stat.value }}</div>
+      <div
+        class="stat-change"
+        [class.positive]="stat.change > 0"
+        [class.negative]="stat.change < 0"
+      >
+        <span class="material-icons">
+          {{ stat.change > 0 ? "arrow_upward" : "arrow_downward" }}
+        </span>
+        {{ stat.change > 0 ? "+" + stat.change : stat.change }}
+      </div>
+    </div>
+  </div>
+</div>

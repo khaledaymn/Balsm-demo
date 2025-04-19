@@ -1,0 +1,54 @@
+<div class="attendance-tracker">
+  <div class="time-display">
+    <h2>الوقت الحالي: {{ formatTime(currentTime) }}</h2>
+    <p *ngIf="workPeriod.name">
+      فترة العمل: {{ workPeriod.name }} ({{ workPeriod.start }} -
+      {{ workPeriod.end }})
+    </p>
+    <p *ngIf="isLoadingPeriod">جاري تحميل فترة العمل...</p>
+  </div>
+
+  <div class="status" [ngClass]="{ error: status.errorMessage }">
+    <p *ngIf="status.isWithinLocation">
+      شكرا لوجودك معنا في {{ status.locationName }}
+    </p>
+    <p *ngIf="!status.isWithinLocation && !status.errorMessage">
+      أنت خارج موقع العمل المسموح
+    </p>
+    <p *ngIf="status.errorMessage">{{ status.errorMessage }}</p>
+  </div>
+
+  <div class="actions">
+    <button
+      [disabled]="isCheckedIn || isGettingLocation"
+      (click)="checkIn()"
+      class="check-in-btn"
+    >
+      <span class="material-icons">login</span>
+      تسجيل الحضور
+    </button>
+    <button
+      [disabled]="!isCheckedIn || isGettingLocation"
+      (click)="checkOut()"
+      class="check-out-btn"
+    >
+      <span class="material-icons">logout</span>
+      تسجيل المغادرة
+    </button>
+  </div>
+
+  <div class="attendance-info" *ngIf="checkInTime">
+    <p>وقت الحضور: {{ checkInTime ? formatTime(checkInTime) : "-" }}</p>
+    <p>وقت الخروج: {{ checkOutTime ? formatTime(checkOutTime) : "-" }}</p>
+    <p>ساعات العمل: {{ workHours }}</p>
+  </div>
+
+  <div class="loading" *ngIf="isGettingLocation">
+    <p>جاري تحديد الموقع...</p>
+  </div>
+
+  <!-- Notification Area -->
+  <div class="notification" *ngIf="notification" [ngClass]="notification.type">
+    <p>{{ notification.message }}</p>
+  </div>
+</div>

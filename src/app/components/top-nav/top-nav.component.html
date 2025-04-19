@@ -1,0 +1,21 @@
+<div class="top-nav-container">
+  <nav class="top-nav">
+    <ul class="nav-list">
+      <li class="nav-item" routerLinkActive="active">
+        <a [routerLink]="['/dashboard']" class="nav-link">الملف الشخصي</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a [routerLink]="['/salary-details']" class="nav-link">الراتب</a>
+      </li>
+      <li class="nav-item" routerLinkActive="active">
+        <a [routerLink]="['/leave-details', 'leaves']" class="nav-link"
+          >الإجازات</a
+        >
+      </li>
+    </ul>
+  </nav>
+
+  <div class="attendance-container">
+    <!-- <app-attendance-tracker></app-attendance-tracker> -->
+  </div>
+</div>

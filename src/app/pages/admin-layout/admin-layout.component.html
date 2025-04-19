@@ -1,0 +1,41 @@
+<!-- <div class="admin-container">
+  <app-admin-sidebar
+    [collapsed]="collapsed"
+    [isMobile]="isMobile"
+    (toggleSidebar)="toggleSidebar()"
+  ></app-admin-sidebar>
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+</div> -->
+<div
+  class="admin-layout"
+  [class.sidebar-collapsed]="collapsed"
+  [class.mobile]="isMobile"
+>
+  <!-- Sidebar with content projection for additional components -->
+  <app-admin-sidebar
+    [collapsed]="collapsed"
+    [isMobile]="isMobile"
+    (toggleSidebar)="toggleSidebar()"
+  >
+    <!-- Additional components can be placed here -->
+    <div class="sidebar-custom-content">
+      <!-- This content will be projected into the sidebar -->
+    </div>
+  </app-admin-sidebar>
+
+  <!-- Overlay for mobile -->
+  <div
+    *ngIf="isMobile && !collapsed"
+    class="sidebar-overlay"
+    (click)="toggleSidebar()"
+  ></div>
+
+  <!-- Main content -->
+  <div class="admin-content" [class.sidebar-collapsed]="collapsed">
+    <main class="admin-main">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

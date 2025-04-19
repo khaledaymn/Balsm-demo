@@ -1,0 +1,154 @@
+<div class="employee-list-container">
+  <div class="print-header">
+    <div class="print-title">قائمة الموظفين</div>
+    <div class="print-date">تاريخ الطباعة: {{ getCurrentDate() }}</div>
+    <div class="print-time">وقت الطباعة: {{ getCurrentTime() }}</div>
+  </div>
+
+  <div class="list-header">
+    <h2 class="section-title">قائمة الموظفين</h2>
+    <div class="header-actions">
+      <button
+        class="export-btn"
+        (click)="exportToExcel()"
+        title="تصدير إلى Excel"
+      >
+        <span class="material-icons">file_download</span>
+        تصدير Excel
+      </button>
+      <button
+        class="print-btn"
+        (click)="printEmployeeList()"
+        title="طباعة القائمة"
+      >
+        <span class="material-icons">print</span>
+        طباعة
+      </button>
+      <a routerLink="/app/admin/add-employee" routerLinkActive="active">
+        <button class="add-employee-btn">
+          <span class="material-icons">person_add</span>
+          إضافة موظف
+        </button>
+      </a>
+    </div>
+  </div>
+
+  <div class="filters-container">
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+        placeholder="بحث عن موظف..."
+      />
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="employees-table">
+      <thead>
+        <tr>
+          <th (click)="sortBy('name')">
+            الاسم
+            <span class="sort-icon" *ngIf="sortField === 'name'">
+              <span class="material-icons">{{
+                sortDirection === "asc" ? "arrow_upward" : "arrow_downward"
+              }}</span>
+            </span>
+          </th>
+          <th (click)="sortBy('email')">
+            البريد الإلكتروني
+            <span class="sort-icon" *ngIf="sortField === 'email'">
+              <span class="material-icons">{{
+                sortDirection === "asc" ? "arrow_upward" : "arrow_downward"
+              }}</span>
+            </span>
+          </th>
+          <th (click)="sortBy('baseSalary')">
+            الراتب
+            <span class="sort-icon" *ngIf="sortField === 'baseSalary'">
+              <span class="material-icons">{{
+                sortDirection === "asc" ? "arrow_upward" : "arrow_downward"
+              }}</span>
+            </span>
+          </th>
+          <th class="print-hide">التفاصيل</th>
+          <th class="print-hide">التعديل</th>
+          <th class="print-hide">الحذف</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let employee of filteredEmployees">
+          <td class="employee-name">
+            <div class="employee-avatar">
+              {{ employee.name?.charAt(0) || "" }}
+            </div>
+            <div>{{ employee.name || "" }}</div>
+          </td>
+          <td data-label="البريد الإلكتروني">{{ employee.email || "" }}</td>
+          <td data-label="الراتب" class="salary-cell">
+            {{ employee.baseSalary ?? 0 }} ريال
+          </td>
+          <td class="action-cell print-hide">
+            <a
+              [routerLink]="['/app/admin/employee-details', employee.id]"
+              routerLinkActive="active"
+            >
+              <button class="action-btn details-btn" title="التفاصيل">
+                <span class="material-icons">visibility</span>
+              </button>
+            </a>
+          </td>
+          <td class="action-cell print-hide">
+            <a
+              Bue
+              [routerLink]="['/app/admin/edit-employee', employee.id]"
+              routerLinkActive="active"
+            >
+              <button class="action-btn edit-btn" title="تعديل">
+                <span class="material-icons">edit</span>
+              </button>
+            </a>
+          </td>
+          <td class="action-cell print-hide">
+            <button
+              class="action-btn delete-btn"
+              (click)="deleteEmployee(employee)"
+              title="حذف"
+            >
+              <span class="material-icons">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" *ngIf="notification" [ngClass]="notification.type">
+    <p>{{ notification.message }}</p>
+  </div>
+
+  <!-- Confirmation Box -->
+  <div class="confirmation-box" *ngIf="employeeToDelete">
+    <div class="confirmation-content">
+      <p>هل أنت متأكد من حذف الموظف {{ employeeToDelete.name }}؟</p>
+      <div class="confirmation-actions">
+        <button class="confirm-btn" (click)="confirmDelete()">نعم</button>
+        <button class="cancel-btn" (click)="cancelDelete()">لا</button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="empty-state"
+    *ngIf="filteredEmployees && filteredEmployees.length === 0"
+  >
+    <span class="material-icons">search_off</span>
+    <p>لم يتم العثور على موظفين مطابقين لمعايير البحث</p>
+    <button class="reset-btn" (click)="resetFilters()">
+      إعادة ضبط الفلاتر
+    </button>
+  </div>
+</div>

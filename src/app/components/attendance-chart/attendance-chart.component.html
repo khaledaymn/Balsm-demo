@@ -1,0 +1,23 @@
+<!-- <div class="chart-container">
+  <canvas
+    #attendanceChartCanvas
+    id="attendanceChart"
+    *ngIf="!isDataEmpty"
+  ></canvas>
+  <div class="no-data-message" *ngIf="isDataEmpty">
+    لا توجد بيانات حضور متاحة حاليًا
+  </div>
+</div> -->
+<div class="chart-container">
+  <canvas
+    #attendanceChartCanvas
+    id="attendanceChart"
+    *ngIf="!isDataEmpty && !errorMessage"
+  ></canvas>
+  <div class="no-data-message" *ngIf="isDataEmpty && !errorMessage">
+    لا توجد بيانات حضور متاحة حاليًا
+  </div>
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+</div>

@@ -1,0 +1,314 @@
+<div class="add-employee-container">
+  <h2>إضافة موظف جديد</h2>
+
+  <form (ngSubmit)="addEmployee()">
+    <!-- Name -->
+    <div class="form-group">
+      <label for="name" class="form-label"
+        >الاسم <span class="required">*</span></label
+      >
+      <input
+        type="text"
+        id="name"
+        [(ngModel)]="newEmployee.name"
+        name="name"
+        placeholder="أدخل الاسم"
+        class="form-control"
+        [class.is-invalid]="submitted && (!newEmployee.name || !isNameUnique)"
+        required
+        aria-describedby="nameError"
+      />
+      <div id="nameError" class="invalid-feedback" *ngIf="submitted">
+        <div *ngIf="!newEmployee.name">الاسم مطلوب</div>
+        <div *ngIf="newEmployee.name && !isNameUnique">الاسم مستخدم بالفعل</div>
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label for="email" class="form-label"
+        >البريد الإلكتروني <span class="required">*</span></label
+      >
+      <input
+        type="email"
+        id="email"
+        [(ngModel)]="newEmployee.email"
+        name="email"
+        placeholder="أدخل البريد الإلكتروني"
+        class="form-control"
+        [class.is-invalid]="submitted && (!isEmailValid() || !isEmailUnique)"
+        required
+        aria-describedby="emailError"
+      />
+      <div id="emailError" class="invalid-feedback" *ngIf="submitted">
+        <div *ngIf="!isEmailValid()">يجب أن يكون بريدًا إلكترونيًا صالحًا</div>
+        <div *ngIf="isEmailValid() && !isEmailUnique">
+          البريد الإلكتروني مستخدم بالفعل
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone Number -->
+    <div class="form-group">
+      <label for="phoneNumber" class="form-label"
+        >رقم الهاتف <span class="required">*</span></label
+      >
+      <input
+        type="text"
+        id="phoneNumber"
+        [(ngModel)]="newEmployee.phoneNumber"
+        name="phoneNumber"
+        placeholder="+1234567890"
+        class="form-control"
+        [class.is-invalid]="submitted && !isPhoneNumberValid()"
+        required
+        aria-describedby="phoneError"
+      />
+      <div
+        id="phoneError"
+        class="invalid-feedback"
+        *ngIf="submitted && !isPhoneNumberValid()"
+      >
+        يجب أن يبدأ رقم الهاتف بـ + ويحتوي على 10-14 أرقام
+      </div>
+    </div>
+
+    <!-- Address -->
+    <div class="form-group">
+      <label for="address" class="form-label"
+        >العنوان <span class="required">*</span></label
+      >
+      <input
+        type="text"
+        id="address"
+        [(ngModel)]="newEmployee.address"
+        name="address"
+        placeholder="أدخل العنوان"
+        class="form-control"
+        [class.is-invalid]="submitted && !isAddressValid()"
+        required
+        aria-describedby="addressError"
+      />
+      <div
+        id="addressError"
+        class="invalid-feedback"
+        *ngIf="submitted && !isAddressValid()"
+      >
+        العنوان يجب أن يحتوي على 3 أحرف على الأقل
+      </div>
+    </div>
+
+    <!-- National ID -->
+    <div class="form-group">
+      <label for="nationalId" class="form-label"
+        >الرقم القومي <span class="required">*</span></label
+      >
+      <input
+        type="text"
+        id="nationalId"
+        [(ngModel)]="newEmployee.nationalId"
+        name="nationalId"
+        placeholder="أدخل الرقم القومي"
+        class="form-control"
+        [class.is-invalid]="submitted && !isNationalIdValid()"
+        required
+        aria-describedby="nationalIdError"
+      />
+      <div
+        id="nationalIdError"
+        class="invalid-feedback"
+        *ngIf="submitted && !isNationalIdValid()"
+      >
+        الرقم القومي يجب أن يكون 14 رقمًا
+      </div>
+    </div>
+
+    <!-- Base Salary -->
+    <div class="form-group">
+      <label for="baseSalary" class="form-label"
+        >الراتب <span class="required">*</span></label
+      >
+      <input
+        type="number"
+        id="baseSalary"
+        [(ngModel)]="newEmployee.baseSalary"
+        name="baseSalary"
+        placeholder="أدخل الراتب"
+        class="form-control"
+        [class.is-invalid]="submitted && newEmployee.baseSalary <= 0"
+        required
+        aria-describedby="salaryError"
+      />
+      <div
+        id="salaryError"
+        class="invalid-feedback"
+        *ngIf="submitted && newEmployee.baseSalary <= 0"
+      >
+        الراتب يجب أن يكون أكبر من 0
+      </div>
+    </div>
+
+    <!-- Branch -->
+    <div class="form-group">
+      <label for="branchSelect" class="form-label"
+        >الفرع <span class="required">*</span></label
+      >
+      <select
+        id="branchSelect"
+        [(ngModel)]="newEmployee.branchId"
+        name="branchSelect"
+        class="form-control"
+        [class.is-invalid]="submitted && !isBranchValid()"
+        (ngModelChange)="onBranchChange($event)"
+        required
+        aria-describedby="branchError branchHelp"
+        [disabled]="isLoadingBranches"
+      >
+        <option value="0" disabled>اختر الفرع</option>
+        <option *ngFor="let branch of branches" [ngValue]="branch.id">
+          {{ branch.name }}
+        </option>
+      </select>
+      <div *ngIf="isLoadingBranches" class="loading-spinner" role="status">
+        <span class="visually-hidden">جارٍ التحميل...</span>
+      </div>
+      <div
+        id="branchError"
+        class="invalid-feedback"
+        *ngIf="submitted && !isBranchValid()"
+      >
+        يرجى اختيار فرع صالح
+      </div>
+      <small id="branchHelp" class="form-text text-muted">
+        اختر الفرع الذي سيعمل به الموظف
+      </small>
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label for="password" class="form-label"
+        >كلمة المرور <span class="required">*</span></label
+      >
+      <input
+        type="password"
+        id="password"
+        [(ngModel)]="newEmployee.password"
+        name="password"
+        placeholder="أدخل كلمة المرور"
+        class="form-control"
+        [class.is-invalid]="submitted && !isPasswordValid()"
+        required
+        aria-describedby="passwordError"
+      />
+      <div
+        id="passwordError"
+        class="invalid-feedback"
+        *ngIf="submitted && !isPasswordValid()"
+      >
+        كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل، حرف، رقم، ورمز خاص
+      </div>
+    </div>
+
+    <!-- Gender -->
+    <div class="form-group">
+      <label for="gender" class="form-label"
+        >الجنس <span class="required">*</span></label
+      >
+      <select
+        id="gender"
+        [(ngModel)]="newEmployee.gender"
+        name="gender"
+        class="form-control"
+        [class.is-invalid]="
+          submitted && !['male', 'female'].includes(newEmployee.gender)
+        "
+        required
+        aria-describedby="genderError"
+      >
+        <option value="" disabled>اختر الجنس</option>
+        <option value="male">ذكر</option>
+        <option value="female">أنثى</option>
+      </select>
+      <div
+        id="genderError"
+        class="invalid-feedback"
+        *ngIf="submitted && !['male', 'female'].includes(newEmployee.gender)"
+      >
+        يجب اختيار جنس صالح
+      </div>
+    </div>
+
+    <!-- Date of Barth -->
+    <div class="form-group">
+      <label for="dateOfBarth" class="form-label"
+        >تاريخ الميلاد <span class="required">*</span></label
+      >
+      <input
+        type="date"
+        id="dateOfBarth"
+        [(ngModel)]="newEmployee.dateOfBarth"
+        name="dateOfBarth"
+        class="form-control"
+        [class.is-invalid]="
+          submitted &&
+          (!newEmployee.dateOfBarth ||
+            !isDateOfBarthValid() ||
+            !isDateOrderValid())
+        "
+        required
+        aria-describedby="dateOfBarthError"
+      />
+      <div id="dateOfBarthError" class="invalid-feedback" *ngIf="submitted">
+        <div *ngIf="!newEmployee.dateOfBarth">تاريخ الميلاد مطلوب</div>
+        <div *ngIf="newEmployee.dateOfBarth && !isDateOfBarthValid()">
+          تاريخ الميلاد يجب أن يكون بعد 1900
+        </div>
+        <div
+          *ngIf="
+            newEmployee.dateOfBarth &&
+            isDateOfBarthValid() &&
+            !isDateOrderValid()
+          "
+        >
+          تاريخ الميلاد يجب أن يكون قبل تاريخ العمل
+        </div>
+      </div>
+    </div>
+
+    <!-- Hiring Date -->
+    <div class="form-group">
+      <label for="hiringDate" class="form-label"
+        >تاريخ بدء العمل <span class="required">*</span></label
+      >
+      <input
+        type="date"
+        id="hiringDate"
+        [(ngModel)]="newEmployee.hiringDate"
+        name="hiringDate"
+        class="form-control"
+        [class.is-invalid]="
+          submitted && (!newEmployee.hiringDate || !isDateOrderValid())
+        "
+        required
+        aria-describedby="hiringDateError"
+      />
+      <div id="hiringDateError" class="invalid-feedback" *ngIf="submitted">
+        <div *ngIf="!newEmployee.hiringDate">تاريخ بدء العمل مطلوب</div>
+        <div *ngIf="newEmployee.hiringDate && !isDateOrderValid()">
+          تاريخ العمل يجب أن يكون بعد تاريخ الميلاد
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button type="submit" [disabled]="isLoadingBranches">إضافة الموظف</button>
+      <button type="button" (click)="cancelAdd()">إلغاء</button>
+    </div>
+  </form>
+
+  <!-- Notification -->
+  <div class="notification" *ngIf="notification" [ngClass]="notification.type">
+    {{ notification.message }}
+  </div>
+</div>

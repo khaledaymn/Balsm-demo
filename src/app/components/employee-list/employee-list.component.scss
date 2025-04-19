@@ -1,0 +1,729 @@
+// Variables
+$primary-color: #008D7F;
+$primary-light: rgba($primary-color, 0.1);
+$secondary-color: #2D3748;
+$accent-color: #FFC107;
+$success-color: #4CAF50;
+$success-light: rgba($success-color, 0.1);
+$info-color: #2196F3;
+$info-light: rgba($info-color, 0.1);
+$warning-color: #FF9800;
+$warning-light: rgba($warning-color, 0.1);
+$danger-color: #F44336;
+$danger-light: rgba($danger-color, 0.1);
+$text-primary: #333333;
+$text-secondary: #666666;
+$text-light: #999999;
+$border-color: #E5E9F2;
+$background-color: #F8F9FC;
+$card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+$transition: all 0.3s ease;
+$border-radius: 8px;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin button-style($bg-color, $text-color: white) {
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  border-radius: $border-radius;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: $transition;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 5px rgba(darken($bg-color, 20%), 0.2);
+
+  &:hover {
+    background-color: darken($bg-color, 5%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(darken($bg-color, 20%), 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(darken($bg-color, 20%), 0.2);
+  }
+
+  .material-icons {
+    font-size: 1.1rem;
+  }
+}
+
+// Main container
+.employee-list-container {
+  direction: rtl;
+  padding: 2rem;
+  background-color: white;
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
+  max-width: 1200px;
+  margin: 2rem auto;
+  position: relative;
+  overflow: hidden;
+  @media print {
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+  // Print header
+  .print-header {
+    display: none;
+
+    @media print {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      // margin: 0 !important;
+      padding: 10px 0 !important;
+      border-bottom: 1px solid $border-color !important;
+    }
+
+    .print-title {
+      font-size: 14pt !important;
+      font-weight: bold !important;
+      color: $text-primary !important;
+    }
+
+    .print-date,
+    .print-time {
+      font-size: 10pt !important;
+      color: $text-secondary !important;
+    }
+  }
+
+  // List header
+  .list-header {
+    @include flex-between;
+    // margin-bottom: 2rem;
+    // padding-bottom: 1.5rem;
+    // border-bottom: 1px solid $border-color;
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: $text-primary;
+      position: relative;
+      padding-right: 1rem;
+
+      &:before {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 1.5rem;
+        background-color: $primary-color;
+        border-radius: 2px;
+      }
+      @media print {
+        display: none;
+
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .export-btn {
+        @include button-style($success-color);
+      }
+
+      .print-btn {
+        @include button-style($info-color);
+      }
+
+      .add-employee-btn {
+        @include button-style($primary-color);
+      }
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+  }
+
+  // Filters container
+  .filters-container {
+    margin-bottom: 1.5rem;
+
+    .search-box {
+      position: relative;
+      max-width: 500px;
+
+      .material-icons {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: $text-secondary;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.875rem 2.5rem 0.875rem 1rem;
+        border: 1px solid $border-color;
+        border-radius: $border-radius;
+        font-size: 0.95rem;
+        transition: $transition;
+        background-color: $background-color;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+          background-color: white;
+        }
+
+        &::placeholder {
+          color: $text-light;
+        }
+      }
+    }
+  }
+
+  // Table styles
+  .table-responsive {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+    border-radius: $border-radius;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $background-color;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba($text-secondary, 0.3);
+      border-radius: 3px;
+
+      &:hover {
+        background-color: rgba($text-secondary, 0.5);
+      }
+    }
+
+    .employees-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+
+      th,
+      td {
+        padding: 1rem 1.25rem;
+        text-align: right;
+      }
+
+      th {
+        background-color: $background-color;
+        color: $text-primary;
+        font-weight: 600;
+        font-size: 0.95rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        cursor: pointer;
+        transition: $transition;
+        white-space: nowrap;
+
+        &:hover {
+          background-color: darken($background-color, 3%);
+          color: $primary-color;
+        }
+
+        &:first-child {
+          border-top-right-radius: $border-radius;
+        }
+
+        &:last-child {
+          border-top-left-radius: $border-radius;
+        }
+
+        .sort-icon {
+          display: inline-flex;
+          margin-right: 0.5rem;
+          vertical-align: middle;
+
+          .material-icons {
+            font-size: 1.1rem;
+            color: $primary-color;
+          }
+        }
+      }
+
+      tbody {
+        tr {
+          transition: $transition;
+
+          &:nth-child(even) {
+            background-color: rgba($background-color, 0.5);
+          }
+
+          &:hover {
+            background-color: rgba($primary-color, 0.05);
+          }
+
+          &:last-child {
+            td:first-child {
+              border-bottom-right-radius: $border-radius;
+            }
+
+            td:last-child {
+              border-bottom-left-radius: $border-radius;
+            }
+          }
+        }
+      }
+
+      td {
+        border-bottom: 1px solid $border-color;
+        font-size: 0.95rem;
+        color: $text-primary;
+
+        &.employee-name {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-weight: 500;
+
+          .employee-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: $primary-light;
+            color: $primary-color;
+            @include flex-center;
+            font-weight: 600;
+            font-size: 1rem;
+            flex-shrink: 0;
+          }
+        }
+
+        &.salary-cell {
+          font-weight: 500;
+          color: $primary-color;
+        }
+
+        &.action-cell {
+          white-space: nowrap;
+
+          .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            transition: $transition;
+            @include flex-center;
+
+            .material-icons {
+              font-size: 1.1rem;
+            }
+
+            &.details-btn {
+              color: $info-color;
+
+              &:hover {
+                background-color: $info-light;
+              }
+            }
+
+            &.edit-btn {
+              color: $warning-color;
+
+              &:hover {
+                background-color: $warning-light;
+              }
+            }
+
+            &.delete-btn {
+              color: $danger-color;
+
+              &:hover {
+                background-color: $danger-light;
+              }
+            }
+          }
+        }
+      }
+
+      @media (max-width: 992px) {
+        th,
+        td {
+          padding: 0.875rem 1rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        thead {
+          display: none;
+        }
+
+        tbody {
+          tr {
+            display: block;
+            border: 1px solid $border-color;
+            border-radius: $border-radius;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+
+          td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba($border-color, 0.5);
+
+            &:before {
+              content: attr(data-label);
+              font-weight: 600;
+              color: $text-secondary;
+            }
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            &.employee-name {
+              flex-direction: row-reverse;
+              justify-content: space-between;
+
+              &:before {
+                content: "الاسم";
+                font-weight: 600;
+                color: $text-secondary;
+              }
+            }
+
+            &.action-cell {
+              justify-content: flex-end;
+              gap: 0.5rem;
+
+              &:before {
+                content: "الإجراءات";
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Notification
+  .notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 2rem;
+    border-radius: $border-radius;
+    color: white;
+    font-size: 1rem;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    animation: slideIn 0.3s ease-in-out, slideOut 0.3s ease-in-out 2.7s forwards;
+
+    &.success {
+      background-color: $success-color;
+    }
+
+    &.error {
+      background-color: $danger-color;
+    }
+
+    &.warning {
+      background-color: $warning-color;
+    }
+
+    &.info {
+      background-color: $info-color;
+    }
+
+    p {
+      margin: 0;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      &:before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: white;
+      }
+    }
+  }
+
+  // Confirmation box
+  .confirmation-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    @include flex-center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-in-out;
+
+    .confirmation-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: $border-radius;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      animation: scaleIn 0.3s ease-in-out;
+
+      p {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+        color: $text-primary;
+      }
+
+      .confirmation-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+
+        button {
+          padding: 0.75rem 2rem;
+          border: none;
+          border-radius: $border-radius;
+          font-weight: 500;
+          cursor: pointer;
+          transition: $transition;
+
+          &.confirm-btn {
+            background-color: $danger-color;
+            color: white;
+
+            &:hover {
+              background-color: darken($danger-color, 5%);
+            }
+          }
+
+          &.cancel-btn {
+            background-color: $background-color;
+            color: $text-primary;
+
+            &:hover {
+              background-color: darken($background-color, 5%);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Empty state
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+
+    .material-icons {
+      font-size: 4rem;
+      color: rgba($text-secondary, 0.3);
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: $text-secondary;
+      margin-bottom: 1.5rem;
+    }
+
+    .reset-btn {
+      @include button-style($primary-color);
+      margin: 0 auto;
+    }
+  }
+
+  // Print styles
+  @media print {
+    .employee-list-container {
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+    }
+    .print-header {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 10px 0 !important;
+      border-bottom: 1px solid #ddd !important;
+    }
+    .print-title {
+      font-size: 14pt !important;
+      font-weight: bold !important;
+      color: $text-primary !important;
+    }
+    .print-date,
+    .print-time {
+      font-size: 10pt !important;
+      color: $text-secondary !important;
+    }
+    .employees-table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      font-size: 10pt !important;
+    }
+    .employees-table th,
+    .employees-table td {
+      border: 1px solid #ddd !important;
+      padding: 8px !important;
+      text-align: right !important;
+    }
+    .employees-table th {
+      background-color: #f5f5f5 !important;
+      color: black !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .employees-table tr:nth-child(even) td {
+      background-color: #f9f9f9 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .employee-avatar {
+      display: none !important;
+    }
+    // .salary-cell::after {
+    //   content: " ريال";
+    // }
+    .employees-table th:nth-child(1)
+    {
+      width: 30% !important;
+    }
+    .employees-table th:nth-child(2),
+    .employees-table td:nth-child(2) {
+      width: 30% !important;
+    }
+    .employees-table th:nth-child(3),
+    .employees-table td:nth-child(3) {
+      width: 30% !important;
+    }
+    .print-hide,
+    .filters-container,
+    .header-actions,
+    .notification,
+    .confirmation-box,
+    app-add-employee,
+    app-edit-employee,
+    app-employee-details {
+      display: none !important;
+    }
+    @page {
+      size: A4 landscape;
+      margin: 1cm;
+    }
+  }
+}
+
+// Access denied
+.access-denied {
+  text-align: center;
+  padding: 3rem;
+  background-color: white;
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
+  max-width: 500px;
+  margin: 3rem auto;
+
+  p {
+    font-size: 1.2rem;
+    color: $danger-color;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+
+    &:before {
+      content: 'block';
+      font-family: 'Material Icons';
+      font-size: 1.5rem;
+    }
+  }
+}
+
+// Animations
+@keyframes slideIn {
+  from {
+    top: -50px;
+    opacity: 0;
+  }
+  to {
+    top: 20px;
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    top: 20px;
+    opacity: 1;
+  }
+  to {
+    top: -50px;
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

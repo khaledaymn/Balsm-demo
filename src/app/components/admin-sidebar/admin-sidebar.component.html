@@ -1,0 +1,111 @@
+<aside
+  class="admin-sidebar"
+  [class.collapsed]="collapsed"
+  [class.mobile]="isMobile"
+>
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <img src="balsm.png" alt="بلسم" class="logo" />
+      <span class="logo-text" *ngIf="!collapsed || isMobile">بلسم</span>
+    </div>
+    <button
+      *ngIf="isMobile"
+      class="close-sidebar"
+      (click)="toggleSidebar.emit()"
+    >
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+
+  <div class="sidebar-content">
+    <nav class="sidebar-nav">
+      <ul class="nav-list">
+        <li
+          *ngFor="let item of navItems"
+          class="nav-item"
+          [class.has-children]="item.children && item.children.length > 0"
+          [class.active]="isActive(item.route) || isChildActive(item)"
+        >
+          <a
+            [routerLink]="item.children ? null : item.route"
+            [class.active]="isActive(item.route) || isChildActive(item)"
+            class="nav-link"
+            (click)="onNavItemClick(item, $event)"
+          >
+            <span class="material-icons nav-icon">{{ item.icon }}</span>
+            <span class="nav-label" *ngIf="!collapsed || isMobile">{{
+              item.label
+            }}</span>
+            <span
+              *ngIf="
+                item.children &&
+                item.children.length > 0 &&
+                (!collapsed || isMobile)
+              "
+              class="material-icons expand-icon"
+              [class.expanded]="item.expanded"
+            >
+              keyboard_arrow_down
+            </span>
+          </a>
+
+          <div
+            *ngIf="
+              item.children &&
+              item.children.length > 0 &&
+              item.expanded &&
+              (!collapsed || isMobile)
+            "
+            class="sub-menu"
+          >
+            <ul class="sub-nav-list">
+              <li *ngFor="let child of item.children" class="sub-nav-item">
+                <a
+                  [routerLink]="child.route"
+                  [class.active]="isActive(child.route)"
+                  class="sub-nav-link"
+                  (click)="isMobile ? toggleSidebar.emit() : null"
+                >
+                  <span class="material-icons sub-nav-icon">{{
+                    child.icon
+                  }}</span>
+                  <span class="sub-nav-label">{{ child.label }}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="sidebar-footer" *ngIf="!collapsed || isMobile">
+    <div class="user-info">
+      <img src="" alt="صورة المستخدم" class="user-avatar" />
+      <div class="user-details">
+        <h3 class="user-name">أحمد محمد</h3>
+        <p class="user-role">مدير النظام</p>
+      </div>
+    </div>
+    <button
+      class="collapse-button"
+      (click)="handleCollapseClick($event)"
+      *ngIf="!isMobile"
+      type="button"
+    >
+      <span class="material-icons">{{
+        collapsed ? "keyboard_double_arrow_left" : "keyboard_double_arrow_right"
+      }}</span>
+      <span *ngIf="!collapsed">تصغير القائمة</span>
+    </button>
+  </div>
+
+  <button
+    *ngIf="collapsed && !isMobile"
+    class="expand-button"
+    (click)="handleCollapseClick($event)"
+    type="button"
+  >
+    <span class="material-icons">keyboard_double_arrow_left</span>
+  </button>
+</aside>
