@@ -4,13 +4,24 @@ import {
   HttpErrorResponse,
   HttpHeaders,
 } from '@angular/common/http';
-import { catchError, firstValueFrom, map, Observable, of, throwError } from 'rxjs';
+import {
+  catchError,
+  firstValueFrom,
+  map,
+  Observable,
+  of,
+  throwError,
+} from 'rxjs';
 import { environment } from '../../../environments/environments';
-import { Employee, addEmployee } from '../../models/employee.model';
+import {
+  Employee,
+  addEmployee,
+  editEmployee,
+} from '../../models/employee.model';
 import { Holiday } from '../../models/holiday.model';
 
 // Generic API response interface
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   success: boolean;
   message: string;
   data: T;
@@ -43,14 +54,12 @@ export class EmployeeService {
       .pipe(catchError(this.handleError));
   }
 
-  // Fetch and transform employee data
   loadEmployees(): Observable<Employee[]> {
     return this.http.get<{ data: any[] }>(`${this.apiUrl}/users/getall`).pipe(
       map((response) => {
-        // Check if response has 'data' property
         if (!response || !Array.isArray(response.data)) {
           throw new Error(
-            'Invalid API response: Expected { data: Employee[] }'
+            `Invalid API response: Expected ${'data'} to be an array.`
           );
         }
         return response.data.map((employee) => ({
@@ -61,7 +70,7 @@ export class EmployeeService {
           phoneNumber: employee.phoneNumber || '',
           address: employee.address || '',
           nationalId: employee.nationalId || '',
-          baseSalary: employee.baseSalary ?? 0,
+          salary: employee.salary ?? 0,
           shift: employee.shift || [],
           branch: employee.branch || [],
           gender: employee.gender || '',
@@ -142,12 +151,22 @@ export class EmployeeService {
   }
 
   // Update an employee
-  updateEmployee(employee: addEmployee): Observable<ApiResponse<void>> {
+  updateEmployee(employee: editEmployee): Observable<ApiResponse<void>> {
     return this.http
       .put<ApiResponse<void>>(`${this.apiUrl}/users/edit`, employee, {
         headers: this.getHeaders(),
       })
       .pipe(catchError(this.handleError));
+  }
+
+  addUserToRole(body: {
+    userId: string;
+    roleName: string[];
+  }): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
+      `${this.apiUrl}/Users/AddUserToRole`,
+      body
+    );
   }
 
   // Get all official holidays
@@ -192,7 +211,7 @@ export class EmployeeService {
     return firstValueFrom(
       this.http
         .put<ApiResponse<any>>(
-          `${this.apiUrl}/OfficialVacations/edit/${holiday.id}`,
+          `${this.apiUrl}/OfficialVacations/edit`,
           holiday,
           { headers: this.getHeaders() }
         )

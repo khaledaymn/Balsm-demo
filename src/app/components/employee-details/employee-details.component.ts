@@ -42,7 +42,7 @@ export class EmployeeDetailsComponent implements OnInit {
           phoneNumber: response.data.phoneNumber || '',
           address: response.data.address || '',
           nationalId: response.data.nationalId || '',
-          baseSalary: response.data.baseSalary ?? 0,
+          salary: response.data.salary ?? 0,
           shift: response.data.shift || [],
           hiringDate: response.data.hiringDate || '',
           gender: response.data.gender || '',

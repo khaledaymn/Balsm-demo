@@ -1,54 +1,79 @@
 <div class="attendance-tracker">
+  <!-- Header -->
   <div class="time-display">
-    <h2>الوقت الحالي: {{ formatTime(currentTime) }}</h2>
-    <p *ngIf="workPeriod.name">
-      فترة العمل: {{ workPeriod.name }} ({{ workPeriod.start }} -
-      {{ workPeriod.end }})
-    </p>
-    <p *ngIf="isLoadingPeriod">جاري تحميل فترة العمل...</p>
+    <h2 class="time">تتبع الحضور</h2>
+    <p class="date">{{ today | date: 'fullDate':'':'ar' }}</p>
   </div>
 
-  <div class="status" [ngClass]="{ error: status.errorMessage }">
-    <p *ngIf="status.isWithinLocation">
-      شكرا لوجودك معنا في {{ status.locationName }}
-    </p>
-    <p *ngIf="!status.isWithinLocation && !status.errorMessage">
-      أنت خارج موقع العمل المسموح
-    </p>
-    <p *ngIf="status.errorMessage">{{ status.errorMessage }}</p>
+  <!-- Notification Area -->
+  <div *ngIf="message" class="notification success">
+    <span class="material-icons">check_circle</span>
+    <p>{{ message }}</p>
   </div>
 
+  <div *ngIf="error" class="notification error">
+    <span class="material-icons">error</span>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Actions Section -->
   <div class="actions">
     <button
-      [disabled]="isCheckedIn || isGettingLocation"
-      (click)="checkIn()"
       class="check-in-btn"
+      (click)="checkIn()"
+      [disabled]="!userId || isLoading || hasActiveCheckIn(getCurrentShift())"
     >
       <span class="material-icons">login</span>
       تسجيل الحضور
     </button>
     <button
-      [disabled]="!isCheckedIn || isGettingLocation"
-      (click)="checkOut()"
       class="check-out-btn"
+      (click)="checkOut()"
+      [disabled]="!userId || isLoading || !hasActiveCheckIn(getCurrentShift()) || !canCheckOut()"
     >
       <span class="material-icons">logout</span>
-      تسجيل المغادرة
+      تسجيل الانصراف
     </button>
   </div>
 
-  <div class="attendance-info" *ngIf="checkInTime">
-    <p>وقت الحضور: {{ checkInTime ? formatTime(checkInTime) : "-" }}</p>
-    <p>وقت الخروج: {{ checkOutTime ? formatTime(checkOutTime) : "-" }}</p>
-    <p>ساعات العمل: {{ workHours }}</p>
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="loading">
+    <p>جاري المعالجة</p>
   </div>
 
-  <div class="loading" *ngIf="isGettingLocation">
-    <p>جاري تحديد الموقع...</p>
+  <!-- Attendance Records -->
+  <div *ngIf="attendanceRecords.length > 0" class="attendance-info">
+    <h2 class="status-label">سجلات الحضور</h2>
+    <div *ngFor="let record of attendanceRecords" class="status-checked-in">
+      <p>
+        <span class="status-label">الوقت:</span>
+        <span class="status-time">{{ record.timeOfAttend | date: 'medium':'':'ar' }}</span>
+      </p>
+      <p>
+        <span class="status-label">الموقع:</span>
+        <span class="status-location valid-location">
+          <span class="material-icons">place</span>
+          {{ record.latitude }}, {{ record.longitude }}
+        </span>
+      </p>
+    </div>
   </div>
 
-  <!-- Notification Area -->
-  <div class="notification" *ngIf="notification" [ngClass]="notification.type">
-    <p>{{ notification.message }}</p>
+  <!-- Leave Records -->
+  <div *ngIf="leaveRecords.length > 0" class="attendance-info">
+    <h2 class="status-label">سجلات الانصراف</h2>
+    <div *ngFor="let record of leaveRecords" class="status-checked-out">
+      <p>
+        <span class="status-label">الوقت:</span>
+        <span class="status-time">{{ record.timeOfLeave | date: 'medium':'':'ar' }}</span>
+      </p>
+      <p>
+        <span class="status-label">الموقع:</span>
+        <span class="status-location valid-location">
+          <span class="material-icons">place</span>
+          {{ record.latitude }}, {{ record.longitude }}
+        </span>
+      </p>
+    </div>
   </div>
 </div>

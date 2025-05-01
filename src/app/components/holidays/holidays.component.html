@@ -24,7 +24,7 @@
     [ngModel]="yearFilter()"
     (ngModelChange)="onYearFilterChange($event)"
   >
-    <option [value]="undefined">جميع السنوات</option>
+    <option disabled>اختر العام</option>
     <option *ngFor="let year of getYearOptions()" [value]="year">
       {{ year }}
     </option>
@@ -207,9 +207,8 @@
       </button>
     </div>
     <p>
-      هل أنت متأكد من حذف العطلة "{{ selectedHoliday()?.vacationName }}"
-      (المعرف: {{ selectedHoliday()?.id }}) في تاريخ
-      {{ formatDate(selectedHoliday()?.vacationDay || "") }}؟
+      هل أنت متأكد من حذف العطلة "{{ selectedHoliday()?.vacationName }}" في
+      تاريخ {{ formatDate(selectedHoliday()?.vacationDay || "") }}؟
     </p>
     <div class="modal-actions">
       <button class="delete-btn" (click)="deleteHoliday()">

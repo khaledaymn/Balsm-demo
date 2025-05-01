@@ -15,6 +15,11 @@ import { EditEmployeeComponent } from './components/edit-employee/edit-employee.
 import { HolidaysComponent } from './components/holidays/holidays.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { EmployeeShiftsComponent } from './components/employee-shifts/employee-shifts.component';
+import { BranchesComponent } from './components/branches/branches.component';
+import { UserRolesComponent } from './components/Roles/Roles.component';
+import { AttendanceTrackerComponent } from './components/attendance-tracker/attendance-tracker.component';
+import { GeneralSettingsComponent } from './components/general-settings/general-settings.component';
+import { AttendanceReportsComponent } from './components/attendance-reports/attendance-reports.component';
 
 export const appRoutes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
@@ -47,14 +52,25 @@ export const appRoutes: Routes = [
           { path: 'employee-details/:id', component: EmployeeDetailsComponent },
           { path: 'holidays', component: HolidaysComponent },
           { path: 'shifts', component: EmployeeShiftsComponent },
+          { path: 'branches', component: BranchesComponent }, // Placeholder for branches component
+          { path: 'user-roles', component: UserRolesComponent }, // Placeholder for branches component
+          {
+            path: 'attendance-tracker',
+            component: AttendanceTrackerComponent,
+          },
+          {
+            path: 'settings',
+            component: GeneralSettingsComponent,
+          },
+          { path: 'attendance/reports', component: AttendanceReportsComponent },
         ],
       },
 
       {
         path: 'userDashboard',
         component: UserdashboardComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['User'] },
+        // canActivate: [RoleGuard],
+        // data: { roles: ['User'] },
         children: [
           { path: '', redirectTo: 'userDashboard', pathMatch: 'full' },
           // { path: 'dashboard', component: AdminDashboardComponent },

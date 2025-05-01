@@ -81,6 +81,12 @@ export class AdminSidebarComponent {
     },
     { label: 'مناوبات الموظفين', icon: 'schedule', route: '/app/admin/shifts' },
     {
+      label: 'إدارة الصلاحيات',
+      icon: 'admin_panel_settings',
+      route: 'user-roles',
+    },
+    { label: 'الفروع', icon: 'business', route: '/app/admin/branches' },
+    {
       label: 'الإجازات',
       icon: 'event',
       route: '/app/admin/holidays',

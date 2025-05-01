@@ -1,0 +1,219 @@
+<!-- Notification -->
+<div
+  *ngIf="notification()"
+  class="notification"
+  [class]="notification()?.type"
+  role="alert"
+  aria-live="assertive"
+>
+  <span class="material-icons">
+    {{ getNotificationIcon(notification()!.type) }}
+  </span>
+  {{ notification()?.message }}
+</div>
+
+<!-- Header -->
+<div class="user-roles-header">
+  <h2>إدارة صلاحيات المستخدمين</h2>
+  <p class="header-description">
+    قم بتعيين أو إزالة صلاحيات المستخدمين في النظام
+  </p>
+</div>
+
+<!-- Filters -->
+<div class="filters">
+  <div class="search-box">
+    <span class="material-icons">search</span>
+    <input
+      type="text"
+      [ngModel]="searchTerm()"
+      (ngModelChange)="onSearchChange($event)"
+      placeholder="بحث عن مستخدم..."
+      aria-label="بحث عن مستخدم"
+    />
+  </div>
+
+  <div class="role-filter">
+    <label for="roleFilter">تصفية حسب الدور:</label>
+    <select
+      id="roleFilter"
+      [ngModel]="roleFilter()"
+      (ngModelChange)="onRoleFilterChange($event)"
+      aria-label="تصفية حسب الدور"
+    >
+      <option value="">جميع الأدوار</option>
+      <option value="Admin">مدير النظام</option>
+      <option value="User">موظف</option>
+    </select>
+  </div>
+
+  <button
+    class="reset-btn"
+    (click)="resetFilters()"
+    aria-label="إعادة ضبط الفلاتر"
+  >
+    <span class="material-icons">refresh</span>
+    إعادة ضبط
+  </button>
+</div>
+
+<!-- Users List -->
+<div class="users-list">
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري تحميل بيانات المستخدمين...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading() && filteredUsers().length === 0" class="empty-state">
+    <span class="material-icons">person_off</span>
+    <p>لا يوجد مستخدمين متطابقين مع معايير البحث</p>
+    <button
+      class="reset-btn"
+      (click)="resetFilters()"
+      aria-label="عرض جميع المستخدمين"
+    >
+      عرض جميع المستخدمين
+    </button>
+  </div>
+
+  <!-- Users Table -->
+  <div
+    *ngIf="!isLoading() && filteredUsers().length > 0"
+    class="users-table-container"
+  >
+    <table class="users-table" role="grid">
+      <thead>
+        <tr>
+          <th scope="col">المستخدم</th>
+          <th scope="col">البريد الإلكتروني</th>
+          <th scope="col">الأدوار</th>
+          <th scope="col">الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers()">
+          <td>
+            <span class="user-name">{{ user.name }}</span>
+          </td>
+          <td>{{ user.email }}</td>
+          <td class="roles-cell">
+            <span
+              *ngFor="let role of user.roles"
+              class="role-badge"
+              [class]="getRoleBadgeClass(role)"
+            >
+              {{ getRoleDisplayName(role) }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button
+              class="edit-roles-btn"
+              (click)="openEditRolesModal(user)"
+              aria-label="تعديل أدوار المستخدم"
+              [attr.aria-expanded]="isEditRolesModalOpen()"
+            >
+              <span class="material-icons">admin_panel_settings</span>
+              تعديل الأدوار
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Edit Roles Modal -->
+<div
+  class="modal"
+  *ngIf="isEditRolesModalOpen()"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>
+        <span class="material-icons">admin_panel_settings</span> تعديل أدوار
+        المستخدم
+      </h2>
+      <button
+        class="close-btn"
+        (click)="closeEditRolesModal()"
+        aria-label="إغلاق النافذة"
+      >
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedUser()">
+      <div class="user-info">
+        <div class="user-details">
+          <h3 class="user-name">{{ selectedUser()!.name }}</h3>
+          <p class="user-email">{{ selectedUser()!.email }}</p>
+        </div>
+      </div>
+
+      <div class="roles-selection">
+        <h4>الأدوار المتاحة</h4>
+        <p class="roles-hint">حدد الأدوار التي تريد منحها للمستخدم</p>
+
+        <div class="roles-grid">
+          <div
+            *ngFor="let role of availableRoles"
+            class="role-option"
+            [class.selected]="hasRole(role)"
+            (click)="toggleRole(role)"
+            (keyup.enter)="toggleRole(role)"
+            (keyup.space)="toggleRole(role)"
+            role="button"
+            tabindex="0"
+            [attr.aria-label]="
+              'تبديل دور ' + getRoleDisplayName(role) + ' للمستخدم'
+            "
+            [attr.aria-checked]="hasRole(role)"
+          >
+            <div class="role-checkbox">
+              <span class="material-icons" *ngIf="hasRole(role)"
+                >check_circle</span
+              >
+              <span class="material-icons" *ngIf="!hasRole(role)"
+                >radio_button_unchecked</span
+              >
+            </div>
+            <div class="role-info">
+              <span class="role-name">{{ getRoleDisplayName(role) }}</span>
+              <span class="role-description">
+                {{
+                  role === "Admin"
+                    ? "وصول كامل لجميع ميزات النظام"
+                    : "وصول محدود للنظام"
+                }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button
+        class="save-btn"
+        (click)="saveUserRoles()"
+        [disabled]="isLoading()"
+        aria-label="حفظ التغييرات"
+      >
+        <span class="material-icons">save</span>
+        حفظ التغييرات
+      </button>
+      <button
+        class="cancel-btn"
+        (click)="closeEditRolesModal()"
+        aria-label="إلغاء"
+      >
+        <span class="material-icons">cancel</span>
+        إلغاء
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,11 +1,11 @@
-<div class="edit-section" *ngIf="addEmployee; else loadingOrError">
+<div class="edit-section" *ngIf="editEmployee; else loadingOrError">
   <h3>تعديل الموظف</h3>
   <form>
     <div class="form-group">
       <label class="required">الاسم</label>
       <input
         type="text"
-        [(ngModel)]="addEmployee.name"
+        [(ngModel)]="editEmployee.name"
         name="name"
         required
         placeholder="أدخل اسم الموظف"
@@ -22,7 +22,7 @@
       <label class="required">البريد الإلكتروني</label>
       <input
         type="email"
-        [(ngModel)]="addEmployee.email"
+        [(ngModel)]="editEmployee.email"
         name="email"
         required
         placeholder="example@company.com"
@@ -39,7 +39,7 @@
       <label class="required">اسم المستخدم</label>
       <input
         type="text"
-        [(ngModel)]="addEmployee.userName"
+        [(ngModel)]="editEmployee.userName"
         name="userName"
         required
         placeholder="أدخل اسم المستخدم"
@@ -56,7 +56,7 @@
       <label class="required">الراتب</label>
       <input
         type="number"
-        [(ngModel)]="addEmployee.baseSalary"
+        [(ngModel)]="editEmployee.salary"
         name="salary"
         required
         placeholder="أدخل الراتب"
@@ -73,7 +73,7 @@
       <label>رقم الهاتف</label>
       <input
         type="text"
-        [(ngModel)]="addEmployee.phoneNumber"
+        [(ngModel)]="editEmployee.phoneNumber"
         name="phoneNumber"
         placeholder="أدخل رقم الهاتف"
       />
@@ -82,7 +82,7 @@
       <label>العنوان</label>
       <input
         type="text"
-        [(ngModel)]="addEmployee.address"
+        [(ngModel)]="editEmployee.address"
         name="address"
         placeholder="أدخل العنوان"
       />
@@ -91,18 +91,14 @@
       <label>الرقم الوطني</label>
       <input
         type="text"
-        [(ngModel)]="addEmployee.nationalId"
+        [(ngModel)]="editEmployee.nationalId"
         name="nationalId"
         placeholder="أدخل الرقم الوطني"
       />
     </div>
     <div class="form-group">
       <label for="branch">الفرع</label>
-      <select
-        id="branch"
-        [(ngModel)]="addEmployee.branchId"
-        name="branch"
-      >
+      <select id="branch" [(ngModel)]="editEmployee.branchId" name="branch">
         <option value="" disabled>اختر الفرع</option>
         <option *ngFor="let branch of branches" [value]="branch.id">
           {{ branch.name }}
@@ -111,7 +107,7 @@
     </div>
     <div class="form-group">
       <label>الجنس</label>
-      <select [(ngModel)]="addEmployee.gender" name="gender">
+      <select [(ngModel)]="editEmployee.gender" name="gender">
         <option value="" disabled>اختر الجنس</option>
         <option value="Male">ذكر</option>
         <option value="Female">أنثى</option>
@@ -121,7 +117,7 @@
       <label>تاريخ بدء العمل</label>
       <input
         type="date"
-        [(ngModel)]="addEmployee.hiringDate"
+        [(ngModel)]="editEmployee.hiringDate"
         name="dateOfWork"
       />
     </div>
@@ -129,12 +125,12 @@
       <label>تاريخ الميلاد</label>
       <input
         type="date"
-        [(ngModel)]="addEmployee.dateOfBarth"
+        [(ngModel)]="editEmployee.dateOfBarth"
         name="dateOfBirth"
       />
     </div>
     <div class="form-actions">
-      <button type="button" (click)="saveaddEmployee()">حفظ</button>
+      <button type="button" (click)="saveeditEmployee()">حفظ</button>
       <button type="button" (click)="cancelEdit()">إلغاء</button>
     </div>
   </form>

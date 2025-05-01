@@ -65,9 +65,9 @@
               }}</span>
             </span>
           </th>
-          <th (click)="sortBy('baseSalary')">
+          <th (click)="sortBy('salary')">
             الراتب
-            <span class="sort-icon" *ngIf="sortField === 'baseSalary'">
+            <span class="sort-icon" *ngIf="sortField === 'salary'">
               <span class="material-icons">{{
                 sortDirection === "asc" ? "arrow_upward" : "arrow_downward"
               }}</span>
@@ -82,13 +82,13 @@
         <tr *ngFor="let employee of filteredEmployees">
           <td class="employee-name">
             <div class="employee-avatar">
-              {{ employee.name?.charAt(0) || "" }}
+              {{ employee.name.charAt(0) || "" }}
             </div>
             <div>{{ employee.name || "" }}</div>
           </td>
           <td data-label="البريد الإلكتروني">{{ employee.email || "" }}</td>
           <td data-label="الراتب" class="salary-cell">
-            {{ employee.baseSalary ?? 0 }} ريال
+            {{ employee.salary }} ريال
           </td>
           <td class="action-cell print-hide">
             <a

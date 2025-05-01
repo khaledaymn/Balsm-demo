@@ -16,7 +16,7 @@ interface AppNotification {
 @Component({
   selector: 'app-add-employee',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './add-employee.component.html',
   styleUrls: ['./add-employee.component.scss'],
 })
@@ -33,7 +33,7 @@ export class AddEmployeeComponent implements OnInit {
     phoneNumber: '',
     address: '',
     nationalId: '',
-    baseSalary: 0,
+    salary: 0,
     password: 'P@ssword123',
     gender: 'male',
     hiringDate: '',
@@ -86,34 +86,23 @@ export class AddEmployeeComponent implements OnInit {
 
     try {
       // Client-side uniqueness checks
-      const isNameUnique = await firstValueFrom(this.employeeService.isNameUnique(this.newEmployee.name));
+      const isNameUnique = await firstValueFrom(
+        this.employeeService.isNameUnique(this.newEmployee.name)
+      );
       this.isNameUnique = isNameUnique ?? false;
       if (!this.isNameUnique) {
         this.showNotification('الاسم مستخدم بالفعل', 'error');
         return;
       }
 
-      const isEmailUnique = await firstValueFrom(this.employeeService.isEmailUnique(this.newEmployee.email));
+      const isEmailUnique = await firstValueFrom(
+        this.employeeService.isEmailUnique(this.newEmployee.email)
+      );
       this.isEmailUnique = isEmailUnique ?? false;
       if (!this.isEmailUnique) {
         this.showNotification('البريد الإلكتروني مستخدم بالفعل', 'error');
         return;
       }
-
-      // Server-side uniqueness checks
-      // const isNameUniqueServer = await firstValueFrom(this.employeeService.checkNameUniqueServer(this.newEmployee.name));
-      // this.isNameUnique = isNameUniqueServer ?? false;
-      // if (!this.isNameUnique) {
-      //   this.showNotification('الاسم مستخدم بالفعل', 'error');
-      //   return;
-      // }
-
-      // const isEmailUniqueServer = await firstValueFrom(this.employeeService.checkEmailUniqueServer(this.newEmployee.email));
-      // this.isEmailUnique = isEmailUniqueServer ?? false;
-      // if (!this.isEmailUnique) {
-      //   this.showNotification('البريد الإلكتروني مستخدم بالفعل', 'error');
-      //   return;
-      // }
 
       // Proceed with adding employee
       this.employeeService.addEmployee(this.newEmployee).subscribe({
@@ -205,7 +194,7 @@ export class AddEmployeeComponent implements OnInit {
       this.isPhoneNumberValid() &&
       this.isAddressValid() &&
       this.isNationalIdValid() &&
-      this.newEmployee.baseSalary > 0 &&
+      this.newEmployee.salary > 0 &&
       this.isPasswordValid() &&
       ['male', 'female'].includes(this.newEmployee.gender) &&
       this.isDateOfBarthValid() &&
@@ -222,7 +211,7 @@ export class AddEmployeeComponent implements OnInit {
       phoneNumber: '',
       address: '',
       nationalId: '',
-      baseSalary: 0,
+      salary: 0,
       password: 'P@ssword123',
       gender: 'male',
       hiringDate: '',

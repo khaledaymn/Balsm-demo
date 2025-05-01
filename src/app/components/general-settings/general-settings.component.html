@@ -1,0 +1,154 @@
+<div class="general-settings-container">
+  <div class="settings-card">
+    <div class="card-header">
+      <h2>
+        <i class="material-icons">settings</i>
+        الإعدادات العامة
+      </h2>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="loading-container">
+      <div class="spinner"></div>
+      <p>جاري تحميل الإعدادات...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error()" class="message error-message">
+      <i class="material-icons">error</i>
+      <span>{{ error() }}</span>
+      <button class="close-btn" (click)="clearMessages()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="success()" class="message success-message">
+      <i class="material-icons">check_circle</i>
+      <span>{{ success() }}</span>
+      <button class="close-btn" (click)="clearMessages()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <!-- Settings Form -->
+    <form
+      [formGroup]="settingsForm"
+      (ngSubmit)="saveSettings()"
+      *ngIf="!loading()"
+    >
+      <div class="form-group">
+        <label for="vacations">عدد أيام الإجازات في السنة</label>
+        <div class="input-container">
+          <input
+            type="number"
+            id="vacations"
+            formControlName="numberOfVacationsInYear"
+            min="0"
+            max="365"
+          />
+          <div class="unit">يوم</div>
+        </div>
+        <div
+          class="error-text"
+          *ngIf="hasError('numberOfVacationsInYear', 'required')"
+        >
+          هذا الحقل مطلوب
+        </div>
+        <div
+          class="error-text"
+          *ngIf="hasError('numberOfVacationsInYear', 'min')"
+        >
+          يجب أن تكون القيمة 0 أو أكثر
+        </div>
+        <div
+          class="error-text"
+          *ngIf="hasError('numberOfVacationsInYear', 'max')"
+        >
+          يجب أن تكون القيمة 365 أو أقل
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="extraRate">معدل ساعات العمل الإضافية والتأخير</label>
+        <div class="input-container">
+          <input
+            type="number"
+            id="extraRate"
+            formControlName="rateOfExtraAndLateHour"
+            min="0"
+            max="100"
+            step="0.1"
+          />
+          <div class="unit">%</div>
+        </div>
+        <div
+          class="error-text"
+          *ngIf="hasError('rateOfExtraAndLateHour', 'required')"
+        >
+          هذا الحقل مطلوب
+        </div>
+        <div
+          class="error-text"
+          *ngIf="hasError('rateOfExtraAndLateHour', 'min')"
+        >
+          يجب أن تكون القيمة 0 أو أكثر
+        </div>
+        <div
+          class="error-text"
+          *ngIf="hasError('rateOfExtraAndLateHour', 'max')"
+        >
+          يجب أن تكون القيمة 100 أو أقل
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="workingHours">عدد ساعات العمل اليومية</label>
+        <div class="input-container">
+          <input
+            type="number"
+            id="workingHours"
+            formControlName="numberOfDayWorkingHours"
+            min="1"
+            max="24"
+          />
+          <div class="unit">ساعة</div>
+        </div>
+        <div
+          class="error-text"
+          *ngIf="hasError('numberOfDayWorkingHours', 'required')"
+        >
+          هذا الحقل مطلوب
+        </div>
+        <div
+          class="error-text"
+          *ngIf="hasError('numberOfDayWorkingHours', 'min')"
+        >
+          يجب أن تكون القيمة 1 أو أكثر
+        </div>
+        <div
+          class="error-text"
+          *ngIf="hasError('numberOfDayWorkingHours', 'max')"
+        >
+          يجب أن تكون القيمة 24 أو أقل
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="reset-btn" (click)="resetForm()">
+          <i class="material-icons">refresh</i>
+          إعادة تعيين
+        </button>
+        <button
+          type="submit"
+          class="save-btn"
+          [disabled]="settingsForm.invalid || saveLoading()"
+        >
+          <i class="material-icons">save</i>
+          <span *ngIf="!saveLoading()">حفظ التغييرات</span>
+          <span *ngIf="saveLoading()">جاري الحفظ...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

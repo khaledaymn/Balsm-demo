@@ -131,18 +131,18 @@
       <input
         type="number"
         id="baseSalary"
-        [(ngModel)]="newEmployee.baseSalary"
+        [(ngModel)]="newEmployee.salary"
         name="baseSalary"
         placeholder="أدخل الراتب"
         class="form-control"
-        [class.is-invalid]="submitted && newEmployee.baseSalary <= 0"
+        [class.is-invalid]="submitted && newEmployee.salary <= 0"
         required
         aria-describedby="salaryError"
       />
       <div
         id="salaryError"
         class="invalid-feedback"
-        *ngIf="submitted && newEmployee.baseSalary <= 0"
+        *ngIf="submitted && newEmployee.salary <= 0"
       >
         الراتب يجب أن يكون أكبر من 0
       </div>

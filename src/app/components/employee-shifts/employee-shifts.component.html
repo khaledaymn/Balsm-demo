@@ -20,7 +20,7 @@
       <div class="employee-row" *ngFor="let employee of employees">
         <div class="employee-info">
           <div class="employee-avatar">
-            {{ employee.name?.charAt(0) || "" }}
+            {{ employee.name.charAt(0) || "" }}
           </div>
           <span class="employee-name">{{ employee.name }}</span>
         </div>

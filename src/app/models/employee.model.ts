@@ -7,13 +7,14 @@ export interface Employee {
   phoneNumber: string;
   address: string;
   nationalId: string;
-  baseSalary: number;
+  salary: number;
   shift: {
     id: number;
     startTime: string;
     endTime: string;
     employeeId: string;
   }[];
+  password: string;
   gender: string;
   hiringDate: string;
   dateOfBarth: string;
@@ -34,10 +35,23 @@ export interface addEmployee {
   phoneNumber: string;
   address: string;
   nationalId: string;
-  baseSalary: number;
+  salary: number;
   gender: string;
   hiringDate: string;
   dateOfBarth: string;
-  roles: ['User' | 'Admin'];
+  roles: string[] | ['User'];
+  branchId: number;
+}
+export interface editEmployee {
+  id?: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  address: string;
+  nationalId: string;
+  salary: number;
+  gender: string;
+  hiringDate: string;
+  dateOfBarth: string;
   branchId: number;
 }

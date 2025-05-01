@@ -49,14 +49,14 @@ $border-radius: 8px;
   box-shadow: 0 2px 5px rgba(darken($bg-color, 20%), 0.2);
 
   &:hover {
-    background-color: darken($bg-color, 5%);
+    background-color: $bg-color;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(darken($bg-color, 20%), 0.3);
+    box-shadow: 0 4px 8px rgba($bg-color, 0.3);
   }
 
   &:active {
     transform: translateY(0);
-    box-shadow: 0 2px 3px rgba(darken($bg-color, 20%), 0.2);
+    box-shadow: 0 2px 3px rgba($bg-color, 0.2);
   }
 
   .material-icons {
@@ -254,7 +254,7 @@ $border-radius: 8px;
         white-space: nowrap;
 
         &:hover {
-          background-color: darken($background-color, 3%);
+          background-color:$background-color;
           color: $primary-color;
         }
 
@@ -537,7 +537,7 @@ $border-radius: 8px;
             color: white;
 
             &:hover {
-              background-color: darken($danger-color, 5%);
+              background-color: $danger-color;
             }
           }
 
@@ -546,7 +546,7 @@ $border-radius: 8px;
             color: $text-primary;
 
             &:hover {
-              background-color: darken($background-color, 5%);
+              background-color: $background-color;
             }
           }
         }

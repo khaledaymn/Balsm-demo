@@ -19,7 +19,7 @@ interface Notification {
 @Component({
   selector: 'app-official-holidays',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './holidays.component.html',
   styleUrls: ['./holidays.component.scss'],
 })

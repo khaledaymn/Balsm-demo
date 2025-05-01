@@ -6,7 +6,9 @@ import { appRoutes } from './app.routes';
 import { authInterceptor } from './core/interceptor/auth.interceptor';
 import { lastValueFrom } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
-
+import { NgModule, LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeAr from '@angular/common/locales/ar';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(appRoutes),
@@ -18,5 +20,6 @@ export const appConfig: ApplicationConfig = {
         return null;
       });
     }),
+    { provide: LOCALE_ID, useValue: 'ar' },
   ],
 };

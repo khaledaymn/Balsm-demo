@@ -1,0 +1,243 @@
+@import '../../../styles.scss';
+
+.general-settings-container {
+  padding: 1.5rem;
+  direction: rtl;
+  font-family: 'Cairo', sans-serif;
+}
+
+.settings-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-left: 0.75rem;
+      color: #008D7F;
+    }
+  }
+}
+
+// Loading state
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(63, 81, 181, 0.1);
+    border-radius: 50%;
+    border-top-color: #008D7F;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #666;
+    font-size: 1rem;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Message styles
+.message {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  margin: 1rem;
+  border-radius: 4px;
+
+  i {
+    margin-left: 0.75rem;
+    font-size: 1.25rem;
+  }
+
+  .close-btn {
+    margin-right: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.error-message {
+  background-color: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  color: #d32f2f;
+}
+
+.success-message {
+  background-color: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #388e3c;
+}
+
+// Form styles
+form {
+  padding: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    direction: rtl;
+
+    &:focus {
+      outline: none;
+      border-color: #008D7F;
+      box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+    }
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    &[type=number] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+  }
+
+  .unit {
+    position: absolute;
+    left: 1rem;
+    color: #666;
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
+}
+
+.error-text {
+  color: #d32f2f;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  gap: 1rem;
+
+  button {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    i {
+      margin-left: 0.5rem;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .reset-btn {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    color: #666;
+
+    &:hover:not(:disabled) {
+      background-color: #e9ecef;
+    }
+  }
+
+  .save-btn {
+    background-color: #008D7F;
+    border: none;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(#008D7F,.1);
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .general-settings-container {
+    padding: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .general-settings-container {
+    padding: 0;
+  }
+
+  .settings-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  .form-actions {
+    display: none;
+  }
+}

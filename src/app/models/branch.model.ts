@@ -3,4 +3,5 @@ export interface Branch {
   name: string;
   latitude: number;
   longitude: number;
+  radius: number;
 }

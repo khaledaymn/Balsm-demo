@@ -1,0 +1,323 @@
+<!-- Notification -->
+<div
+  *ngIf="notification()"
+  class="notification"
+  [ngClass]="notification()?.type"
+>
+  <span class="material-icons">
+    {{ getNotificationIcon(notification()!.type) }}
+  </span>
+  {{ notification()?.message }}
+</div>
+
+<!-- Header with Add Button -->
+<div class="branches-header">
+  <h2>الفروع</h2>
+  <button class="add-btn" (click)="openAddModal()">
+    <span class="material-icons">add</span>
+    إضافة فرع جديد
+  </button>
+</div>
+
+<!-- Filters -->
+<div class="filters">
+  <div class="search-box">
+    <span class="material-icons">search</span>
+    <input
+      type="text"
+      [ngModel]="searchTerm()"
+      (ngModelChange)="onSearchChange($event)"
+      placeholder="بحث عن فرع..."
+    />
+  </div>
+
+  <button class="reset-btn" (click)="resetFilters()">
+    <span class="material-icons">refresh</span>
+    إعادة ضبط
+  </button>
+</div>
+
+<!-- Branches List -->
+<div class="branches-list">
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري تحميل البيانات...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="!isLoading() && filteredBranches().length === 0"
+    class="empty-state"
+  >
+    <span class="material-icons">business_off</span>
+    <p>لا توجد فروع متطابقة مع معايير البحث</p>
+    <button class="reset-btn" (click)="resetFilters()">عرض جميع الفروع</button>
+  </div>
+
+  <!-- Branches Grid -->
+  <div
+    *ngIf="!isLoading() && filteredBranches().length > 0"
+    class="branches-grid"
+  >
+    <div *ngFor="let branch of filteredBranches()" class="branch-card">
+      <div class="card-header">
+        <div class="branch-name">{{ branch.name }}</div>
+      </div>
+
+      <div class="card-body">
+        <div class="info-item">
+          <span class="material-icons">location_on</span>
+          <span>{{ formatLocation(branch.latitude, branch.longitude) }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="material-icons">radar</span>
+          <span>{{ branch.radius }} متر</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button
+          class="action-btn edit-btn"
+          (click)="openEditModal(branch)"
+          title="تعديل"
+        >
+          <span class="material-icons">edit</span>
+        </button>
+        <button
+          class="action-btn delete-btn"
+          (click)="openDeleteModal(branch)"
+          title="حذف"
+        >
+          <span class="material-icons">delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Branch Modal -->
+<div class="modal" *ngIf="isAddModalOpen()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><span class="material-icons">add_business</span> إضافة فرع جديد</h2>
+      <button class="close-btn" (click)="closeAddModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form>
+        <div class="form-group">
+          <label for="branchName"
+            >اسم الفرع <span class="required">*</span></label
+          >
+          <div class="input-with-icon">
+            <span class="material-icons">business</span>
+            <input
+              id="branchName"
+              type="text"
+              [(ngModel)]="newBranch.name"
+              name="branchName"
+              required
+              placeholder="أدخل اسم الفرع"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="branchLatitude"
+            >خط العرض <span class="required">*</span></label
+          >
+          <div class="input-with-icon">
+            <span class="material-icons">location_on</span>
+            <input
+              id="branchLatitude"
+              type="number"
+              [(ngModel)]="newBranch.latitude"
+              name="branchLatitude"
+              required
+              step="0.000001"
+              placeholder="أدخل خط العرض"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="branchLongitude"
+            >خط الطول <span class="required">*</span></label
+          >
+          <div class="input-with-icon">
+            <span class="material-icons">location_on</span>
+            <input
+              id="branchLongitude"
+              type="number"
+              [(ngModel)]="newBranch.longitude"
+              name="branchLongitude"
+              required
+              step="0.000001"
+              placeholder="أدخل خط الطول"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="branchRadius"
+            >نطاق الفرع (متر) <span class="required">*</span></label
+          >
+          <div class="input-with-icon">
+            <span class="material-icons">radar</span>
+            <input
+              id="branchRadius"
+              type="number"
+              [(ngModel)]="newBranch.radius"
+              name="branchRadius"
+              required
+              min="1"
+              placeholder="أدخل نطاق الفرع بالمتر"
+            />
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-actions">
+      <button class="save-btn" (click)="addBranch()">
+        <span class="material-icons">save</span>
+        حفظ
+      </button>
+      <button class="cancel-btn" (click)="closeAddModal()">
+        <span class="material-icons">cancel</span>
+        إلغاء
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Branch Modal -->
+<div class="modal" *ngIf="isEditModalOpen()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><span class="material-icons">edit_location_alt</span> تعديل الفرع</h2>
+      <button class="close-btn" (click)="closeEditModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form *ngIf="selectedBranch()">
+        <div class="form-group">
+          <label for="editBranchName"
+            >اسم الفرع <span class="required">*</span></label
+          >
+          <div class="input-with-icon">
+            <span class="material-icons">business</span>
+            <input
+              id="editBranchName"
+              type="text"
+              [(ngModel)]="selectedBranch()!.name"
+              name="editBranchName"
+              required
+              placeholder="أدخل اسم الفرع"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editBranchLatitude"
+            >خط العرض <span class="required">*</span></label
+          >
+          <div class="input-with-icon">
+            <span class="material-icons">location_on</span>
+            <input
+              id="editBranchLatitude"
+              type="number"
+              [(ngModel)]="selectedBranch()!.latitude"
+              name="editBranchLatitude"
+              required
+              step="0.000001"
+              placeholder="أدخل خط العرض"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editBranchLongitude"
+            >خط الطول <span class="required">*</span></label
+          >
+          <div class="input-with-icon">
+            <span class="material-icons">location_on</span>
+            <input
+              id="editBranchLongitude"
+              type="number"
+              [(ngModel)]="selectedBranch()!.longitude"
+              name="editBranchLongitude"
+              required
+              step="0.000001"
+              placeholder="أدخل خط الطول"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editBranchRadius"
+            >نطاق الفرع (متر) <span class="required">*</span></label
+          >
+          <div class="input-with-icon">
+            <span class="material-icons">radar</span>
+            <input
+              id="editBranchRadius"
+              type="number"
+              [(ngModel)]="selectedBranch()!.radius"
+              name="editBranchRadius"
+              required
+              min="1"
+              placeholder="أدخل نطاق الفرع بالمتر"
+            />
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-actions">
+      <button class="save-btn" (click)="updateBranch()">
+        <span class="material-icons">save</span>
+        حفظ التغييرات
+      </button>
+      <button class="cancel-btn" (click)="closeEditModal()">
+        <span class="material-icons">cancel</span>
+        إلغاء
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Branch Modal -->
+<div class="modal" *ngIf="isDeleteModalOpen()">
+  <div class="modal-content delete-modal">
+    <div class="modal-header">
+      <h2><span class="material-icons">delete_forever</span> تأكيد الحذف</h2>
+      <button class="close-btn" (click)="closeDeleteModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body delete-confirmation">
+      <span class="material-icons warning-icon">warning</span>
+      <p>هل أنت متأكد من حذف الفرع "{{ selectedBranch()?.name }}"؟</p>
+      <p class="delete-warning">هذا الإجراء لا يمكن التراجع عنه.</p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="delete-btn" (click)="deleteBranch()">
+        <span class="material-icons">delete</span>
+        نعم، حذف
+      </button>
+      <button class="cancel-btn" (click)="closeDeleteModal()">
+        <span class="material-icons">cancel</span>
+        إلغاء
+      </button>
+    </div>
+  </div>
+</div>

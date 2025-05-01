@@ -53,7 +53,7 @@ export class EmployeeListComponent implements OnInit {
           phoneNumber: employee.phoneNumber || '',
           address: employee.address || '',
           nationalId: employee.nationalId || '',
-          baseSalary: employee.baseSalary ?? 0,
+          salary: employee.salary ?? 0,
           shift: employee.shift || [],
           branch: employee.branch || [],
           gender: employee.gender || '',

@@ -1,0 +1,284 @@
+<div class="container">
+  <!-- Notification -->
+  @if (notification()) {
+  <div
+    class="notification"
+    [class]="notification()?.type"
+    role="alert"
+    aria-live="assertive"
+  >
+    <span class="material-icons">
+      {{ getNotificationIcon(notification()!.type) }}
+    </span>
+    {{ notification()?.message }}
+  </div>
+  }
+
+  <!-- Header -->
+  <div class="attendance-reports-header">
+    <h2>تقارير الحضور</h2>
+    <p class="header-description">عرض وتصفية تقارير الحضور الشهرية للموظفين</p>
+  </div>
+
+  <!-- Filters -->
+  <form [formGroup]="filterForm" class="filters">
+    <div class="filter-group">
+      <label for="year">السنة:</label>
+      <input
+        type="number"
+        id="year"
+        formControlName="year"
+        (change)="onFilterChange()"
+        min="2000"
+        max="2100"
+        aria-label="تصفية حسب السنة"
+      />
+    </div>
+    <div class="filter-group">
+      <label for="month">الشهر:</label>
+      <select
+        id="month"
+        formControlName="month"
+        (change)="onFilterChange()"
+        aria-label="تصفية حسب الشهر"
+      >
+        @for (m of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track m) {
+        <option [value]="m">{{ m }}</option>
+        }
+      </select>
+    </div>
+    <button
+      class="reset-btn"
+      type="button"
+      (click)="resetFilters()"
+      aria-label="إعادة ضبط الفلاتر"
+    >
+      <span class="material-icons">refresh</span>
+      إعادة ضبط
+    </button>
+  </form>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري تحميل تقارير الحضور...</p>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && attendanceReports().length === 0) {
+  <div class="empty-state">
+    <span class="material-icons">event_busy</span>
+    <p>لا توجد تقارير حضور متاحة لهذه الفلاتر</p>
+    <button
+      class="reset-btn"
+      type="button"
+      (click)="resetFilters()"
+      aria-label="إعادة ضبط الفلاتر"
+    >
+      إعادة ضبط الفلاتر
+    </button>
+  </div>
+  }
+
+  <!-- Attendance Reports Table -->
+  @if (!isLoading() && attendanceReports().length > 0) {
+  <div class="reports-table-container">
+    <table class="reports-table" role="grid">
+      <thead>
+        <tr>
+          <th scope="col">الموظف</th>
+          <th scope="col">البريد الإلكتروني</th>
+          <th scope="col">ساعات العمل الشهرية</th>
+          <th scope="col">ساعات التأخير</th>
+          <th scope="col">أيام الغياب</th>
+          <th scope="col">أيام الإجازة</th>
+          <th scope="col">ساعات العمل الإضافية</th>
+          <th scope="col">الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (report of attendanceReports(); track report.employeeId) {
+        <tr>
+          <td data-label="الموظف">{{ report.name }}</td>
+          <td data-label="البريد الإلكتروني">{{ report.email }}</td>
+          <td data-label="ساعات العمل الشهرية">
+            {{ report.numberOfMonthlyWorkingHours | number : "1.2-2" }}
+          </td>
+          <td data-label="ساعات التأخير">
+            {{ report.numberOfLateHours | number : "1.2-2" }}
+          </td>
+          <td data-label="أيام الغياب">{{ report.numberOfAbsentDays }}</td>
+          <td data-label="أيام الإجازة">{{ report.numberOfVacationDays }}</td>
+          <td data-label="ساعات العمل الإضافية">
+            {{ report.numberOfOverTime | number : "1.2-2" }}
+          </td>
+          <td data-label="الإجراءات" class="actions-cell">
+            <button
+              class="details-btn"
+              (click)="loadEmployeeAttendance(report.employeeId)"
+              aria-label="عرض تفاصيل حضور"
+            >
+              <span class="material-icons">visibility</span>
+              عرض التفاصيل
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button
+        [disabled]="pageNumber() === 1"
+        (click)="changePage(pageNumber() - 1)"
+        aria-label="الصفحة السابقة"
+      >
+        <span class="material-icons">chevron_right</span>
+      </button>
+      <span>الصفحة {{ pageNumber() }}</span>
+      <button
+        [disabled]="attendanceReports().length < pageSize()"
+        (click)="changePage(pageNumber() + 1)"
+        aria-label="الصفحة التالية"
+      >
+        <span class="material-icons">chevron_left</span>
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Employee Attendance Modal -->
+  @if (showEmployeeModal()) {
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><span class="material-icons">event</span> تفاصيل حضور الموظف</h2>
+        <button
+          class="close-btn"
+          (click)="closeEmployeeModal()"
+          aria-label="إغلاق النافذة"
+        >
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Employee Filters -->
+        <form [formGroup]="employeeFilterForm" class="employee-filters">
+          <div class="filter-group">
+            <label for="reportType">نوع التقرير:</label>
+            <select
+              id="reportType"
+              formControlName="reportType"
+              (change)="onEmployeeFilterChange()"
+            >
+              <option value="0">يومي</option>
+              <option value="1">أسبوعي</option>
+              <option value="2">شهري</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="dayDate">تاريخ معين:</label>
+            <input
+              type="date"
+              id="dayDate"
+              formControlName="dayDate"
+              (change)="onEmployeeFilterChange()"
+            />
+          </div>
+          <div class="filter-group">
+            <label for="fromDate">من تاريخ:</label>
+            <input
+              type="date"
+              id="fromDate"
+              formControlName="fromDate"
+              (change)="onEmployeeFilterChange()"
+            />
+          </div>
+          <div class="filter-group">
+            <label for="toDate">إلى تاريخ:</label>
+            <input
+              type="date"
+              id="toDate"
+              formControlName="toDate"
+              (change)="onEmployeeFilterChange()"
+            />
+          </div>
+          <div class="filter-group">
+            <label for="month">الشهر:</label>
+            <select
+              id="month"
+              formControlName="month"
+              (change)="onEmployeeFilterChange()"
+            >
+              <option value="">-- اختر --</option>
+              @for (m of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track m) {
+              <option [value]="m">{{ m }}</option>
+              }
+            </select>
+          </div>
+        </form>
+
+        <!-- Employee Attendance Table -->
+        @if (employeeAttendance().length > 0) {
+        <div class="employee-table-container">
+          <table class="employee-table">
+            <thead>
+              <tr>
+                <th>الموظف</th>
+                <th>البريد</th>
+                <th>التاريخ</th>
+                <th>وقت الحضور</th>
+                <th>وقت المغادرة</th>
+                <th>الفرع</th>
+                <th>ساعات إضافية</th>
+                <th>ساعات التأخير</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (record of employeeAttendance(); track record.date) {
+              <tr>
+                <td data-label="الموظف">{{ record.employeeName }}</td>
+                <td data-label="البريد">{{ record.email }}</td>
+                <td data-label="التاريخ">
+                  {{ record.date | date : "yyyy-MM-dd" }}
+                </td>
+                <td data-label="وقت الحضور">{{ record.timeOfAttend }}</td>
+                <td data-label="وقت المغادرة">{{ record.timeOfLeave }}</td>
+                <td data-label="الفرع">{{ record.branchName }}</td>
+                <td data-label="ساعات إضافية">
+                  {{ record.numberOfOverTime | number : "1.2-2" }}
+                </td>
+                <td data-label="ساعات التأخير">
+                  {{ record.numberOfLateHour | number : "1.2-2" }}
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        } @else if (!isLoading()) {
+        <div class="empty-state">
+          <span class="material-icons">event_busy</span>
+          <p>لا توجد سجلات حضور متاحة</p>
+        </div>
+        }
+      </div>
+
+      <div class="modal-actions">
+        <button
+          class="cancel-btn"
+          (click)="closeEmployeeModal()"
+          aria-label="إغلاق"
+        >
+          <span class="material-icons">cancel</span>
+          إغلاق
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

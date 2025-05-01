@@ -1,0 +1,364 @@
+// Import existing variables
+@import '../Roles/Roles.component.scss';
+
+// Container
+.container {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+
+  @media (max-width: 576px) {
+    padding: 0.75rem;
+  }
+}
+
+// Header
+.attendance-reports-header {
+  margin-bottom: 1.5rem;
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 0.5rem;
+    position: relative;
+    padding-right: 1rem;
+
+    &:before {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 1.5rem;
+      background-color: $primary-color;
+      border-radius: 2px;
+    }
+  }
+
+  .header-description {
+    color: $text-secondary;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  @media (max-width: 576px) {
+    h2 {
+      font-size: 1.25rem;
+    }
+    .header-description {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// Filters
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: $background-color;
+  border-radius: $border-radius;
+  align-items: center;
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 150px;
+
+    label {
+      color: $text-secondary;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    input,
+    select {
+      padding: 0.6rem 0.75rem;
+      border: 1px solid $border-color;
+      border-radius: $border-radius;
+      font-size: 0.9rem;
+      background-color: white;
+      transition: $transition;
+      flex: 1;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 2px $primary-light;
+      }
+    }
+
+    input[type="number"] {
+      width: 100px;
+    }
+  }
+
+  .reset-btn {
+    @extend .reset-btn;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    .filter-group {
+      width: 100%;
+      input,
+      select {
+        width: 100%;
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    padding: 0.5rem;
+    .filter-group {
+      label {
+        font-size: 0.8rem;
+      }
+      input,
+      select {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
+
+// Reports Table
+.reports-table-container {
+  @extend .users-table-container;
+
+  .reports-table {
+    @extend .users-table;
+
+    th,
+    td {
+      padding: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .actions-cell {
+      .details-btn {
+        @extend .edit-roles-btn;
+        background-color: $info-light;
+        color: $info-color;
+
+        &:hover {
+          background-color: $info-color;
+          color: white;
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      td {
+        &.actions-cell {
+          .details-btn {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+      }
+    }
+
+    @media (max-width: 576px) {
+      td {
+        font-size: 0.8rem;
+        padding: 0.5rem;
+      }
+    }
+  }
+}
+
+// Pagination
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+
+  button {
+    padding: 0.5rem;
+    border: none;
+    background: $primary-light;
+    color: $primary-color;
+    border-radius: $border-radius;
+    cursor: pointer;
+    transition: $transition;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      background: $primary-color;
+      color: white;
+    }
+
+    &[disabled] {
+      background: $border-color;
+      color: $text-light;
+      cursor: not-allowed;
+    }
+
+    .material-icons {
+      font-size: 18px;
+    }
+  }
+
+  span {
+    font-size: 0.9rem;
+    color: $text-secondary;
+  }
+
+  @media (max-width: 576px) {
+    gap: 0.5rem;
+    button {
+      padding: 0.4rem;
+      .material-icons {
+        font-size: 16px;
+      }
+    }
+    span {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// Employee Modal
+.modal {
+  @extend .modal;
+
+  .modal-content {
+    @extend .modal-content;
+
+    .modal-header {
+      @extend .modal-header;
+    }
+
+    .modal-body {
+      @extend .modal-body;
+
+      .employee-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+
+        .filter-group {
+          @extend .filter-group;
+        }
+
+        @media (max-width: 576px) {
+          flex-direction: column;
+          .filter-group {
+            width: 100%;
+            input,
+            select {
+              width: 100%;
+              padding: 0.5rem;
+              font-size: 0.85rem;
+            }
+          }
+        }
+      }
+
+      .employee-table-container {
+        overflow-x: auto;
+
+        .employee-table {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 0;
+
+          th,
+          td {
+            padding: 0.75rem;
+            text-align: right;
+            border-bottom: 1px solid $border-color;
+            font-size: 0.9rem;
+          }
+
+          th {
+            background-color: $background-color;
+            color: $text-primary;
+            font-weight: 600;
+          }
+
+          tbody tr {
+            &:hover {
+              background-color: $primary-light;
+            }
+          }
+
+          @media (max-width: 768px) {
+            thead {
+              display: none;
+            }
+
+            tbody,
+            tr,
+            td {
+              display: block;
+              width: 100%;
+            }
+
+            tr {
+              margin-bottom: 0.75rem;
+              border: 1px solid $border-color;
+              border-radius: 8px;
+              padding: 0.5rem;
+              background-color: white;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            td {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 0.5rem 0.75rem;
+              text-align: right;
+              border-bottom: none;
+              font-size: 0.85rem;
+
+              &:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: $text-primary;
+                font-size: 0.8rem;
+                flex: 1;
+                text-align: right;
+              }
+            }
+          }
+
+          @media (max-width: 576px) {
+            td {
+              font-size: 0.8rem;
+              padding: 0.4rem 0.5rem;
+
+              &:before {
+                font-size: 0.75rem;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .modal-actions {
+      @extend .modal-actions;
+
+      .cancel-btn {
+        @extend .cancel-btn;
+      }
+    }
+  }
+}

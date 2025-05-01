@@ -1,20 +1,63 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError, of } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environments';
+import { Shift } from '../../models/shifts.model';
+import { Branch } from '../../models/branch.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = environment.apiUrl;
-  private tokenKey = 'auth_token'; // Key for localStorage
-  private rolesKey = 'auth_roles'; // Key for localStorage
-  private userIdKey = 'auth_userId'; // Key for userId in localStorage
+  private tokenKey = 'auth_token';
+  private rolesKey = 'auth_roles';
+  private shiftsKey = 'auth_shifts';
+  private userIdKey = 'auth_userId';
+  private branchNameKey = 'auth_branchName';
   private isLoggedInSubject = new BehaviorSubject<boolean>(this.hasToken());
 
   constructor(private http: HttpClient) {}
+
+  // Add checkAuthStatus method
+  checkAuthStatus(): Observable<boolean> {
+    const token = this.getToken();
+    if (!token) {
+      this.isLoggedInSubject.next(false);
+      return of(false);
+    }
+
+    // Optionally validate the token with the backend (if an endpoint exists)
+    // For now, rely on the presence of the token and the isLoggedInSubject
+    const isLoggedIn = this.isLoggedInSubject.value;
+    return of(isLoggedIn).pipe(
+      tap((status) => {
+        console.log('Auth status checked:', status);
+        if (!status) {
+          this.clearAuthData(); // Clear stale data if not logged in
+        }
+      })
+    );
+
+    // If you have a backend endpoint to validate the token, you can uncomment this:
+    /*
+    return this.http.get(`${this.apiUrl}/Account/validate-token`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).pipe(
+      map(() => {
+        this.isLoggedInSubject.next(true);
+        return true;
+      }),
+      catchError((error) => {
+        console.error('Token validation failed:', error);
+        this.clearAuthData();
+        this.isLoggedInSubject.next(false);
+        return of(false);
+      })
+    );
+    */
+  }
 
   login(
     email: string,
@@ -23,18 +66,26 @@ export class AuthService {
     token: string;
     roles: string[] | string | null;
     id: string;
+    shift: Shift[];
+    branch: Branch;
   }> {
     return this.http
       .post<{
         token: string;
         roles: string[] | string | null;
         id: string;
+        shift: Shift[];
+        branch: Branch;
       }>(`${this.apiUrl}/Account/login`, { email, password })
       .pipe(
         tap((response) => {
+          console.log('Login response:', response);
+          console.log('Setting branch data:', response.branch);
           this.setToken(response.token);
-          this.setRoles(response.roles ?? 'User'); // Default to 'User' if roles are null
+          this.setRoles(response.roles ?? 'User');
           this.setUserId(response.id);
+          this.setShifts(response.shift);
+          this.setBranchName(response.branch);
           this.isLoggedInSubject.next(true);
         }),
         catchError((error) =>
@@ -54,43 +105,6 @@ export class AuthService {
     );
   }
 
-  getUserInfo(): Observable<{
-    token: string | null;
-    roles: string[] | string | null;
-    userId: string | null;
-  }> {
-    return this.http
-      .get<{
-        token: string | null;
-        roles: string[] | string | null;
-        userId: string | null;
-      }>(`${this.apiUrl}/me`)
-      .pipe(catchError(() => of({ token: null, roles: null, userId: null })));
-  }
-
-  public checkAuthStatus(): Observable<any> {
-    if (!this.hasToken()) {
-      this.isLoggedInSubject.next(false);
-      return of(null);
-    }
-    return this.getUserInfo().pipe(
-      tap((response) => {
-        if (response.token && response.roles && response.userId) {
-          this.setToken(response.token);
-          this.setRoles(response.roles);
-          this.setUserId(response.userId);
-          this.isLoggedInSubject.next(true);
-        } else {
-          this.clearAuthData();
-        }
-      }),
-      catchError(() => {
-        this.clearAuthData();
-        return of(null);
-      })
-    );
-  }
-
   isLoggedIn(): boolean {
     return this.isLoggedInSubject.value;
   }
@@ -104,8 +118,48 @@ export class AuthService {
     return roles ? JSON.parse(roles) : [];
   }
 
+  getShifts(): Shift[] {
+    const shifts = localStorage.getItem(this.shiftsKey);
+    return shifts ? JSON.parse(shifts) : [];
+  }
+
   getUserId(): string | null {
-    return localStorage.getItem(this.userIdKey);
+    const userId = localStorage.getItem(this.userIdKey);
+    console.log('Retrieved auth_userId from localStorage:', userId);
+    if (!userId) return null;
+    try {
+      if (userId.startsWith('{')) {
+        const parsed = JSON.parse(userId);
+        return parsed.id ?? null;
+      }
+      return userId;
+    } catch (error) {
+      console.error('Failed to parse userId:', error);
+      return null;
+    }
+  }
+
+  getBranchName(): Branch | null {
+    const branch = localStorage.getItem(this.branchNameKey);
+    console.log('Retrieved auth_branchName from localStorage:', branch);
+    if (!branch) return null;
+    try {
+      const parsed = JSON.parse(branch);
+      if (
+        parsed &&
+        typeof parsed.id === 'number' &&
+        typeof parsed.name === 'string' &&
+        typeof parsed.latitude === 'number' &&
+        typeof parsed.longitude === 'number' &&
+        typeof parsed.radius === 'number'
+      ) {
+        return parsed as Branch;
+      }
+      return null;
+    } catch (error) {
+      console.error('Failed to parse branch data:', error);
+      return null;
+    }
   }
 
   hasRole(role: string): boolean {
@@ -133,12 +187,25 @@ export class AuthService {
       ? Array.isArray(roles)
         ? roles
         : [roles]
-      : ['User']; // Default to ['User'] if roles are null
+      : ['User'];
     localStorage.setItem(this.rolesKey, JSON.stringify(rolesArray));
   }
 
+  private setShifts(shifts: Shift[]): void {
+    localStorage.setItem(this.shiftsKey, JSON.stringify(shifts));
+  }
+
   private setUserId(userId: string): void {
+    console.log('Setting auth_userId in localStorage:', userId);
     localStorage.setItem(this.userIdKey, userId);
+  }
+
+  private setBranchName(branch: Branch | null): void {
+    if (branch) {
+      localStorage.setItem(this.branchNameKey, JSON.stringify(branch));
+    } else {
+      localStorage.removeItem(this.branchNameKey);
+    }
   }
 
   private hasToken(): boolean {
@@ -148,9 +215,12 @@ export class AuthService {
   private clearAuthData(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.rolesKey);
+    localStorage.removeItem(this.shiftsKey);
     localStorage.removeItem(this.userIdKey);
+    localStorage.removeItem(this.branchNameKey);
     this.isLoggedInSubject.next(false);
   }
+
   forgotPassword(email: string): Observable<string> {
     return this.http.post(
       `${this.apiUrl}/account/forgetpassword`,
@@ -159,43 +229,6 @@ export class AuthService {
     );
   }
 
-  // validateResetToken(token: string): Observable<any> {
-  //   return this.http
-  //     .post(`${this.apiUrl}/validate-reset-token`, { token })
-  //     .pipe(
-  //       tap((response) => console.log('Token validated:', response)),
-  //       catchError((error) =>
-  //         throwError(
-  //           () => new Error('Invalid or expired token: ' + error.message)
-  //         )
-  //       )
-  //     );
-  // }
-
-  // resetPassword(
-  //   password: string,
-  //   email: string,
-  //   token: string
-  // ): Observable<string> {
-  //   const body = { password, email, token };
-  //   console.log('Request body:', body);
-  //   return this.http
-  //     .post(`${this.apiUrl}/account/resetPassword`, body, {
-  //       responseType: 'text',
-  //     })
-  //     .pipe(
-  //       tap((response) => console.log('Reset password response:', response)),
-  //       catchError((error) => {
-  //         console.error('Reset password error details:', error);
-  //         return throwError(
-  //           () =>
-  //             new Error(
-  //               'Failed to reset password: ' + (error.error || error.message)
-  //             )
-  //         );
-  //       })
-  //     );
-  // }
   resetPassword(
     password: string,
     email: string,
@@ -209,12 +242,13 @@ export class AuthService {
       })
       .pipe(catchError(this.handleError));
   }
-  // Mock methods (optional)
+
   validateResetToken1(token: string): Observable<any> {
     return of({ valid: true }).pipe(
       tap(() => console.log('Mock token validated:', token))
     );
   }
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'Something went wrong; please try again later.';
     if (error.status === 400) {
@@ -231,9 +265,4 @@ export class AuthService {
     });
     return throwError(() => new Error(errorMessage));
   }
-  // resetPassword1(token: string, password: string): Observable<any> {
-  //   return of({ success: true }).pipe(
-  //     tap(() => console.log('Mock password reset:', token, password))
-  //   );
-  // }
 }

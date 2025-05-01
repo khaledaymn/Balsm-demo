@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EmployeeService } from '../../core/services/employee.service';
-import { addEmployee, Employee } from '../../models/employee.model';
+import { editEmployee, Employee } from '../../models/employee.model';
 import { Branch } from '../../models/branch.model';
 import { BranchService } from '../../core/services/branches.service';
 
@@ -20,7 +20,7 @@ interface Notification {
   styleUrls: ['./edit-employee.component.scss'],
 })
 export class EditEmployeeComponent implements OnInit {
-  addEmployee: addEmployee | null = null;
+  editEmployee: editEmployee | null = null;
   notification: Notification | null = null;
   errorMessage: string | null = null;
   branches: Branch[] = [];
@@ -38,6 +38,7 @@ export class EditEmployeeComponent implements OnInit {
     console.log(id);
     if (id) {
       this.loadEmployee(id);
+      console.log(id + ' ,,,,,,,,,,,id loadEmployee');
     } else {
       this.errorMessage = 'لم يتم العثور على معرف الموظف';
     }
@@ -53,26 +54,25 @@ export class EditEmployeeComponent implements OnInit {
       },
     });
   }
-  private loadEmployee(id: string): void {
-    console.log(this.addEmployee);
+  private loadEmployee(id: string): any {
     this.employeeService.getEmployeeById(id).subscribe({
       next: (response) => {
         const employee = response.data;
-        this.addEmployee = {
-          id: employee.id,
+        this.editEmployee = {
+          id: employee.id || '',
           name: employee.name || '',
           email: employee.email || '',
           phoneNumber: employee.phoneNumber || '',
           address: employee.address || '',
-          password: '', // Optional; consider removing if not needed
           gender: employee.gender || 'male',
-          baseSalary: employee.baseSalary ?? 0,
+          salary: employee.salary ?? 0,
           branchId: employee.branch.id || 0,
           hiringDate: employee.hiringDate || '',
           nationalId: employee.nationalId || '',
           dateOfBarth: employee.dateOfBarth || '',
-          roles: ['User'],
         };
+        console.log(this.editEmployee + ' loadEmployee');
+        return this.editEmployee;
       },
       error: (err) => {
         console.error('Failed to load employee:', err);
@@ -81,9 +81,9 @@ export class EditEmployeeComponent implements OnInit {
     });
   }
 
-  saveaddEmployee(): void {
-    if (this.addEmployee) {
-      this.employeeService.updateEmployee(this.addEmployee).subscribe({
+  saveeditEmployee(): void {
+    if (this.editEmployee) {
+      this.employeeService.updateEmployee(this.editEmployee).subscribe({
         next: () => {
           this.showNotification('تم تعديل الموظف بنجاح', 'success');
           setTimeout(() => {

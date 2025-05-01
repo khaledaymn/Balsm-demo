@@ -6,7 +6,7 @@
   <div class="employee-details-card">
     <div class="card-header">
       <div class="employee-avatar">
-        {{ employee.name?.charAt(0) || "" }}
+        {{ employee.name.charAt(0) || "" }}
       </div>
       <h3 class="card-title">تفاصيل الموظف</h3>
       <button class="close-btn" (click)="closeDetails()">
@@ -37,9 +37,7 @@
             <span class="material-icons">payments</span>
             الراتب
           </div>
-          <div class="info-value highlight">
-            {{ employee.baseSalary ?? 0 }} ريال
-          </div>
+          <div class="info-value highlight">{{ employee.salary }} ريال</div>
         </div>
 
         <div class="info-group">
@@ -108,7 +106,7 @@
             الأدوار
           </div>
           <div class="info-value">
-            {{ employee.roles?.join(", ") || "غير متوفر" }}
+            {{ employee.roles.join(", ") || "غير متوفر" }}
           </div>
         </div>
       </div>
