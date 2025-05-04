@@ -1,0 +1,27 @@
+export interface EmployeeSalary {
+  employeeId: string;
+  employeeName: string;
+  netSalary: number;
+}
+
+export interface EmployeeSalaryDetails {
+  employeeName: string;
+  baseSalary: number;
+  overTime: number;
+  overTimeSalary: number;
+  lateTime: number;
+  lateTimeSalary: number;
+  numberOfAbsentDays: number;
+  absentDaysSalary: number;
+  totalSalary: number;
+}
+
+// export interface EmployeeSalaryResponse {
+//   success: boolean;
+//   data: EmployeeSalary[];
+// }
+
+// export interface EmployeeSalaryDetailsResponse {
+//   success: boolean;
+//   data: EmployeeSalaryDetails;
+// }

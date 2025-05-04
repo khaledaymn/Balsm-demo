@@ -1,0 +1,591 @@
+// Variables
+$primary-color: #008D7F;
+$primary-light: rgba($primary-color, 0.1);
+$earning-color: #4CAF50;
+$earning-light: rgba($earning-color, 0.1);
+$deduction-color: #F44336;
+$deduction-light: rgba($deduction-color, 0.1);
+$border-color: #E5E9F2;
+$background-color: #F8F9FC;
+$text-primary: #333333;
+$text-secondary: #666666;
+$text-light: #999999;
+$transition: all 0.3s ease;
+$border-radius: 0.5rem;
+
+// Container
+.container {
+  display: block;
+  direction: rtl;
+  font-family: 'Cairo', sans-serif;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: $border-radius;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 1400px;
+  margin: 2rem auto;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    margin: 0.5rem;
+    border-radius: 8px;
+  }
+
+  @media (max-width: 576px) {
+    padding: 0.75rem;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+// Notification
+.notification {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.6rem 1rem;
+  border-radius: $border-radius;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 90%;
+  min-width: 200px;
+
+  .material-icons {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  &.success {
+    background-color: #4CAF50;
+  }
+
+  &.error {
+    background-color: #F44336;
+  }
+
+  &.info {
+    background-color: $primary-color;
+  }
+
+  @media (max-width: 576px) {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    .material-icons {
+      font-size: 16px;
+    }
+  }
+}
+
+// Loading and Empty States
+.loading-state,
+.empty-state {
+  padding: 2rem 0.75rem;
+  text-align: center;
+  background-color: $background-color;
+  border-radius: $border-radius;
+  margin: 1rem 0;
+
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid $primary-light;
+    border-radius: 50%;
+    border-top-color: $primary-color;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 0.75rem;
+  }
+
+  p {
+    color: $text-secondary;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .material-icons {
+    font-size: 36px;
+    color: $text-light;
+    margin-bottom: 0.75rem;
+  }
+
+  @media (max-width: 576px) {
+    padding: 1.5rem 0.5rem;
+    .material-icons {
+      font-size: 32px;
+    }
+    p {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// Employees Table
+.employees-table-container {
+  overflow-x: auto;
+  border-radius: $border-radius;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .history-table {
+    width: 100%;
+  }
+
+  .table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 0.5fr;
+    background-color: $background-color;
+    border-radius: $border-radius $border-radius 0 0;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 0.5rem;
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 0.5fr;
+    border-bottom: 1px solid $border-color;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba($primary-color, 0.02);
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    @media (max-width: 768px) {
+      display: block;
+      padding: 1rem;
+      border: 1px solid $border-color;
+      border-radius: 0.25rem;
+      margin-bottom: 0.75rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .table-cell {
+    padding: 0.75rem 1rem;
+
+    @media (max-width: 768px) {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+
+      &:before {
+        content: attr(data-label);
+        font-weight: 600;
+      }
+    }
+  }
+
+  .actions-cell {
+    display: flex;
+    gap: 0.25rem;
+
+    .icon-button {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+
+      .material-icons {
+        font-size: 16px;
+      }
+    }
+
+    .view-button {
+      background-color: rgba($primary-color, 0.1);
+      color: $primary-color;
+
+      &:hover {
+        background-color: rgba($primary-color, 0.2);
+      }
+    }
+  }
+}
+
+// Modal
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  backdrop-filter: blur(2px);
+  padding: 0.5rem;
+
+  .modal-content {
+    background-color: white;
+    border-radius: $border-radius;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: scaleIn 0.3s ease;
+  }
+}
+
+// Provided SCSS for Salary Details (adjusted)
+@media print {
+  .back-button,
+  .header-actions,
+  .actions-cell {
+    display: none !important;
+  }
+
+  .salary-details-page {
+    padding: 0 !important;
+  }
+
+  .breakdown-section {
+    break-inside: avoid;
+  }
+}
+
+.salary-details-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .back-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: $text-secondary;
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-left: 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    &:hover {
+      color: $primary-color;
+    }
+
+    .material-icons {
+      font-size: 18px;
+    }
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 0.5rem;
+
+    .action-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: $primary-light;
+      color: $primary-color;
+      border: none;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: rgba($primary-color, 0.2);
+      }
+
+      .material-icons {
+        font-size: 18px;
+      }
+    }
+  }
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.salary-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  .summary-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    .summary-title {
+      font-size: 0.875rem;
+      color: $text-secondary;
+      margin-bottom: 0.5rem;
+    }
+
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+
+    &.net-salary {
+      background-color: $primary-light;
+
+      .summary-title {
+        color: rgba($primary-color, 0.8);
+      }
+
+      .summary-value {
+        color: $primary-color;
+      }
+    }
+  }
+}
+
+.salary-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.breakdown-section {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid $border-color;
+
+    .material-icons {
+      font-size: 20px;
+    }
+
+    &:first-child {
+      color: $earning-color;
+
+      .material-icons {
+        color: $earning-color;
+      }
+    }
+
+    &:nth-child(2) {
+      color: $deduction-color;
+
+      .material-icons {
+        color: $deduction-color;
+      }
+    }
+  }
+}
+
+.breakdown-items {
+  .breakdown-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid $border-color;
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+
+    .item-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 1rem;
+
+      .material-icons {
+        font-size: 18px;
+      }
+    }
+
+    .item-details {
+      flex: 1;
+
+      .item-name {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: $text-primary;
+      }
+
+      .item-info {
+        font-size: 0.75rem;
+        color: $text-light;
+        margin-top: 0.25rem;
+      }
+    }
+
+    .item-amount {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: $text-primary;
+    }
+  }
+
+  .breakdown-total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid $border-color;
+
+    .total-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+
+    .total-amount {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+  }
+}
+
+// Style earning items
+.breakdown-items:first-of-type {
+  .item-icon {
+    background-color: $earning-light;
+    color: $earning-color;
+
+    .material-icons {
+      color: $earning-color;
+    }
+  }
+
+  .breakdown-total {
+    .total-label,
+    .total-amount {
+      color: $earning-color;
+    }
+  }
+}
+
+// Style deduction items
+.breakdown-items:last-of-type {
+  .item-icon {
+    background-color: $deduction-light;
+    color: $deduction-color;
+
+    .material-icons {
+      color: $deduction-color;
+    }
+  }
+
+  .breakdown-total {
+    .total-label,
+    .total-amount {
+      color: $deduction-color;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    top: -50px;
+    opacity: 0;
+  }
+  to {
+    top: 10px;
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

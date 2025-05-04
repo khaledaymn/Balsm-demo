@@ -20,6 +20,8 @@ import { UserRolesComponent } from './components/Roles/Roles.component';
 import { AttendanceTrackerComponent } from './components/attendance-tracker/attendance-tracker.component';
 import { GeneralSettingsComponent } from './components/general-settings/general-settings.component';
 import { AttendanceReportsComponent } from './components/attendance-reports/attendance-reports.component';
+import { EmployeeSalariesComponent } from './components/employee-salaries/employee-salaries.component';
+import { NotificationsComponent } from './components/notification/notification.component';
 
 export const appRoutes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
@@ -63,6 +65,9 @@ export const appRoutes: Routes = [
             component: GeneralSettingsComponent,
           },
           { path: 'attendance/reports', component: AttendanceReportsComponent },
+          { path: 'notification', component: NotificationsComponent },
+
+          { path: 'payroll/list', component: EmployeeSalariesComponent },
         ],
       },
 

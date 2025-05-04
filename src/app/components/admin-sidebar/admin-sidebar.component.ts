@@ -87,6 +87,11 @@ export class AdminSidebarComponent {
     },
     { label: 'الفروع', icon: 'business', route: '/app/admin/branches' },
     {
+      label: 'الاشعارات',
+      icon: 'notifications',
+      route: '/app/admin/notification',
+    },
+    {
       label: 'الإجازات',
       icon: 'event',
       route: '/app/admin/holidays',

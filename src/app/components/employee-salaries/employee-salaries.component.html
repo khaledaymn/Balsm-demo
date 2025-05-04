@@ -1,0 +1,185 @@
+<div class="container">
+  <!-- Notification -->
+  @if (notification()) {
+  <div
+    class="notification"
+    [class]="notification()?.type"
+    role="alert"
+    aria-live="assertive"
+  >
+    <span class="material-icons">
+      {{ getNotificationIcon(notification()!.type) }}
+    </span>
+    {{ notification()?.message }}
+  </div>
+  }
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <a [routerLink]="['/dashboard']" class="back-button">
+        <span class="material-icons">arrow_back</span>
+        العودة إلى لوحة التحكم
+      </a>
+      <h1 class="page-title">رواتب الموظفين</h1>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري تحميل رواتب الموظفين...</p>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && employees().length === 0) {
+  <div class="empty-state">
+    <span class="material-icons">event_busy</span>
+    <p>لا توجد رواتب متاحة</p>
+  </div>
+  }
+
+  <!-- Employees Table -->
+  @if (!isLoading() && employees().length > 0) {
+  <div class="employees-table-container">
+    <div class="history-table">
+      <div class="table-header">
+        <div class="header-cell">اسم الموظف</div>
+        <div class="header-cell">صافي الراتب</div>
+        <div class="header-cell">إجراءات</div>
+      </div>
+      @for (employee of employees(); track employee.employeeId) {
+      <div class="table-row">
+        <div class="table-cell" data-label="اسم الموظف">
+          {{ employee.employeeName }}
+        </div>
+        <div class="table-cell" data-label="صافي الراتب">
+          {{ formatCurrency(employee.netSalary) }}
+        </div>
+        <div class="table-cell actions-cell" data-label="إجراءات">
+          <button
+            class="icon-button view-button"
+            (click)="loadEmployeeSalaryDetails(employee)"
+            attr.aria-label="عرض تفاصيل راتب {{ employee.employeeName }}"
+          >
+            <span class="material-icons">visibility</span>
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- Salary Details Modal -->
+  @if (showDetailsModal() && salaryDetails()) {
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-content salary-details-page">
+      <div class="page-header">
+        <div class="header-left">
+          <button class="back-button" (click)="closeDetailsModal()">
+            <span class="material-icons">arrow_back</span>
+            العودة
+          </button>
+          <h1 class="page-title">
+            تفاصيل الراتب - {{ selectedEmployee()?.employeeName }}
+          </h1>
+        </div>
+        <div class="header-actions">
+          <button class="action-button" (click)="printPayslip()">
+            <span class="material-icons">print</span>
+            طباعة قسيمة الراتب
+          </button>
+          <button class="action-button" (click)="downloadPdf()">
+            <span class="material-icons">file_download</span>
+            تنزيل PDF
+          </button>
+        </div>
+      </div>
+
+      <div class="tab-content">
+        <div class="salary-summary">
+          <div class="summary-card">
+            <div class="summary-title">إجمالي الراتب</div>
+            <div class="summary-value">{{ formatCurrency(totalEarnings) }}</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-title">إجمالي الخصومات</div>
+            <div class="summary-value">
+              {{ formatCurrency(totalDeductions) }}
+            </div>
+          </div>
+          <div class="summary-card net-salary">
+            <div class="summary-title">صافي الراتب</div>
+            <div class="summary-value">{{ formatCurrency(netSalary) }}</div>
+          </div>
+        </div>
+
+        <div class="salary-breakdown">
+          <div class="breakdown-section">
+            <h2 class="section-title">
+              <span class="material-icons">add_circle_outline</span>
+              المستحقات
+            </h2>
+            <div class="breakdown-items">
+              @for (item of salaryItems; track item.name) { @if (item.type ===
+              'earning') {
+              <div class="breakdown-item">
+                <div class="item-icon">
+                  <span class="material-icons">{{ item.icon }}</span>
+                </div>
+                <div class="item-details">
+                  <div class="item-name">{{ item.name }}</div>
+                  @if (item.info) {
+                  <div class="item-info">{{ item.info }}</div>
+                  }
+                </div>
+                <div class="item-amount">{{ formatCurrency(item.amount) }}</div>
+              </div>
+              } }
+              <div class="breakdown-total">
+                <div class="total-label">إجمالي المستحقات</div>
+                <div class="total-amount">
+                  {{ formatCurrency(totalEarnings) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="breakdown-section">
+            <h2 class="section-title">
+              <span class="material-icons">remove_circle_outline</span>
+              الخصومات
+            </h2>
+            <div class="breakdown-items">
+              @for (item of salaryItems; track item.name) { @if (item.type ===
+              'deduction') {
+              <div class="breakdown-item">
+                <div class="item-icon">
+                  <span class="material-icons">{{ item.icon }}</span>
+                </div>
+                <div class="item-details">
+                  <div class="item-name">{{ item.name }}</div>
+                  @if (item.info) {
+                  <div class="item-info">{{ item.info }}</div>
+                  }
+                </div>
+                <div class="item-amount">{{ formatCurrency(item.amount) }}</div>
+              </div>
+              } }
+              <div class="breakdown-total">
+                <div class="total-label">إجمالي الخصومات</div>
+                <div class="total-amount">
+                  {{ formatCurrency(totalDeductions) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

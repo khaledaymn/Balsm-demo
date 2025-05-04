@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Shift } from '../../models/shifts.model';
 import { AttendanceService } from '../../core/services/Attendance/attendance.service';
+import { LocationService } from '../../core/services/Attendance/location.service';
 
 @Component({
   selector: 'app-attendance-tracker',
@@ -27,7 +28,8 @@ export class AttendanceTrackerComponent implements OnInit {
     private attendanceService: AttendanceOperationsService,
     private a: AttendanceService,
     private authService: AuthService,
-    private timeValidationService: TimeValidationService
+    private timeValidationService: TimeValidationService,
+    private locationService: LocationService
   ) {}
 
   ngOnInit(): void {
@@ -35,6 +37,7 @@ export class AttendanceTrackerComponent implements OnInit {
     if (this.userId) {
       this.loadAttendanceRecords();
     }
+    console.log(this.locationService.getCurrentLocation());
   }
 
   private loadAttendanceRecords(): void {
