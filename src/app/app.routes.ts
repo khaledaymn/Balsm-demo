@@ -22,6 +22,7 @@ import { GeneralSettingsComponent } from './components/general-settings/general-
 import { AttendanceReportsComponent } from './components/attendance-reports/attendance-reports.component';
 import { EmployeeSalariesComponent } from './components/employee-salaries/employee-salaries.component';
 import { NotificationsComponent } from './components/notification/notification.component';
+import { EmployeeSalaryDetailsComponent } from './components/employee-salary-details/employee-salary-details.component';
 
 export const appRoutes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
@@ -56,6 +57,14 @@ export const appRoutes: Routes = [
           { path: 'shifts', component: EmployeeShiftsComponent },
           { path: 'branches', component: BranchesComponent }, // Placeholder for branches component
           { path: 'user-roles', component: UserRolesComponent }, // Placeholder for branches component
+          {
+            path: 'employee-salary',
+            component: EmployeeSalariesComponent,
+          },
+          {
+            path: 'employee-salary-details/:id',
+            component: EmployeeSalaryDetailsComponent,
+          },
           {
             path: 'attendance-tracker',
             component: AttendanceTrackerComponent,

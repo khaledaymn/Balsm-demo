@@ -33,12 +33,12 @@ export class SalaryService {
 
   getEmployeeSalaryDetails(
     employeeId: string,
-    startDate?: string,
-    endDate?: string
+    month: number,
+    year: number
   ): Observable<EmployeeSalaryDetails> {
-    let params = new HttpParams();
-    if (startDate) params = params.set('startDate', startDate);
-    if (endDate) params = params.set('endDate', endDate);
+    let params = new HttpParams()
+      .set('month', month.toString())
+      .set('year', year.toString());
 
     const headers = new HttpHeaders({ accept: '*/*' });
 

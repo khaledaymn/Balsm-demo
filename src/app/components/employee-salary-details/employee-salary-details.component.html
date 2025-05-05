@@ -1,0 +1,138 @@
+<div
+  class="salary-details-overlay"
+  *ngIf="salaryDetails"
+  (click)="onOverlayClick($event)"
+>
+  <div class="salary-details-card">
+    <div class="card-header">
+      <div class="employee-avatar">
+        {{ salaryDetails.employeeName.charAt(0) || "" }}
+      </div>
+      <h3 class="card-title">تفاصيل الراتب</h3>
+      <button class="close-btn" (click)="closeDetails()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="card-body">
+      <div class="info-grid">
+        <div class="info-group">
+          <div class="info-label">
+            <span class="material-icons">person</span>
+            اسم الموظف
+          </div>
+          <div class="info-value">
+            {{ salaryDetails.employeeName || "غير متوفر" }}
+          </div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-label">
+            <span class="material-icons">calendar_month</span>
+            الشهر/السنة
+          </div>
+          <div class="info-value">
+            {{ salaryDetails.month }}/{{ salaryDetails.year }}
+          </div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-label">
+            <span class="material-icons">payments</span>
+            الراتب الأساسي
+          </div>
+          <div class="info-value highlight">
+            {{ salaryDetails.baseSalary | number : "1.2-2" }} ريال
+          </div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">
+            <span class="material-icons">account_balance</span>
+            إجمالي الراتب
+          </div>
+          <div class="info-value highlight">
+            {{ salaryDetails.totalSalary | number : "1.2-2" }} ريال
+          </div>
+        </div>
+        <div class="info-group">
+          <div class="info-label">
+            <span class="material-icons">schedule</span>
+            ساعات العمل الإضافي
+          </div>
+          <div class="info-value">
+            {{ salaryDetails.overTime | number : "1.2-2" }} ساعة
+          </div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-label">
+            <span class="material-icons">add_circle</span>
+            راتب العمل الإضافي
+          </div>
+          <div class="info-value">
+            {{ salaryDetails.overTimeSalary | number : "1.2-2" }} ريال
+          </div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-label">
+            <span class="material-icons">schedule</span>
+            ساعات التأخير
+          </div>
+          <div class="info-value">
+            {{ salaryDetails.lateTime | number : "1.2-2" }} ساعة
+          </div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-label">
+            <span class="material-icons">remove_circle</span>
+            خصم التأخير
+          </div>
+          <div class="info-value">
+            {{ salaryDetails.lateTimeSalary | number : "1.2-2" }} ريال
+          </div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-label">
+            <span class="material-icons">event_busy</span>
+            أيام الغياب
+          </div>
+          <div class="info-value">
+            {{ salaryDetails.numberOfAbsentDays | number : "1.2-2" }} يوم
+          </div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-label">
+            <span class="material-icons">remove_circle</span>
+            خصم الغياب
+          </div>
+          <div class="info-value">
+            {{ salaryDetails.absentDaysSalary | number : "1.2-2" }} ريال
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <button class="action-btn close-btn" (click)="closeDetails()">
+        <span class="material-icons">close</span>
+        إغلاق
+      </button>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingOrError>
+  <div class="loading-error" *ngIf="errorMessage; else loading">
+    <p>{{ errorMessage }}</p>
+    <button class="back-btn" (click)="closeDetails()">رجوع</button>
+  </div>
+  <ng-template #loading>
+    <div class="loading">
+      <p>جاري تحميل تفاصيل الراتب...</p>
+    </div>
+  </ng-template>
+</ng-template>

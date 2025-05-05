@@ -1,185 +1,129 @@
-<div class="container">
+<div class="employee-list-container">
+  <div class="print-header">
+    <div class="print-title">قائمة الموظفين</div>
+    <div class="print-date">تاريخ الطباعة: {{ getCurrentDate() }}</div>
+    <div class="print-time">وقت الطباعة: {{ getCurrentTime() }}</div>
+  </div>
+
+  <div class="list-header">
+    <h2 class="section-title">رواتب الموظفين</h2>
+    <div class="header-actions">
+      <button
+        class="export-btn"
+        (click)="exportToExcel()"
+        title="تصدير إلى Excel"
+      >
+        <span class="material-icons">file_download</span>
+        تصدير Excel
+      </button>
+      <button
+        class="print-btn"
+        (click)="printEmployeeList()"
+        title="طباعة القائمة"
+      >
+        <span class="material-icons">print</span>
+        طباعة
+      </button>
+    </div>
+  </div>
+
+  <div class="filters-container">
+    <div class="search-box">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+        placeholder="بحث عن موظف..."
+      />
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="employees-table">
+      <thead>
+        <tr>
+          <th (click)="sortBy('name')">
+            الاسم
+            <span class="sort-icon" *ngIf="sortField === 'name'">
+              <span class="material-icons">{{
+                sortDirection === "asc" ? "arrow_upward" : "arrow_downward"
+              }}</span>
+            </span>
+          </th>
+          <th (click)="sortBy('email')">
+            البريد الإلكتروني
+            <span class="sort-icon" *ngIf="sortField === 'email'">
+              <span class="material-icons">{{
+                sortDirection === "asc" ? "arrow_upward" : "arrow_downward"
+              }}</span>
+            </span>
+          </th>
+          <th (click)="sortBy('salary')">
+            الراتب
+            <span class="sort-icon" *ngIf="sortField === 'salary'">
+              <span class="material-icons">{{
+                sortDirection === "asc" ? "arrow_upward" : "arrow_downward"
+              }}</span>
+            </span>
+          </th>
+          <th class="print-hide">التفاصيل</th>
+          <th class="print-hide">التعديل</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let employee of filteredEmployees">
+          <td class="employee-name">
+            <div class="employee-avatar">
+              {{ employee.name.charAt(0) || "" }}
+            </div>
+            <div>{{ employee.name || "" }}</div>
+          </td>
+          <td data-label="البريد الإلكتروني">{{ employee.email || "" }}</td>
+          <td data-label="الراتب" class="salary-cell">
+            {{ employee.salary }} ريال
+          </td>
+          <td class="action-cell print-hide">
+            <a
+              [routerLink]="['/app/admin/employee-salaries-details', employee.id]"
+              routerLinkActive="active"
+            >
+              <button class="action-btn details-btn" title="التفاصيل">
+                <span class="material-icons">visibility</span>
+              </button>
+            </a>
+          </td>
+          <td class="action-cell print-hide">
+            <a
+              Bue
+              [routerLink]="['/app/admin/edit-employee', employee.id]"
+              routerLinkActive="active"
+            >
+              <button class="action-btn edit-btn" title="تعديل">
+                <span class="material-icons">edit</span>
+              </button>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <!-- Notification -->
-  @if (notification()) {
+  <div class="notification" *ngIf="notification" [ngClass]="notification.type">
+    <p>{{ notification.message }}</p>
+  </div>
+
+  <!-- Confirmation Box -->
+
   <div
-    class="notification"
-    [class]="notification()?.type"
-    role="alert"
-    aria-live="assertive"
+    class="empty-state"
+    *ngIf="filteredEmployees && filteredEmployees.length === 0"
   >
-    <span class="material-icons">
-      {{ getNotificationIcon(notification()!.type) }}
-    </span>
-    {{ notification()?.message }}
+    <span class="material-icons">search_off</span>
+    <p>لم يتم العثور على موظفين مطابقين لمعايير البحث</p>
+    <button class="reset-btn" (click)="resetFilters()">
+      إعادة ضبط الفلاتر
+    </button>
   </div>
-  }
-
-  <!-- Header -->
-  <div class="page-header">
-    <div class="header-left">
-      <a [routerLink]="['/dashboard']" class="back-button">
-        <span class="material-icons">arrow_back</span>
-        العودة إلى لوحة التحكم
-      </a>
-      <h1 class="page-title">رواتب الموظفين</h1>
-    </div>
-  </div>
-
-  <!-- Loading State -->
-  @if (isLoading()) {
-  <div class="loading-state">
-    <div class="spinner"></div>
-    <p>جاري تحميل رواتب الموظفين...</p>
-  </div>
-  }
-
-  <!-- Empty State -->
-  @if (!isLoading() && employees().length === 0) {
-  <div class="empty-state">
-    <span class="material-icons">event_busy</span>
-    <p>لا توجد رواتب متاحة</p>
-  </div>
-  }
-
-  <!-- Employees Table -->
-  @if (!isLoading() && employees().length > 0) {
-  <div class="employees-table-container">
-    <div class="history-table">
-      <div class="table-header">
-        <div class="header-cell">اسم الموظف</div>
-        <div class="header-cell">صافي الراتب</div>
-        <div class="header-cell">إجراءات</div>
-      </div>
-      @for (employee of employees(); track employee.employeeId) {
-      <div class="table-row">
-        <div class="table-cell" data-label="اسم الموظف">
-          {{ employee.employeeName }}
-        </div>
-        <div class="table-cell" data-label="صافي الراتب">
-          {{ formatCurrency(employee.netSalary) }}
-        </div>
-        <div class="table-cell actions-cell" data-label="إجراءات">
-          <button
-            class="icon-button view-button"
-            (click)="loadEmployeeSalaryDetails(employee)"
-            attr.aria-label="عرض تفاصيل راتب {{ employee.employeeName }}"
-          >
-            <span class="material-icons">visibility</span>
-          </button>
-        </div>
-      </div>
-      }
-    </div>
-  </div>
-  }
-
-  <!-- Salary Details Modal -->
-  @if (showDetailsModal() && salaryDetails()) {
-  <div class="modal" role="dialog" aria-modal="true">
-    <div class="modal-content salary-details-page">
-      <div class="page-header">
-        <div class="header-left">
-          <button class="back-button" (click)="closeDetailsModal()">
-            <span class="material-icons">arrow_back</span>
-            العودة
-          </button>
-          <h1 class="page-title">
-            تفاصيل الراتب - {{ selectedEmployee()?.employeeName }}
-          </h1>
-        </div>
-        <div class="header-actions">
-          <button class="action-button" (click)="printPayslip()">
-            <span class="material-icons">print</span>
-            طباعة قسيمة الراتب
-          </button>
-          <button class="action-button" (click)="downloadPdf()">
-            <span class="material-icons">file_download</span>
-            تنزيل PDF
-          </button>
-        </div>
-      </div>
-
-      <div class="tab-content">
-        <div class="salary-summary">
-          <div class="summary-card">
-            <div class="summary-title">إجمالي الراتب</div>
-            <div class="summary-value">{{ formatCurrency(totalEarnings) }}</div>
-          </div>
-          <div class="summary-card">
-            <div class="summary-title">إجمالي الخصومات</div>
-            <div class="summary-value">
-              {{ formatCurrency(totalDeductions) }}
-            </div>
-          </div>
-          <div class="summary-card net-salary">
-            <div class="summary-title">صافي الراتب</div>
-            <div class="summary-value">{{ formatCurrency(netSalary) }}</div>
-          </div>
-        </div>
-
-        <div class="salary-breakdown">
-          <div class="breakdown-section">
-            <h2 class="section-title">
-              <span class="material-icons">add_circle_outline</span>
-              المستحقات
-            </h2>
-            <div class="breakdown-items">
-              @for (item of salaryItems; track item.name) { @if (item.type ===
-              'earning') {
-              <div class="breakdown-item">
-                <div class="item-icon">
-                  <span class="material-icons">{{ item.icon }}</span>
-                </div>
-                <div class="item-details">
-                  <div class="item-name">{{ item.name }}</div>
-                  @if (item.info) {
-                  <div class="item-info">{{ item.info }}</div>
-                  }
-                </div>
-                <div class="item-amount">{{ formatCurrency(item.amount) }}</div>
-              </div>
-              } }
-              <div class="breakdown-total">
-                <div class="total-label">إجمالي المستحقات</div>
-                <div class="total-amount">
-                  {{ formatCurrency(totalEarnings) }}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="breakdown-section">
-            <h2 class="section-title">
-              <span class="material-icons">remove_circle_outline</span>
-              الخصومات
-            </h2>
-            <div class="breakdown-items">
-              @for (item of salaryItems; track item.name) { @if (item.type ===
-              'deduction') {
-              <div class="breakdown-item">
-                <div class="item-icon">
-                  <span class="material-icons">{{ item.icon }}</span>
-                </div>
-                <div class="item-details">
-                  <div class="item-name">{{ item.name }}</div>
-                  @if (item.info) {
-                  <div class="item-info">{{ item.info }}</div>
-                  }
-                </div>
-                <div class="item-amount">{{ formatCurrency(item.amount) }}</div>
-              </div>
-              } }
-              <div class="breakdown-total">
-                <div class="total-label">إجمالي الخصومات</div>
-                <div class="total-amount">
-                  {{ formatCurrency(totalDeductions) }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  }
 </div>

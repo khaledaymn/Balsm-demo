@@ -2,6 +2,8 @@ export interface EmployeeSalary {
   employeeId: string;
   employeeName: string;
   netSalary: number;
+  month?: number;
+  year?: number;
 }
 
 export interface EmployeeSalaryDetails {
@@ -14,6 +16,8 @@ export interface EmployeeSalaryDetails {
   numberOfAbsentDays: number;
   absentDaysSalary: number;
   totalSalary: number;
+  month: number;
+  year: number;
 }
 
 // export interface EmployeeSalaryResponse {
