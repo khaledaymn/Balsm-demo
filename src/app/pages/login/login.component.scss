@@ -81,7 +81,7 @@ $white: #ffffff;
       }
 
       &::placeholder {
-        color: lighten($text-secondary, 25%);
+        color: rgba($text-secondary, 25%);
       }
     }
   }
@@ -172,11 +172,11 @@ $white: #ffffff;
     margin-top: 0.5rem;
 
     &:hover {
-      background-color: darken($primary-color, 5%);
+      background-color: rgba($primary-color, 5%);
     }
 
     &:disabled {
-      background-color: lighten($primary-color, 30%);
+      background-color: rgba($primary-color, 30%);
       cursor: not-allowed;
     }
   }

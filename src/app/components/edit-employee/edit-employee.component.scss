@@ -48,17 +48,17 @@ $input-border-radius: 8px;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 2px 5px rgba(darken($bg-color, 20%), 0.2);
+  box-shadow: 0 2px 5px rgba(rgba($bg-color, 20%), 0.2);
 
   &:hover {
-    background-color: darken($bg-color, 5%);
+    background-color: rgba($bg-color, 5%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(darken($bg-color, 20%), 0.3);
+    box-shadow: 0 4px 8px rgba(rgba($bg-color, 20%), 0.3);
   }
 
   &:active {
     transform: translateY(0);
-    box-shadow: 0 2px 3px rgba(darken($bg-color, 20%), 0.2);
+    box-shadow: 0 2px 3px rgba(rgba($bg-color, 20%), 0.2);
   }
 
   &:disabled {

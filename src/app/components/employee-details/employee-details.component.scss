@@ -222,7 +222,7 @@ $border-radius: 12px;
         color: white;
 
         &:hover {
-          background-color: darken($warning-color, 5%);
+          background-color: rgba($warning-color, 5%);
         }
       }
 
@@ -232,7 +232,7 @@ $border-radius: 12px;
         border: 1px solid $border-color;
 
         &:hover {
-          background-color: darken($background-color, 5%);
+          background-color: rgba($background-color, 5%);
           color: $text-primary;
         }
       }

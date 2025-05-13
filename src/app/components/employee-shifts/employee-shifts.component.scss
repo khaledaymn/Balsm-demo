@@ -530,7 +530,7 @@ $spacing-xxl: 3rem;
     width: 120px;
     padding: $spacing-sm $spacing-md;
     border: 1px solid $border-color;
-    border-radius: $border-radius / 2;
+    border-radius: calc($border-radius / 2);
     font-size: $font-size-sm;
     transition: $transition;
 
@@ -549,7 +549,7 @@ $spacing-xxl: 3rem;
 
   .save-btn, .cancel-btn {
     padding: $spacing-sm $spacing-md;
-    border-radius: $border-radius / 2;
+    border-radius:calc( $border-radius / 2);
     font-size: $font-size-sm;
     font-weight: 500;
     cursor: pointer;
@@ -569,7 +569,7 @@ $spacing-xxl: 3rem;
     color: white;
 
     &:hover:not(:disabled) {
-      background-color: darken($primary-color, 5%);
+      background-color: rgba($primary-color, 5%);
       transform: translateY(-2px);
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
@@ -586,7 +586,7 @@ $spacing-xxl: 3rem;
     border: 1px solid $border-color;
 
     &:hover:not(:disabled) {
-      background-color: darken($background-color, 3%);
+      background-color: rgba($background-color, 3%);
       color: $text-primary;
     }
 
@@ -630,7 +630,7 @@ $spacing-xxl: 3rem;
 
     .confirm-btn, .cancel-btn {
       padding: $spacing-sm $spacing-lg;
-      border-radius: $border-radius / 2;
+      border-radius:calc( $border-radius / 2);
       font-size: $font-size-sm;
       font-weight: 500;
       cursor: pointer;
@@ -649,7 +649,7 @@ $spacing-xxl: 3rem;
       color: white;
 
       &:hover:not(:disabled) {
-        background-color: darken($danger-color, 5%);
+        background-color: rgba($danger-color, 5%);
       }
     }
 
@@ -659,7 +659,7 @@ $spacing-xxl: 3rem;
       border: 1px solid $border-color;
 
       &:hover:not(:disabled) {
-        background-color: darken($background-color, 3%);
+        background-color: rgba($background-color, 3%);
         color: $text-primary;
       }
     }

@@ -175,7 +175,7 @@ $transition-duration: 0.3s;
       color: white;
 
       &:hover:not(:disabled) {
-        background-color: darken($success-color, 5%);
+        background-color: rgba($success-color, 5%);
       }
     }
 
@@ -184,7 +184,7 @@ $transition-duration: 0.3s;
       color: white;
 
       &:hover:not(:disabled) {
-        background-color: darken($error-color, 5%);
+        background-color: rgba($error-color, 5%);
       }
     }
 
