@@ -120,7 +120,7 @@ $border_radius: 8px;
     gap: 0.5rem;
 
     &:hover {
-      background-color: darken($primary-color, 5%);
+      background-color: rgba($primary-color, 5%);
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
@@ -212,7 +212,7 @@ $border_radius: 8px;
     margin-right: auto;
 
     &:hover {
-      background-color: darken($background-color, 5%);
+      background-color: rgba($background-color, 5%);
       color: $text-primary;
     }
 
@@ -337,7 +337,7 @@ $border_radius: 8px;
 
           &.edit-btn {
             background-color: $warning-light;
-            color: darken($warning-color, 10%);
+            color: rgba($warning-color, 10%);
 
             &:hover {
               background-color: $warning-color;
@@ -349,7 +349,7 @@ $border_radius: 8px;
 
           &.delete-btn {
             background-color: $danger-light;
-            color: darken($danger-color, 10%);
+            color: rgba($danger-color, 10%);
 
             &:hover {
               background-color: $danger-color;
@@ -700,7 +700,7 @@ $border_radius: 8px;
           border: none;
 
           &:hover {
-            background-color: darken($primary-color, 5%);
+            background-color: rgba($primary-color, 5%);
             transform: translateY(-2px);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
           }
@@ -712,7 +712,7 @@ $border_radius: 8px;
           border: none;
 
           &:hover {
-            background-color: darken($danger-color, 5%);
+            background-color: rgba($danger-color, 5%);
             transform: translateY(-2px);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
           }
