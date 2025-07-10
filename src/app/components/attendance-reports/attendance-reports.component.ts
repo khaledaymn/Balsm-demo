@@ -1,7 +1,13 @@
 import { Component, signal, OnInit, OnDestroy } from '@angular/core';
-import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormGroup,
+  FormControl,
+  Validators,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ReportsService } from '../../core/services/reports.service';
 import { AttendanceReport } from '../../models/attendance-report.model';
 import { EmployeeAttendanceLeaveReport } from '../../models/employee-attendance-leave.model';
@@ -26,7 +32,8 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
   notification = signal<Notification | null>(null);
   showEmployeeModal = signal<boolean>(false);
   selectedEmployeeId = signal<string | null>(null);
-
+  employeeId!: string;
+  loading!: boolean;
   // Pagination
   pageNumber = signal<number>(1);
   pageSize = signal<number>(10);
@@ -36,36 +43,60 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
   filterForm = new FormGroup({
     year: new FormControl<number>(new Date().getFullYear(), {
       nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.min(2000),
+        Validators.max(2100),
+      ],
     }),
     month: new FormControl<number>(new Date().getMonth() + 1, {
       nonNullable: true,
+      validators: [Validators.required, Validators.min(1), Validators.max(12)],
     }),
   });
 
   employeeFilterForm = new FormGroup({
-    reportType: new FormControl<number>(1, { nonNullable: true }), // Default to monthly
-    dayDate: new FormControl<string>(''),
-    fromDate: new FormControl<string>(''),
-    toDate: new FormControl<string>(''),
+    reportType: new FormControl<number>(1, {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    dayDate: new FormControl<string>('', {
+      validators: [Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)],
+    }),
+    fromDate: new FormControl<string>('', {
+      validators: [Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)],
+    }),
+    toDate: new FormControl<string>('', {
+      validators: [Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)],
+    }),
     month: new FormControl<number | null>(null),
   });
 
   private subscription: Subscription = new Subscription();
 
   constructor(private reportsService: ReportsService) {
-    // Load initial data
     this.loadAttendanceReports();
   }
 
   ngOnInit(): void {
-    // Subscribe to employee filter form changes
     this.subscription.add(
-      this.employeeFilterForm.valueChanges.subscribe(() => {
-        if (this.selectedEmployeeId()) {
-          this.pageNumber.set(1);
-          this.loadEmployeeAttendance(this.selectedEmployeeId()!);
-        }
-      })
+      this.employeeFilterForm.valueChanges
+        .pipe(
+          debounceTime(300),
+          distinctUntilChanged(
+            (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
+          )
+        )
+        .subscribe(() => {
+          if (this.selectedEmployeeId() && this.employeeFilterForm.valid) {
+            console.log('Form Value Changed:', this.employeeFilterForm.value);
+            this.pageNumber.set(1);
+            this.loadEmployeeAttendance(this.selectedEmployeeId()!);
+          } else if (!this.employeeFilterForm.valid) {
+            console.warn('Form Invalid:', this.employeeFilterForm.errors);
+            this.showNotification('error', 'يرجى إدخال بيانات صالحة للفلاتر.');
+          }
+        })
     );
   }
 
@@ -76,22 +107,32 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
   loadAttendanceReports(): void {
     this.isLoading.set(true);
     const { year, month } = this.filterForm.value;
+    if (!year || !month) {
+      this.showNotification('error', 'يرجى تحديد السنة والشهر.');
+      this.isLoading.set(false);
+      return;
+    }
     this.reportsService
       .getAttendanceReport(this.pageNumber(), this.pageSize(), year!, month!)
       .subscribe({
         next: (response) => {
           console.log('Attendance Reports Response:', response);
           if (response.success) {
-            this.attendanceReports.set(response.data);
-            this.totalRecords.set(response.data.length); // Update if API provides total count
+            this.attendanceReports.set(response.data || []);
+            this.totalRecords.set(response.data?.length || 0);
           } else {
             this.showNotification('error', 'فشل في تحميل تقرير الحضور.');
+            this.attendanceReports.set([]);
           }
           this.isLoading.set(false);
         },
         error: (error) => {
           console.error('Attendance Reports Error:', error);
-          this.showNotification('error', error.message);
+          this.showNotification(
+            'error',
+            error.message || 'حدث خطأ أثناء تحميل تقرير الحضور.'
+          );
+          this.attendanceReports.set([]);
           this.isLoading.set(false);
         },
       });
@@ -99,6 +140,7 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
 
   loadEmployeeAttendance(employeeId: string): void {
     this.selectedEmployeeId.set(employeeId);
+    this.employeeId = employeeId;
     this.isLoading.set(true);
 
     // Initialize form only on first modal open
@@ -118,28 +160,59 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
         fromDate,
         toDate,
         dayDate: '',
-        month,
+        month: null,
       });
     }
 
-    // Use current form values
+    // Get current form values
     const { reportType, dayDate, fromDate, toDate } =
       this.employeeFilterForm.value;
+    console.log(this.employeeFilterForm.value);
+    // Validate inputs
+    if (
+      reportType === 0 &&
+      (!dayDate || !this.employeeFilterForm.controls.dayDate.valid)
+    ) {
+      this.showNotification(
+        'error',
+        'يرجى تحديد تاريخ صالح للتقرير اليومي (YYYY-MM-DD).'
+      );
+      this.isLoading.set(false);
+      return;
+    }
+    if (
+      reportType === 1 &&
+      (!fromDate ||
+        !toDate ||
+        !this.employeeFilterForm.controls.fromDate.valid ||
+        !this.employeeFilterForm.controls.toDate.valid)
+    ) {
+      this.showNotification(
+        'error',
+        'يرجى تحديد تواريخ صالحة للتقرير الشهري (YYYY-MM-DD).'
+      );
+      this.isLoading.set(false);
+      return;
+    }
 
     const filterParams: any = {
       pageNumber: this.pageNumber(),
       pageSize: this.pageSize(),
     };
 
-    if (reportType === 0 && dayDate) {
+    if (reportType == 0) {
       filterParams.dayDate = dayDate;
-    } else if (reportType === 1) {
-      filterParams.fromDate = fromDate || '';
-      filterParams.toDate = toDate || '';
-      filterParams.month = this.filterForm.value.month!;
+      console.log(reportType);
+    } else {
+      filterParams.fromDate = fromDate;
+      filterParams.toDate = toDate;
     }
 
-    console.log('Employee Attendance Filter Params:', filterParams);
+    console.log('Employee Attendance Filter Params:', {
+      employeeId,
+      reportType,
+      filterParams,
+    });
 
     this.reportsService
       .getEmployeeAttendanceAndLeaveReport(
@@ -149,30 +222,43 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (response) => {
-          console.log('Employee Attendance Response:', response);
+          this.showEmployeeModal.set(true);
+
           if (response.success) {
-            this.employeeAttendance.set(response.data);
-            this.showEmployeeModal.set(true);
+            this.employeeAttendance.set(response.data || []);
+            if (!response.data || response.data.length === 0) {
+              // this.showNotification(
+              //   'info',
+              //   'لا توجد بيانات متاحة للمعايير المحددة.'
+              // );
+              this.loading = true;
+              console.log('rrrrrrrrrrrrrrrrrrrrr');
+            } else {
+              this.showNotification('success', 'تم تحميل تقرير الموظف بنجاح.');
+            }
           } else {
             this.showNotification('error', 'فشل في تحميل تقرير الموظف.');
+            // this.employeeAttendance.set([]);
           }
-          this.isLoading.set(false);
+          // this.isLoading.set(false);
         },
         error: (error) => {
           console.error('Employee Attendance Error:', error);
-          this.showNotification('error', error.message);
+          this.showNotification(
+            'error',
+            error.message || 'حدث خطأ أثناء تحميل تقرير الموظف.'
+          );
+          this.employeeAttendance.set([]);
           this.isLoading.set(false);
         },
       });
   }
 
   onFilterChange(): void {
-    this.pageNumber.set(1);
-    this.loadAttendanceReports();
-  }
-
-  onEmployeeFilterChange(): void {
-    // Handled by valueChanges subscription
+    if (this.filterForm.valid) {
+      this.pageNumber.set(1);
+      this.loadAttendanceReports();
+    }
   }
 
   changePage(newPage: number): void {
@@ -183,10 +269,18 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
   }
 
   closeEmployeeModal(): void {
+    this.isLoading.set(false);
+
     this.showEmployeeModal.set(false);
     this.selectedEmployeeId.set(null);
     this.employeeAttendance.set([]);
-    this.employeeFilterForm.reset({ reportType: 1 });
+    this.employeeFilterForm.reset({
+      reportType: 1,
+      dayDate: '',
+      fromDate: '',
+      toDate: '',
+      month: null,
+    });
   }
 
   resetFilters(): void {

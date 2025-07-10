@@ -173,30 +173,31 @@
             <select
               id="reportType"
               formControlName="reportType"
-              (change)="onEmployeeFilterChange()"
+              (change)="loadEmployeeAttendance(employeeId)"
             >
               <option value="0">يومي</option>
               <option value="1">شهري</option>
             </select>
           </div>
-          @if (employeeFilterForm.controls.reportType.value === 0) {
+          @if (employeeFilterForm.controls.reportType.value == 0) {
+
           <div class="filter-group">
             <label for="dayDate">تاريخ معين:</label>
             <input
               type="date"
               id="dayDate"
               formControlName="dayDate"
-              (change)="onEmployeeFilterChange()"
+              (change)="loadEmployeeAttendance(employeeId)"
             />
           </div>
-          } @if (employeeFilterForm.controls.reportType.value === 1) {
+          } @if (employeeFilterForm.controls.reportType.value == 1) {
           <div class="filter-group">
             <label for="fromDate">من تاريخ:</label>
             <input
               type="date"
               id="fromDate"
               formControlName="fromDate"
-              (change)="onEmployeeFilterChange()"
+              (change)="loadEmployeeAttendance(employeeId)"
             />
           </div>
           <div class="filter-group">
@@ -205,7 +206,7 @@
               type="date"
               id="toDate"
               formControlName="toDate"
-              (change)="onEmployeeFilterChange()"
+              (change)="loadEmployeeAttendance(employeeId)"
             />
           </div>
           }
@@ -249,7 +250,7 @@
             </tbody>
           </table>
         </div>
-        } @else if (!isLoading()) {
+        } @else if (loading) {
         <div class="empty-state">
           <span class="material-icons">event_busy</span>
           <p>لا توجد سجلات حضور متاحة</p>
