@@ -30,7 +30,7 @@
         formControlName="year"
         (change)="onFilterChange()"
         min="2000"
-        max="2100"
+        max="2200"
         aria-label="تصفية حسب السنة"
       />
     </div>
@@ -176,10 +176,10 @@
               (change)="onEmployeeFilterChange()"
             >
               <option value="0">يومي</option>
-              <option value="1">أسبوعي</option>
-              <option value="2">شهري</option>
+              <option value="1">شهري</option>
             </select>
           </div>
+          @if (employeeFilterForm.controls.reportType.value === 0) {
           <div class="filter-group">
             <label for="dayDate">تاريخ معين:</label>
             <input
@@ -189,6 +189,7 @@
               (change)="onEmployeeFilterChange()"
             />
           </div>
+          } @if (employeeFilterForm.controls.reportType.value === 1) {
           <div class="filter-group">
             <label for="fromDate">من تاريخ:</label>
             <input
@@ -207,19 +208,7 @@
               (change)="onEmployeeFilterChange()"
             />
           </div>
-          <div class="filter-group">
-            <label for="month">الشهر:</label>
-            <select
-              id="month"
-              formControlName="month"
-              (change)="onEmployeeFilterChange()"
-            >
-              <option value="">-- اختر --</option>
-              @for (m of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track m) {
-              <option [value]="m">{{ m }}</option>
-              }
-            </select>
-          </div>
+          }
         </form>
 
         <!-- Employee Attendance Table -->

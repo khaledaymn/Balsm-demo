@@ -32,9 +32,10 @@ export class NotificationsComponent {
     this.isLoading.set(true);
     this.notificationService.getNotifications().subscribe({
       next: (response) => {
+        console.log(response);
         this.notifications.set(response);
         this.filteredNotifications.set(response);
-        this.isLoading.set(false);
+        // this.isLoading.set(false);
       },
       error: (error) => {
         this.showNotification('error', error.message);

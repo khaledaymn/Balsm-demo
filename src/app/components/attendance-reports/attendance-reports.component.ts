@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
 import { ReportsService } from '../../core/services/reports.service';
 import { AttendanceReport } from '../../models/attendance-report.model';
 import { EmployeeAttendanceLeaveReport } from '../../models/employee-attendance-leave.model';
@@ -17,7 +18,7 @@ interface Notification {
   templateUrl: './attendance-reports.component.html',
   styleUrl: './attendance-reports.component.scss',
 })
-export class AttendanceReportsComponent {
+export class AttendanceReportsComponent implements OnInit, OnDestroy {
   // Signals for state management
   isLoading = signal<boolean>(true);
   attendanceReports = signal<AttendanceReport[]>([]);
@@ -42,16 +43,34 @@ export class AttendanceReportsComponent {
   });
 
   employeeFilterForm = new FormGroup({
-    reportType: new FormControl<number>(0, { nonNullable: true }),
+    reportType: new FormControl<number>(1, { nonNullable: true }), // Default to monthly
     dayDate: new FormControl<string>(''),
     fromDate: new FormControl<string>(''),
     toDate: new FormControl<string>(''),
     month: new FormControl<number | null>(null),
   });
 
+  private subscription: Subscription = new Subscription();
+
   constructor(private reportsService: ReportsService) {
     // Load initial data
     this.loadAttendanceReports();
+  }
+
+  ngOnInit(): void {
+    // Subscribe to employee filter form changes
+    this.subscription.add(
+      this.employeeFilterForm.valueChanges.subscribe(() => {
+        if (this.selectedEmployeeId()) {
+          this.pageNumber.set(1);
+          this.loadEmployeeAttendance(this.selectedEmployeeId()!);
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   loadAttendanceReports(): void {
@@ -61,6 +80,7 @@ export class AttendanceReportsComponent {
       .getAttendanceReport(this.pageNumber(), this.pageSize(), year!, month!)
       .subscribe({
         next: (response) => {
+          console.log('Attendance Reports Response:', response);
           if (response.success) {
             this.attendanceReports.set(response.data);
             this.totalRecords.set(response.data.length); // Update if API provides total count
@@ -70,6 +90,7 @@ export class AttendanceReportsComponent {
           this.isLoading.set(false);
         },
         error: (error) => {
+          console.error('Attendance Reports Error:', error);
           this.showNotification('error', error.message);
           this.isLoading.set(false);
         },
@@ -79,19 +100,56 @@ export class AttendanceReportsComponent {
   loadEmployeeAttendance(employeeId: string): void {
     this.selectedEmployeeId.set(employeeId);
     this.isLoading.set(true);
-    const { reportType, dayDate, fromDate, toDate, month } =
+
+    // Initialize form only on first modal open
+    if (!this.showEmployeeModal()) {
+      const { year, month } = this.filterForm.value;
+      const firstDay = new Date(year!, month! - 1, 1);
+      const lastDay = new Date(
+        year!,
+        month! - 1,
+        new Date(year!, month!, 0).getDate()
+      );
+      const fromDate = firstDay.toISOString().split('T')[0];
+      const toDate = lastDay.toISOString().split('T')[0];
+
+      this.employeeFilterForm.patchValue({
+        reportType: 1,
+        fromDate,
+        toDate,
+        dayDate: '',
+        month,
+      });
+    }
+
+    // Use current form values
+    const { reportType, dayDate, fromDate, toDate } =
       this.employeeFilterForm.value;
+
+    const filterParams: any = {
+      pageNumber: this.pageNumber(),
+      pageSize: this.pageSize(),
+    };
+
+    if (reportType === 0 && dayDate) {
+      filterParams.dayDate = dayDate;
+    } else if (reportType === 1) {
+      filterParams.fromDate = fromDate || '';
+      filterParams.toDate = toDate || '';
+      filterParams.month = this.filterForm.value.month!;
+    }
+
+    console.log('Employee Attendance Filter Params:', filterParams);
+
     this.reportsService
-      .getEmployeeAttendanceAndLeaveReport(employeeId, reportType!, {
-        pageNumber: this.pageNumber(),
-        pageSize: this.pageSize(),
-        dayDate: dayDate || undefined,
-        fromDate: fromDate || undefined,
-        toDate: toDate || undefined,
-        month: month || undefined,
-      })
+      .getEmployeeAttendanceAndLeaveReport(
+        employeeId,
+        reportType!,
+        filterParams
+      )
       .subscribe({
         next: (response) => {
+          console.log('Employee Attendance Response:', response);
           if (response.success) {
             this.employeeAttendance.set(response.data);
             this.showEmployeeModal.set(true);
@@ -101,6 +159,7 @@ export class AttendanceReportsComponent {
           this.isLoading.set(false);
         },
         error: (error) => {
+          console.error('Employee Attendance Error:', error);
           this.showNotification('error', error.message);
           this.isLoading.set(false);
         },
@@ -113,10 +172,7 @@ export class AttendanceReportsComponent {
   }
 
   onEmployeeFilterChange(): void {
-    if (this.selectedEmployeeId()) {
-      this.pageNumber.set(1);
-      this.loadEmployeeAttendance(this.selectedEmployeeId()!);
-    }
+    // Handled by valueChanges subscription
   }
 
   changePage(newPage: number): void {
@@ -130,7 +186,7 @@ export class AttendanceReportsComponent {
     this.showEmployeeModal.set(false);
     this.selectedEmployeeId.set(null);
     this.employeeAttendance.set([]);
-    this.employeeFilterForm.reset({ reportType: 0 });
+    this.employeeFilterForm.reset({ reportType: 1 });
   }
 
   resetFilters(): void {

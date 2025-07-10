@@ -56,7 +56,7 @@ export class ReportsService {
   ): Observable<EmployeeAttendanceLeaveResponse> {
     let params = new HttpParams()
       .set('EmployeeId', employeeId)
-      .set('ReportType', reportType.toString());
+      .set('ReportType', reportType.toString() || 1);
 
     if (options.pageNumber)
       params = params.set('PageNumber', options.pageNumber.toString());

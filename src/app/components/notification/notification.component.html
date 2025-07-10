@@ -70,12 +70,13 @@
             <div class="detail-row">
               <span class="detail-label"
                 >تاريخ الوردية:
-                {{
+                <!-- {{
                   formatDate(
                     notification.message.split("يوم ")[1].split(" التي")[0]
                   )
-                }}</span
-              >
+                }} -->
+                {{ formatDate(notification.createdAt) }}
+              </span>
             </div>
             <div class="detail-row">
               <span class="detail-label"
