@@ -38,7 +38,7 @@ $border-radius: 8px;
   color: $text-color;
   border: none;
   border-radius: $border-radius;
-  padding: 0.75rem 1.25rem;
+  // padding: 0.75rem 1.25rem;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -46,7 +46,7 @@ $border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  box-shadow: 0 2px 5px rgba($bg-color, 0.2);
+  // box-shadow: 0 2px 5px rgba($bg-color, 0.2);
 
   &:hover {
     transform: translateY(-2px);
@@ -372,12 +372,14 @@ $border-radius: 8px;
     }
 
     td {
-      border-bottom: 1px solid $border-color;
-      color: $text-primary;
+      // border-bottom: 1px solid $border-color;
+      // color: $text-primary;
 
       &.actions-cell {
+
         .details-btn {
-          @include button-style($info-color);
+          @include button-style(transparent);
+          color:$info-color;
           padding: 0.5rem;
           font-size: 0.85rem;
         }

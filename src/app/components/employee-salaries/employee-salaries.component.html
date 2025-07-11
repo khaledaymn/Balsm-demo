@@ -68,7 +68,7 @@
             </span>
           </th>
           <th class="print-hide">التفاصيل</th>
-          <th class="print-hide">التعديل</th>
+          <!-- <th class="print-hide">التعديل</th> -->
         </tr>
       </thead>
       <tbody>
@@ -85,7 +85,7 @@
           </td>
           <td class="action-cell print-hide">
             <a
-              [routerLink]="['/app/admin/employee-salaries-details', employee.id]"
+              [routerLink]="['/app/admin/employee-salary-details', employee.id]"
               routerLinkActive="active"
             >
               <button class="action-btn details-btn" title="التفاصيل">
@@ -93,7 +93,7 @@
               </button>
             </a>
           </td>
-          <td class="action-cell print-hide">
+          <!-- <td class="action-cell print-hide">
             <a
               Bue
               [routerLink]="['/app/admin/edit-employee', employee.id]"
@@ -103,7 +103,7 @@
                 <span class="material-icons">edit</span>
               </button>
             </a>
-          </td>
+          </td> -->
         </tr>
       </tbody>
     </table>
