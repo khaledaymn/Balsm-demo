@@ -25,6 +25,8 @@ import { NotificationsComponent } from './components/notification/notification.c
 import { EmployeeSalaryDetailsComponent } from './components/employee-salary-details/employee-salary-details.component';
 import { AbsenceReportComponent } from './components/UserComponents/absence-report/absence-report.component';
 import { EmployeeVacationsComponent } from './components/UserComponents/employee-vacations/employee-vacations.component';
+import { UserProfileComponent } from './components/UserComponents/user-profile/user-profile.component';
+import { SalaryDetailsComponent } from './components/UserComponents/salary-details/salary-details.component';
 
 export const appRoutes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
@@ -85,16 +87,21 @@ export const appRoutes: Routes = [
       {
         path: 'userDashboard',
         component: UserdashboardComponent,
-        // canActivate: [RoleGuard],
-        // data: { roles: ['User'] },
+        canActivate: [RoleGuard],
+        data: { roles: ['User', 'Admin'] },
         children: [
           { path: 'vacations', component: EmployeeVacationsComponent },
+
           { path: 'absence', component: AbsenceReportComponent },
           { path: '', redirectTo: 'userDashboard', pathMatch: 'full' },
           // { path: 'dashboard', component: AdminDashboardComponent },
         ],
       },
+      { path: 'absence', component: AbsenceReportComponent },
 
+      { path: 'vacations', component: EmployeeVacationsComponent },
+      { path: 'profile', component: UserProfileComponent },
+      { path: 'salary', component: SalaryDetailsComponent },
       {
         path: 'role-select',
         component: RoleSelectComponent,

@@ -1,6 +1,6 @@
 <div class="container">
   <!-- Notification -->
-  @if (notification()) {
+  <!-- @if (notification()) {
   <div
     class="notification"
     [class]="notification()?.type"
@@ -12,7 +12,7 @@
     </span>
     {{ notification()?.message }}
   </div>
-  }
+  } -->
 
   <!-- Header -->
   <div class="absence-header">
@@ -35,7 +35,7 @@
         <option value="1">شهري</option>
       </select>
     </div>
-    @if (absenceFilterForm.controls.reportType.value === 0) {
+    @if (absenceFilterForm.controls.reportType.value == 0) {
     <div class="filter-group">
       <label for="dayDate">تاريخ معين:</label>
       <input
@@ -45,7 +45,7 @@
         aria-label="تاريخ معين"
       />
     </div>
-    } @if (absenceFilterForm.controls.reportType.value === 1) {
+    } @if (absenceFilterForm.controls.reportType.value == 1) {
     <div class="filter-group">
       <label for="fromDate">من تاريخ:</label>
       <input
@@ -64,7 +64,7 @@
         aria-label="إلى تاريخ"
       />
     </div>
-    <div class="filter-group">
+    <!-- <div class="filter-group">
       <label for="month">الشهر:</label>
       <select id="month" formControlName="month" aria-label="تصفية حسب الشهر">
         <option [value]="null" disabled>اختر الشهر</option>
@@ -72,7 +72,7 @@
         <option [value]="m">{{ m }}</option>
         }
       </select>
-    </div>
+    </div> -->
     }
     <button
       class="reset-btn"
@@ -81,7 +81,6 @@
       aria-label="إعادة ضبط الفلاتر"
     >
       <span class="material-icons">refresh</span>
-      إعادة ضبط
     </button>
   </form>
 
@@ -115,8 +114,6 @@
     <table class="absence-table" role="grid">
       <thead>
         <tr>
-          <th scope="col">الموظف</th>
-          <th scope="col">البريد الإلكتروني</th>
           <th scope="col">التاريخ</th>
           <th scope="col">ساعات الغياب</th>
         </tr>
@@ -125,8 +122,6 @@
         @for (report of absenceReports(); track report.email) { @for (detail of
         report.data; track detail.date) {
         <tr>
-          <td data-label="الموظف">{{ report.employeeName }}</td>
-          <td data-label="البريد الإلكتروني">{{ report.email }}</td>
           <td data-label="التاريخ">{{ detail.date | date : "yyyy-MM-dd" }}</td>
           <td data-label="ساعات الغياب">
             {{ detail.hours | number : "1.0-2" }}

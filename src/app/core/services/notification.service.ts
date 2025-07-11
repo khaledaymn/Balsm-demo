@@ -31,7 +31,10 @@ export class NotificationService {
   takeLeaveByAdmin({
     employeeId,
     shiftId,
-  }: { employeeId: string; shiftId: number }): Observable<TakeLeaveResponse> {
+  }: {
+    employeeId: string;
+    shiftId: number;
+  }): Observable<string> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       accept: '*/*',
@@ -43,11 +46,10 @@ export class NotificationService {
     };
 
     return this.http
-      .post<TakeLeaveResponse>(
-        `${this.baseUrl}/Attendance/TakeLeaveByAdmin`,
-        body,
-        { headers }
-      )
+      .post(`${this.baseUrl}/Attendance/TakeLeaveByAdmin`, body, {
+        headers,
+        responseType: 'text',
+      })
       .pipe(
         catchError((error) => {
           console.error('Error taking leave by admin:', error);

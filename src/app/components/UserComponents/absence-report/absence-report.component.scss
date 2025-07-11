@@ -47,7 +47,7 @@
   }
 
   .reset-btn {
-    display: flex;
+    // display: flex;
     align-items: center;
     padding: 8px 16px;
     background-color: #f44336;
@@ -102,7 +102,7 @@
   }
 
   .reset-btn {
-    display: flex;
+    // display: flex;
     align-items: center;
     padding: 8px 16px;
     background-color: #f44336;
@@ -124,7 +124,7 @@
 
   th, td {
     padding: 12px;
-    text-align: left;
+    text-align: center;
     border-bottom: 1px solid #ddd;
   }
 
@@ -223,7 +223,7 @@
 
     td {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       padding: 8px;
       position: relative;
       border: none;

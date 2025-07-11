@@ -1,0 +1,177 @@
+<div class="container">
+  <!-- Notification -->
+  @if (notification()) {
+  <div
+    class="notification"
+    [class]="notification()?.type"
+    role="alert"
+    aria-live="assertive"
+  >
+    <span class="material-icons">
+      {{ getNotificationIcon(notification()!.type) }}
+    </span>
+    {{ notification()?.message }}
+  </div>
+  }
+
+  <!-- Header -->
+  <div class="profile-header">
+    <div class="header-content">
+      <h2>الملف الشخصي</h2>
+      <p class="header-description">عرض وإدارة تفاصيل حسابك الشخصي</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري تحميل بيانات الملف الشخصي...</p>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && !employee()) {
+  <div class="empty-state">
+    <span class="material-icons">person_off</span>
+    <p>لا توجد بيانات للملف الشخصي متاحة</p>
+  </div>
+  }
+
+  <!-- Profile Details -->
+  @if (!isLoading() && employee()) {
+  <div class="profile-card">
+    <div class="profile-avatar">
+      <span class="material-icons">account_circle</span>
+      <h3>{{ employee()!.name }}</h3>
+    </div>
+
+    <!-- Personal Info Section -->
+    <div class="section">
+      <h4 class="section-title">
+        <span class="material-icons" aria-hidden="true">person</span>
+        المعلومات الشخصية
+      </h4>
+      <div class="section-content">
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">badge</span>
+          <span class="label">الاسم</span>
+          <span class="value">{{ employee()!.name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">email</span>
+          <span class="label">البريد الإلكتروني</span>
+          <span class="value">{{ employee()!.email }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">phone</span>
+          <span class="label">رقم الهاتف</span>
+          <span class="value">{{ employee()!.phoneNumber }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">wc</span>
+          <span class="label">الجنس</span>
+          <span class="value">{{
+            employee()!.gender === "Male" ? "ذكر" : "أنثى"
+          }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">cake</span>
+          <span class="label">تاريخ الميلاد</span>
+          <span class="value">{{
+            employee()!.dateOfBarth | date : "yyyy-MM-dd"
+          }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employment Details Section -->
+    <div class="section">
+      <h4 class="section-title">
+        <span class="material-icons" aria-hidden="true">work</span>
+        تفاصيل التوظيف
+      </h4>
+      <div class="section-content">
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">fingerprint</span>
+          <span class="label">الرقم القومي</span>
+          <span class="value">{{ employee()!.nationalId }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">attach_money</span>
+          <span class="label">الراتب</span>
+          <span class="value">{{ employee()!.salary | number : "1.0-2" }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">event</span>
+          <span class="label">تاريخ التوظيف</span>
+          <span class="value">{{
+            employee()!.hiringDate | date : "yyyy-MM-dd"
+          }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true"
+            >admin_panel_settings</span
+          >
+          <span class="label">الأدوار</span>
+          <span class="value">{{ employee()!.roles.join(", ") }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Branch Info Section -->
+    <div class="section">
+      <h4 class="section-title">
+        <span class="material-icons" aria-hidden="true">location_on</span>
+        معلومات الفرع
+      </h4>
+      <div class="section-content">
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">business</span>
+          <span class="label">اسم الفرع</span>
+          <span class="value">{{ employee()!.branch.name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">map</span>
+          <span class="label">إحداثيات الفرع</span>
+          <span class="value"
+            >{{ employee()!.branch.latitude }},
+            {{ employee()!.branch.longitude }}</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Shifts Section -->
+    <div class="section">
+      <h4 class="section-title">
+        <span class="material-icons" aria-hidden="true">schedule</span>
+        الورديات
+      </h4>
+      <div class="section-content">
+        <button
+          class="toggle-shifts-btn"
+          (click)="toggleShifts()"
+          [attr.aria-expanded]="isShiftsExpanded()"
+          aria-label="تبديل عرض الورديات"
+        >
+          <span class="material-icons">
+            {{ isShiftsExpanded() ? "expand_less" : "expand_more" }}
+          </span>
+          {{ isShiftsExpanded() ? "إخفاء الورديات" : "عرض الورديات" }}
+        </button>
+        @if (isShiftsExpanded()) {
+        <div class="shifts-list">
+          @for (shift of employee()!.shift; track shift.id) {
+          <div class="shift-item">
+            <span class="material-icons" aria-hidden="true">access_time</span>
+            <span>من {{ shift.startTime }} إلى {{ shift.endTime }}</span>
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+  }
+</div>

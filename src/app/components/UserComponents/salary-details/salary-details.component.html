@@ -1,0 +1,168 @@
+<div class="container">
+  <!-- Notification -->
+  @if (notification()) {
+  <div
+    class="notification"
+    [class]="notification()?.type"
+    role="alert"
+    aria-live="assertive"
+    @fadeIn
+  >
+    <span class="material-icons">
+      {{ getNotificationIcon(notification()!.type) }}
+    </span>
+    {{ notification()?.message }}
+  </div>
+  }
+
+  <!-- Header -->
+  <div class="salary-header">
+    <div class="header-content">
+      <h2>تفاصيل الراتب</h2>
+      <p class="header-description">عرض تفاصيل راتبك للشهر المحدد</p>
+    </div>
+  </div>
+
+  <!-- Period Selection -->
+  <div class="period-selection" @fadeIn>
+    <div class="select-group">
+      <label for="month">الشهر:</label>
+      <select
+        id="month"
+        [(ngModel)]="selectedMonth"
+        (ngModelChange)="onPeriodChange()"
+        aria-label="اختر الشهر"
+      >
+        @for (month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track month) {
+        <option [value]="month">{{ month }}</option>
+        }
+      </select>
+    </div>
+    <div class="select-group">
+      <label for="year">السنة:</label>
+      <select
+        id="year"
+        [(ngModel)]="selectedYear"
+        (ngModelChange)="onPeriodChange()"
+        aria-label="اختر السنة"
+      >
+        @for (year of [2023, 2024, 2025]; track year) {
+        <option [value]="year">{{ year }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-state" @fadeIn>
+    <div class="spinner"></div>
+    <p>جاري تحميل تفاصيل الراتب...</p>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && !salaryDetails()) {
+  <div class="empty-state" @fadeIn>
+    <span class="material-icons">money_off</span>
+    <p>لا توجد بيانات راتب متاحة</p>
+  </div>
+  }
+
+  <!-- Salary Details -->
+  @if (!isLoading() && salaryDetails()) {
+  <div class="salary-card" @fadeIn>
+    <div class="section">
+      <h4 class="section-title">
+        <span class="material-icons" aria-hidden="true">person</span>
+        معلومات الموظف
+      </h4>
+      <div class="section-content">
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">badge</span>
+          <span class="label">اسم الموظف</span>
+          <span class="value">{{ salaryDetails()!.employeeName }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h4 class="section-title">
+        <span class="material-icons" aria-hidden="true">attach_money</span>
+        تفاصيل الراتب
+      </h4>
+      <div class="section-content">
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">account_balance</span>
+          <span class="label">الراتب الأساسي</span>
+          <span class="value">{{
+            salaryDetails()!.baseSalary | number : "1.0-2"
+          }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">schedule</span>
+          <span class="label">ساعات العمل الإضافي</span>
+          <span class="value">{{ salaryDetails()!.overTime }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">add_circle</span>
+          <span class="label">راتب العمل الإضافي</span>
+          <span class="value">{{
+            salaryDetails()!.overTimeSalary | number : "1.0-2"
+          }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">access_time</span>
+          <span class="label">ساعات التأخير</span>
+          <span class="value">{{ salaryDetails()!.lateTime }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">remove_circle</span>
+          <span class="label">خصم التأخير</span>
+          <span class="value">{{
+            salaryDetails()!.lateTimeSalary | number : "1.0-2"
+          }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">event_busy</span>
+          <span class="label">أيام الغياب</span>
+          <span class="value">{{ salaryDetails()!.numberOfAbsentDays }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">money_off</span>
+          <span class="label">خصم الغياب</span>
+          <span class="value">{{
+            salaryDetails()!.absentDaysSalary | number : "1.0-2"
+          }}</span>
+        </div>
+        <div class="detail-item total">
+          <span class="material-icons" aria-hidden="true">savings</span>
+          <span class="label">إجمالي الراتب</span>
+          <span class="value">{{
+            salaryDetails()!.totalSalary | number : "1.0-2"
+          }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h4 class="section-title">
+        <span class="material-icons" aria-hidden="true">calendar_today</span>
+        الفترة
+      </h4>
+      <div class="section-content">
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">date_range</span>
+          <span class="label">الشهر</span>
+          <span class="value">{{ salaryDetails()!.month }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-icons" aria-hidden="true">event</span>
+          <span class="label">السنة</span>
+          <span class="value">{{ salaryDetails()!.year }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

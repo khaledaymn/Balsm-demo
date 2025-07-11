@@ -1,6 +1,6 @@
 <div class="container">
   <!-- Notification -->
-  @if (notification()) {
+  <!-- @if (notification()) {
   <div
     class="notification"
     [class]="notification()?.type"
@@ -12,7 +12,7 @@
     </span>
     {{ notification()?.message }}
   </div>
-  }
+  } -->
 
   <!-- Header -->
   <div class="vacations-header">
@@ -48,7 +48,6 @@
       aria-label="إعادة ضبط الفلاتر"
     >
       <span class="material-icons">refresh</span>
-      إعادة ضبط
     </button>
   </form>
 
@@ -79,12 +78,13 @@
   <!-- Vacations Table -->
   @if (!isLoading() && employeeVacation()?.employeeVacationDetails?.length) {
   <div class="vacations-table-container">
+    {{ employeeVacation()!.totalVacationDays }}
+    {{ employeeVacation()?.employeeName }}
+    <!-- {{ employeeVacation()!.email }} -->
+
     <table class="vacations-table" role="grid">
       <thead>
         <tr>
-          <th scope="col">الموظف</th>
-          <th scope="col">البريد الإلكتروني</th>
-          <th scope="col">إجمالي أيام الإجازة</th>
           <th scope="col">التاريخ</th>
           <th scope="col">الساعات</th>
         </tr>
@@ -93,13 +93,6 @@
         @for (detail of employeeVacation()!.employeeVacationDetails; track
         detail.date) {
         <tr>
-          <td data-label="الموظف">{{ employeeVacation()!.employeeName }}</td>
-          <td data-label="البريد الإلكتروني">
-            <!-- {{ employeeVacation()!.email }} -->
-          </td>
-          <td data-label="إجمالي أيام الإجازة">
-            {{ employeeVacation()!.totalVacationDays }}
-          </td>
           <td data-label="التاريخ">{{ detail.date | date : "yyyy-MM-dd" }}</td>
           <td data-label="الساعات">{{ detail.hours | number : "1.0-2" }}</td>
         </tr>

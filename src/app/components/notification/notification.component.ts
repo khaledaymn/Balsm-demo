@@ -104,7 +104,7 @@ export class NotificationsComponent {
       })
       .subscribe({
         next: (response) => {
-          if (response.success) {
+          if (response) {
             this.showNotification(
               'success',
               `تم تسجيل المغادرة بنجاح: ${notification.title}`
@@ -114,6 +114,7 @@ export class NotificationsComponent {
             );
             this.notifications.set(updatedNotifications);
             this.filteredNotifications.set(updatedNotifications);
+            this.ignoreNotification(notification);
           } else {
             this.showNotification('error', 'فشل في تسجيل المغادرة.');
           }

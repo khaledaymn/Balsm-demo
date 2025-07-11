@@ -11,6 +11,5 @@ export interface Notification {
 }
 
 export interface TakeLeaveResponse {
-  success: boolean;
   message: string;
 }

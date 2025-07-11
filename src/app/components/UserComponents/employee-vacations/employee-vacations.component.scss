@@ -47,9 +47,8 @@
   }
 
   .reset-btn {
-    display: flex;
     align-items: center;
-    padding: 8px 16px;
+    padding: 0px 16px;
     background-color: #f44336;
     color: white;
     border: none;
@@ -102,7 +101,7 @@
   }
 
   .reset-btn {
-    display: flex;
+    // display: flex;
     align-items: center;
     padding: 8px 16px;
     background-color: #f44336;
@@ -124,7 +123,7 @@
 
   th, td {
     padding: 12px;
-    text-align: left;
+    text-align:center;
     border-bottom: 1px solid #ddd;
   }
 
@@ -206,7 +205,7 @@
 @media (max-width: 768px) {
   .vacations-table {
     display: block;
-
+direction: rtl;
     thead {
       display: none;
     }
@@ -227,12 +226,14 @@
       padding: 8px;
       position: relative;
       border: none;
+        direction: rtl;
 
       &:before {
         content: attr(data-label);
         font-weight: bold;
         color: #333;
         flex: 1;
+
       }
 
       &:last-child {

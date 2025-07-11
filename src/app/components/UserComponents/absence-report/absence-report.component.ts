@@ -151,12 +151,12 @@ export class AbsenceReportComponent implements OnInit, OnDestroy {
       pageNumber: this.pageNumber(),
       pageSize: this.pageSize(),
     };
-    if (reportType === 0) {
+    if (reportType == 0) {
       filterParams.dayDate = dayDate;
     } else {
       filterParams.fromDate = fromDate;
       filterParams.toDate = toDate;
-      filterParams.month = month || new Date().getMonth() + 1;
+      filterParams.month = month || null;
     }
 
     console.log('Absence Report Filter Params:', {
@@ -229,7 +229,7 @@ export class AbsenceReportComponent implements OnInit, OnDestroy {
       dayDate: '',
       fromDate: firstDay.toISOString().split('T')[0],
       toDate: lastDay.toISOString().split('T')[0],
-      month: currentMonth,
+      month: null,
     });
   }
 
