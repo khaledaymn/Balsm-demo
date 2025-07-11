@@ -23,6 +23,8 @@ import { AttendanceReportsComponent } from './components/attendance-reports/atte
 import { EmployeeSalariesComponent } from './components/employee-salaries/employee-salaries.component';
 import { NotificationsComponent } from './components/notification/notification.component';
 import { EmployeeSalaryDetailsComponent } from './components/employee-salary-details/employee-salary-details.component';
+import { AbsenceReportComponent } from './components/UserComponents/absence-report/absence-report.component';
+import { EmployeeVacationsComponent } from './components/UserComponents/employee-vacations/employee-vacations.component';
 
 export const appRoutes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
@@ -86,6 +88,8 @@ export const appRoutes: Routes = [
         // canActivate: [RoleGuard],
         // data: { roles: ['User'] },
         children: [
+          { path: 'vacations', component: EmployeeVacationsComponent },
+          { path: 'absence', component: AbsenceReportComponent },
           { path: '', redirectTo: 'userDashboard', pathMatch: 'full' },
           // { path: 'dashboard', component: AdminDashboardComponent },
         ],

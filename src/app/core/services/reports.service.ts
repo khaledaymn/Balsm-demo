@@ -4,12 +4,15 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { AttendanceReportResponse } from '../../models/attendance-report.model';
 import { EmployeeAttendanceLeaveResponse } from '../../models/employee-attendance-leave.model';
+import { EmployeeVacation } from '../../models/employee-vacation.model';
+import { environment } from '../../../environments/environments';
+import { AbsenceReportResponse } from '../../models/absence-report.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReportsService {
-  private baseUrl = 'https://hrwebsite.runasp.net/Reports';
+  private baseUrl = environment.apiUrl + '';
 
   constructor(private http: HttpClient) {}
 
@@ -28,10 +31,13 @@ export class ReportsService {
     const headers = new HttpHeaders({ accept: '*/*' });
 
     return this.http
-      .get<AttendanceReportResponse>(`${this.baseUrl}/AttendanceReport`, {
-        headers,
-        params,
-      })
+      .get<AttendanceReportResponse>(
+        `${this.baseUrl}/Reports/AttendanceReport`,
+        {
+          headers,
+          params,
+        }
+      )
       .pipe(
         catchError((error) => {
           console.error('Error fetching attendance report:', error);
@@ -71,7 +77,7 @@ export class ReportsService {
 
     return this.http
       .get<EmployeeAttendanceLeaveResponse>(
-        `${this.baseUrl}/GetEmployeeAttendanceAndLeaveReport`,
+        `${this.baseUrl}/Reports/GetEmployeeAttendanceAndLeaveReport`,
         { headers, params }
       )
       .pipe(
@@ -82,5 +88,54 @@ export class ReportsService {
           );
         })
       );
+  }
+  getEmployeeVacations(
+    employeeId: string,
+    pageNumber: number,
+    pageSize: number,
+    year: number,
+    month: number
+  ): Observable<EmployeeVacation> {
+    let params = new HttpParams()
+      .set('PageNumber', pageNumber.toString())
+      .set('PageSize', pageSize.toString())
+      .set('Year', year.toString())
+      .set('Month', month.toString());
+    const headers = new HttpHeaders({ accept: '*/*' });
+
+    return this.http.get<EmployeeVacation>(
+      `${this.baseUrl}/Users/EmployeeVacations/${employeeId}`,
+      { headers, params }
+    );
+  }
+  getAbsenceReport(
+    employeeId: string,
+    reportType: number,
+    params: {
+      pageNumber: number;
+      pageSize: number;
+      dayDate?: string;
+      fromDate?: string;
+      toDate?: string;
+      month?: number;
+    }
+  ): Observable<AbsenceReportResponse> {
+    let httpParams = new HttpParams()
+      .set('EmployeeId', employeeId)
+      .set('ReportType', reportType.toString())
+      .set('PageNumber', params.pageNumber.toString())
+      .set('PageSize', params.pageSize.toString());
+    if (params.dayDate) httpParams = httpParams.set('DayDate', params.dayDate);
+    if (params.fromDate)
+      httpParams = httpParams.set('FromDate', params.fromDate);
+    if (params.toDate) httpParams = httpParams.set('ToDate', params.toDate);
+    if (params.month)
+      httpParams = httpParams.set('Month', params.month.toString());
+    const headers = new HttpHeaders({ accept: '*/*' });
+
+    return this.http.get<AbsenceReportResponse>(
+      `${this.baseUrl}/Reports/AbsenceReport`,
+      { headers, params: httpParams }
+    );
   }
 }

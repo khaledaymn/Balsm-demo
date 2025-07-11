@@ -22,14 +22,7 @@ export class RoleSelectComponent {
   }
 
   logout() {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/auth/login']);
-      },
-      error: () => {
-        console.error('Logout failed:');
-        this.router.navigate(['/auth/login']); // Redirect even if API fails
-      },
-    });
+    this.authService.logout();
+    this.router.navigate(['/auth/login']); // Redirect even if API fails
   }
 }

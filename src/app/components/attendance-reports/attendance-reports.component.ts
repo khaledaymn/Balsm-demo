@@ -11,6 +11,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ReportsService } from '../../core/services/reports.service';
 import { AttendanceReport } from '../../models/attendance-report.model';
 import { EmployeeAttendanceLeaveReport } from '../../models/employee-attendance-leave.model';
+import { EmployeeVacationsComponent } from '../employee-vacations/employee-vacations.component';
+import { AbsenceReportComponent } from '../absence-report/absence-report.component';
 
 interface Notification {
   type: 'success' | 'error' | 'info';
@@ -20,7 +22,12 @@ interface Notification {
 @Component({
   selector: 'app-attendance-reports',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    EmployeeVacationsComponent,
+    AbsenceReportComponent,
+  ],
   templateUrl: './attendance-reports.component.html',
   styleUrl: './attendance-reports.component.scss',
 })
@@ -31,6 +38,9 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
   employeeAttendance = signal<EmployeeAttendanceLeaveReport[]>([]);
   notification = signal<Notification | null>(null);
   showEmployeeModal = signal<boolean>(false);
+  showVacationsModal = signal<boolean>(false);
+  showAbsenceModal = signal<boolean>(false);
+
   selectedEmployeeId = signal<string | null>(null);
   employeeId!: string;
   loading!: boolean;
@@ -248,7 +258,22 @@ export class AttendanceReportsComponent implements OnInit, OnDestroy {
         },
       });
   }
-
+  showVacations(employeeId: string): void {
+    this.selectedEmployeeId.set(employeeId);
+    this.showVacationsModal.set(true);
+  }
+  showAbsenceReport(employeeId: string): void {
+    this.selectedEmployeeId.set(employeeId);
+    this.showAbsenceModal.set(true);
+  }
+  closeVacationsModal(): void {
+    this.showVacationsModal.set(false);
+    this.selectedEmployeeId.set(null);
+  }
+  closeAbsenceModal(): void {
+    this.showAbsenceModal.set(false);
+    this.selectedEmployeeId.set(null);
+  }
   onFilterChange(): void {
     if (this.filterForm.valid) {
       this.pageNumber.set(1);

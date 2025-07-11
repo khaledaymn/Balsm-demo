@@ -94,15 +94,8 @@ export class AuthService {
       );
   }
 
-  logout(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/Account/logout`, {}).pipe(
-      tap(() => this.clearAuthData()),
-      catchError((error) => {
-        console.error('Logout error:', error);
-        this.clearAuthData();
-        return of(null);
-      })
-    );
+  logout(): void {
+    localStorage.clear();
   }
 
   isLoggedIn(): boolean {

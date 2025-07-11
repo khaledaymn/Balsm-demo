@@ -1,0 +1,130 @@
+<div class="container">
+  <!-- Notification -->
+  @if (notification()) {
+  <div
+    class="notification"
+    [class]="notification()?.type"
+    role="alert"
+    aria-live="assertive"
+  >
+    <span class="material-icons">
+      {{ getNotificationIcon(notification()!.type) }}
+    </span>
+    {{ notification()?.message }}
+  </div>
+  }
+
+  <!-- Header -->
+  <div class="vacations-header">
+    <h2>تقرير إجازات الموظف</h2>
+    <p class="header-description">عرض تفاصيل الإجازات الشهرية للموظف</p>
+  </div>
+
+  <!-- Filters -->
+  <form [formGroup]="filterForm" class="filters">
+    <div class="filter-group">
+      <label for="year">السنة:</label>
+      <input
+        type="number"
+        id="year"
+        formControlName="year"
+        min="2000"
+        max="2100"
+        aria-label="تصفية حسب السنة"
+      />
+    </div>
+    <div class="filter-group">
+      <label for="month">الشهر:</label>
+      <select id="month" formControlName="month" aria-label="تصفية حسب الشهر">
+        @for (m of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track m) {
+        <option [value]="m">{{ m }}</option>
+        }
+      </select>
+    </div>
+    <button
+      class="reset-btn"
+      type="button"
+      (click)="resetFilters()"
+      aria-label="إعادة ضبط الفلاتر"
+    >
+      <span class="material-icons">refresh</span>
+      إعادة ضبط
+    </button>
+  </form>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري تحميل تقرير الإجازات...</p>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && (!employeeVacation() ||
+  employeeVacation()!.employeeVacationDetails.length === 0)) {
+  <div class="empty-state">
+    <span class="material-icons">event_busy</span>
+    <p>لا توجد بيانات إجازات متاحة لهذه الفلاتر</p>
+    <button
+      class="reset-btn"
+      type="button"
+      (click)="resetFilters()"
+      aria-label="إعادة ضبط الفلاتر"
+    >
+      إعادة ضبط الفلاتر
+    </button>
+  </div>
+  }
+
+  <!-- Vacation Details -->
+  @if (!isLoading() && employeeVacation() &&
+  employeeVacation()!.employeeVacationDetails.length > 0) {
+  <div class="vacations-container">
+    <div class="employee-info">
+      <h3>اسم الموظف: {{ employeeVacation()!.employeeName }}</h3>
+      <p>إجمالي أيام الإجازة: {{ employeeVacation()!.totalVacationDays }}</p>
+    </div>
+    <table class="vacations-table" role="grid">
+      <thead>
+        <tr>
+          <th scope="col">التاريخ</th>
+          <th scope="col">عدد الساعات</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (detail of employeeVacation()!.employeeVacationDetails; track
+        detail.date) {
+        <tr>
+          <td data-label="التاريخ">{{ detail.date | date : "yyyy-MM-dd" }}</td>
+          <td data-label="عدد الساعات">
+            {{ detail.hours | number : "1.0-2" }}
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button
+        [disabled]="pageNumber() === 1"
+        (click)="changePage(pageNumber() - 1)"
+        aria-label="الصفحة السابقة"
+      >
+        <span class="material-icons">chevron_right</span>
+      </button>
+      <span>الصفحة {{ pageNumber() }}</span>
+      <button
+        [disabled]="
+          employeeVacation()!.employeeVacationDetails.length < pageSize()
+        "
+        (click)="changePage(pageNumber() + 1)"
+        aria-label="الصفحة التالية"
+      >
+        <span class="material-icons">chevron_left</span>
+      </button>
+    </div>
+  </div>
+  }
+</div>

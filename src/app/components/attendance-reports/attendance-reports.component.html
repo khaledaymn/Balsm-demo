@@ -122,6 +122,20 @@
             >
               <span class="material-icons">visibility</span>
             </button>
+            <button
+              class="vacations-btn"
+              (click)="showVacations(report.employeeId)"
+              aria-label="عرض تقرير الإجازات"
+            >
+              <span class="material-icons">beach_access</span>
+            </button>
+            <button
+              class="absence-btn"
+              (click)="showAbsenceReport(report.employeeId)"
+              aria-label="عرض تقرير الغياب"
+            >
+              <span class="material-icons">event_busy</span>
+            </button>
           </td>
         </tr>
         }
@@ -266,6 +280,52 @@
           <span class="material-icons">cancel</span>
           إغلاق
         </button>
+      </div>
+    </div>
+  </div>
+  }
+  <!-- Employee Vacations Modal -->
+  @if (showVacationsModal()) {
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          <span class="material-icons">beach_access</span> تقرير إجازات الموظف
+        </h2>
+        <button
+          class="close-btn"
+          (click)="closeVacationsModal()"
+          aria-label="إغلاق النافذة"
+        >
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <app-employee-vacations
+          [employeeId]="selectedEmployeeId()!"
+        ></app-employee-vacations>
+      </div>
+    </div>
+  </div>
+  }
+  <!-- Absence Report Modal -->
+  @if (showAbsenceModal()) {
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><span class="material-icons">event_busy</span> تقرير الغياب</h2>
+        <button
+          class="close-btn"
+          (click)="closeAbsenceModal()"
+          aria-label="إغلاق النافذة"
+        >
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <app-absence-report
+          [employeeId]="selectedEmployeeId()!"
+        ></app-absence-report>
       </div>
     </div>
   </div>
