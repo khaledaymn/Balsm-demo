@@ -11,7 +11,6 @@ import {
 })
 export class LocationService {
   userLocation = signal<LocationData | null>(null);
-
   getCurrentLocation(): Promise<LocationData> {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
@@ -28,6 +27,7 @@ export class LocationService {
             timestamp: position.timestamp,
           };
           this.userLocation.set(location);
+          console.log(location, 'mylocation');
           resolve(location);
         },
         (error) => {
@@ -61,6 +61,7 @@ export class LocationService {
       workLocation.longitude
     );
     if (distance <= workLocation.radius) {
+      console.log('location is true from validate location ');
       return { isWithinLocation: true, locationName: workLocation.name };
     }
     return {

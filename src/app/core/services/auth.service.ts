@@ -35,7 +35,7 @@ export class AuthService {
       tap((status) => {
         console.log('Auth status checked:', status);
         if (!status) {
-          this.clearAuthData(); // Clear stale data if not logged in
+          this.logout(); // Clear stale data if not logged in
         }
       })
     );
@@ -95,7 +95,12 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.clear();
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.rolesKey);
+    localStorage.removeItem(this.shiftsKey);
+    localStorage.removeItem(this.userIdKey);
+    localStorage.removeItem(this.branchNameKey);
+    this.isLoggedInSubject.next(false);
   }
 
   isLoggedIn(): boolean {
@@ -203,15 +208,6 @@ export class AuthService {
 
   private hasToken(): boolean {
     return !!localStorage.getItem(this.tokenKey);
-  }
-
-  private clearAuthData(): void {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.rolesKey);
-    localStorage.removeItem(this.shiftsKey);
-    localStorage.removeItem(this.userIdKey);
-    localStorage.removeItem(this.branchNameKey);
-    this.isLoggedInSubject.next(false);
   }
 
   forgotPassword(email: string): Observable<string> {
