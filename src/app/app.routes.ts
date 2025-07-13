@@ -17,7 +17,7 @@ import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password
 import { EmployeeShiftsComponent } from './components/employee-shifts/employee-shifts.component';
 import { BranchesComponent } from './components/branches/branches.component';
 import { UserRolesComponent } from './components/Roles/Roles.component';
-import { AttendanceTrackerComponent } from './components/attendance-tracker/attendance-tracker.component';
+import { AttendanceTrackerComponent } from './components/UserComponents/attendance-tracker/attendance-tracker.component';
 import { GeneralSettingsComponent } from './components/general-settings/general-settings.component';
 import { AttendanceReportsComponent } from './components/attendance-reports/attendance-reports.component';
 import { EmployeeSalariesComponent } from './components/employee-salaries/employee-salaries.component';
