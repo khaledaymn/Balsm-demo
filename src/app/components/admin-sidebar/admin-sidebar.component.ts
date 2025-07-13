@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 interface NavItem {
   label: string;
@@ -17,10 +18,11 @@ interface NavItem {
   templateUrl: './admin-sidebar.component.html',
   styleUrls: ['./admin-sidebar.component.scss'],
 })
-export class AdminSidebarComponent {
+export class AdminSidebarComponent implements OnInit {
   @Input() collapsed = false;
   @Input() isMobile = false;
   @Output() toggleSidebar = new EventEmitter<void>();
+  currentRoute: string = '';
 
   navItems: NavItem[] = [
     { label: 'لوحة القيادة', icon: 'dashboard', route: '/app/admin' },
@@ -99,6 +101,21 @@ export class AdminSidebarComponent {
     { label: 'الإعدادات', icon: 'settings', route: '/app/admin/settings' },
   ];
 
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.currentRoute = event.url;
+      }
+    });
+  }
+
+  ngOnInit(): void {
+      this.currentRoute = this.router.url;
+  }
+
   toggleSubMenu(item: NavItem): void {
     if (this.collapsed && !this.isMobile) {
       this.toggleSidebar.emit();
@@ -142,5 +159,16 @@ export class AdminSidebarComponent {
     event.stopPropagation();
     console.log('Collapse button clicked');
     this.toggleSidebar.emit();
+  }
+
+  onLogout(): void {
+    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+      this.authService.logout();
+      this.router.navigate(['/login']);
+    }
+  }
+
+  onRoleSwitch(){
+    this.router.navigate(['app/role-select'])
   }
 }

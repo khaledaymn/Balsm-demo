@@ -3,9 +3,9 @@
   [class.collapsed]="collapsed"
   [class.mobile]="isMobile"
 >
-  <div class="sidebar-header">
+  <div class="sidebar-header" >
     <div class="logo-container">
-      <img src="balsm.png" alt="بلسم" class="logo" />
+      <img src="balsm.png" alt="بلسم" class="logo" [class.logo-collapced]= "collapsed"  />
       <span class="logo-text" *ngIf="!collapsed || isMobile">بلسم</span>
     </div>
     <button
@@ -79,14 +79,34 @@
     </nav>
   </div>
 
-  <div class="sidebar-footer" *ngIf="!collapsed || isMobile">
+  <div class="sidebar-footer" *ngIf="true|| isMobile">
     <div class="user-info">
-      <img src="" alt="صورة المستخدم" class="user-avatar" />
+      <img src="/Profile.png" alt="صورة المستخدم" class="user-avatar" />
       <div class="user-details">
-        <h3 class="user-name">أحمد محمد</h3>
-        <p class="user-role">مدير النظام</p>
+        <h3 class="user-name">مدير النظام</h3>
+        <!-- <p class="user-role"></p> -->
       </div>
     </div>
+
+    <button
+      class="role-switch-button"
+      (click)="onRoleSwitch()"
+      type="button"
+      title="تغيير الدور"
+    >
+      <span class="material-icons">sync_alt</span>
+      <span *ngIf="!collapsed">تغيير الدور</span>
+    </button>
+    <button
+      class="logout-button"
+      (click)="onLogout()"
+      type="button"
+      title="تسجيل الخروج"
+    >
+      <span class="material-icons">logout</span>
+      <span *ngIf="!collapsed">تسجيل الخروج</span>
+    </button>
+
     <button
       class="collapse-button"
       (click)="handleCollapseClick($event)"
@@ -100,12 +120,12 @@
     </button>
   </div>
 
-  <button
+  <!-- <button
     *ngIf="collapsed && !isMobile"
     class="expand-button"
     (click)="handleCollapseClick($event)"
     type="button"
   >
     <span class="material-icons">keyboard_double_arrow_left</span>
-  </button>
+  </button> -->
 </aside>
