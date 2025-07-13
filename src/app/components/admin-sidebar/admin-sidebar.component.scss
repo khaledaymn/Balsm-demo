@@ -8,6 +8,10 @@ $sidebar-text-muted: #666666;
 $sidebar-hover: #f8f9fc;
 $sidebar-active: #008D7F;
 $sidebar-active-bg: rgba(0, 141, 127, 0.1);
+$logout-hover: #dc3545;
+$logout-hover-bg: rgba(220, 53, 69, 0.1);
+$role-switch-hover: #6f42c1;
+$role-switch-hover-bg: rgba(111, 66, 193, 0.1);
 $transition-duration: 0.3s;
 @media print {
     .admin-sidebar {
@@ -79,6 +83,10 @@ $transition-duration: 0.3s;
     font-weight: 600;
     color: $sidebar-text;
     white-space: nowrap;
+  }
+
+  .logo-collapced {
+    margin-right: -20px;
   }
 
   .close-sidebar {
@@ -323,6 +331,70 @@ $transition-duration: 0.3s;
         overflow: hidden;
         text-overflow: ellipsis;
       }
+    }
+  }
+
+  .role-switch-button {
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: $sidebar-hover;
+    border: none;
+    border-radius: 8px;
+    color: $sidebar-text-muted;
+    cursor: pointer !important;
+    transition: all 0.2s;
+    z-index: 100 !important;
+    position: relative;
+    outline: none;
+    margin-bottom: 10px;
+
+    &:hover {
+      background-color: $role-switch-hover-bg;
+      color: $role-switch-hover;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    .material-icons {
+      font-size: 18px;
+    }
+  }
+  
+  .logout-button {
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: $sidebar-hover;
+    border: none;
+    border-radius: 8px;
+    color: $sidebar-text-muted;
+    cursor: pointer !important;
+    transition: all 0.2s;
+    z-index: 100 !important;
+    position: relative;
+    outline: none;
+    margin-bottom: 10px;
+
+    &:hover {
+      background-color: $logout-hover-bg;
+      color: $logout-hover;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    .material-icons {
+      font-size: 18px;
     }
   }
 

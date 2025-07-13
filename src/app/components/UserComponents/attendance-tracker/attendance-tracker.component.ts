@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Attendance, Leave } from '../../models/attendance.model';
-import { AttendanceOperationsService } from '../../core/services/Attendance/attendance-operations.service';
-import { AuthService } from '../../core/services/auth.service';
-import { TimeValidationService } from '../../core/services/Attendance/time-validation.service';
+import { Attendance, Leave } from '../../../models/attendance.model';
+import { AttendanceOperationsService } from '../../../core/services/Attendance/attendance-operations.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { TimeValidationService } from '../../../core/services/Attendance/time-validation.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Shift } from '../../models/shifts.model';
-import { AttendanceService } from '../../core/services/Attendance/attendance.service';
-import { LocationService } from '../../core/services/Attendance/location.service';
+import { Shift } from '../../../models/shifts.model';
+import { AttendanceService } from '../../../core/services/Attendance/attendance.service';
+import { LocationService } from '../../../core/services/Attendance/location.service';
 
 @Component({
   selector: 'app-attendance-tracker',
