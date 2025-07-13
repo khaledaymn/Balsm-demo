@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AdminSidebarComponent } from '../../components/admin-sidebar/admin-sidebar.component';
+import { AdminSidebarComponent } from '../../components/AdminComponents/admin-sidebar/admin-sidebar.component';
 import { CommonModule } from '@angular/common';
 
 @Component({
