@@ -1,130 +1,284 @@
-<div class="container">
+<div class="vacations-container" dir="rtl">
   <!-- Notification -->
   @if (notification()) {
-  <div
-    class="notification"
-    [class]="notification()?.type"
-    role="alert"
-    aria-live="assertive"
-  >
-    <span class="material-icons">
-      {{ getNotificationIcon(notification()!.type) }}
-    </span>
-    {{ notification()?.message }}
-  </div>
-  }
-
-  <!-- Header -->
-  <div class="vacations-header">
-    <h2>تقرير إجازات الموظف</h2>
-    <p class="header-description">عرض تفاصيل الإجازات الشهرية للموظف</p>
-  </div>
-
-  <!-- Filters -->
-  <form [formGroup]="filterForm" class="filters">
-    <div class="filter-group">
-      <label for="year">السنة:</label>
-      <input
-        type="number"
-        id="year"
-        formControlName="year"
-        min="2000"
-        max="2100"
-        aria-label="تصفية حسب السنة"
-      />
-    </div>
-    <div class="filter-group">
-      <label for="month">الشهر:</label>
-      <select id="month" formControlName="month" aria-label="تصفية حسب الشهر">
-        @for (m of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track m) {
-        <option [value]="m">{{ m }}</option>
-        }
-      </select>
-    </div>
-    <button
-      class="reset-btn"
-      type="button"
-      (click)="resetFilters()"
-      aria-label="إعادة ضبط الفلاتر"
-    >
-      <span class="material-icons">refresh</span>
-      إعادة ضبط
-    </button>
-  </form>
-
-  <!-- Loading State -->
-  @if (isLoading()) {
-  <div class="loading-state">
-    <div class="spinner"></div>
-    <p>جاري تحميل تقرير الإجازات...</p>
-  </div>
-  }
-
-  <!-- Empty State -->
-  @if (!isLoading() && (!employeeVacation() ||
-  employeeVacation()!.employeeVacationDetails.length === 0)) {
-  <div class="empty-state">
-    <span class="material-icons">event_busy</span>
-    <p>لا توجد بيانات إجازات متاحة لهذه الفلاتر</p>
-    <button
-      class="reset-btn"
-      type="button"
-      (click)="resetFilters()"
-      aria-label="إعادة ضبط الفلاتر"
-    >
-      إعادة ضبط الفلاتر
-    </button>
-  </div>
-  }
-
-  <!-- Vacation Details -->
-  @if (!isLoading() && employeeVacation() &&
-  employeeVacation()!.employeeVacationDetails.length > 0) {
-  <div class="vacations-container">
-    <div class="employee-info">
-      <h3>اسم الموظف: {{ employeeVacation()!.employeeName }}</h3>
-      <p>إجمالي أيام الإجازة: {{ employeeVacation()!.totalVacationDays }}</p>
-    </div>
-    <table class="vacations-table" role="grid">
-      <thead>
-        <tr>
-          <th scope="col">التاريخ</th>
-          <th scope="col">عدد الساعات</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (detail of employeeVacation()!.employeeVacationDetails; track
-        detail.date) {
-        <tr>
-          <td data-label="التاريخ">{{ detail.date | date : "yyyy-MM-dd" }}</td>
-          <td data-label="عدد الساعات">
-            {{ detail.hours | number : "1.0-2" }}
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
-
-    <!-- Pagination -->
-    <div class="pagination">
+  <div class="notification-overlay">
+    <div class="notification" [class]="'notification-' + notification()!.type">
+      <span class="material-icons notification-icon">
+        {{ getNotificationIcon(notification()!.type) }}
+      </span>
+      <span class="notification-message">{{ notification()!.message }}</span>
       <button
-        [disabled]="pageNumber() === 1"
-        (click)="changePage(pageNumber() - 1)"
-        aria-label="الصفحة السابقة"
+        class="notification-close"
+        (click)="dismissNotification()"
+        aria-label="إغلاق الإشعار"
       >
-        <span class="material-icons">chevron_right</span>
-      </button>
-      <span>الصفحة {{ pageNumber() }}</span>
-      <button
-        [disabled]="
-          employeeVacation()!.employeeVacationDetails.length < pageSize()
-        "
-        (click)="changePage(pageNumber() + 1)"
-        aria-label="الصفحة التالية"
-      >
-        <span class="material-icons">chevron_left</span>
+        <span class="material-icons">close</span>
       </button>
     </div>
   </div>
   }
+
+  <div class="main-content">
+    <!-- Employee Header -->
+    @if (employeeVacation()) {
+    <div class="employee-header">
+      <div class="employee-info">
+        <h1 class="employee-name">
+          <span class="material-icons">person</span>
+          {{ employeeVacation()!.employeeName }}
+        </h1>
+      </div>
+      <div class="vacation-stats">
+        <div class="stat-card total">
+          <div class="stat-number">{{ vacationStats().total }}</div>
+          <div class="stat-label">إجمالي الإجازات</div>
+        </div>
+        <div class="stat-card used">
+          <div class="stat-number">{{ vacationStats().used }}</div>
+          <div class="stat-label">المستخدمة</div>
+        </div>
+        <div class="stat-card remaining">
+          <div class="stat-number">{{ vacationStats().remaining }}</div>
+          <div class="stat-label">المتبقية</div>
+        </div>
+        <div class="stat-card pending">
+          <div class="stat-number">{{ vacationStats().pending }}</div>
+          <div class="stat-label">في الانتظار</div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Filters Card -->
+    <div class="card filters-card">
+      <div class="card-header">
+        <h2 class="card-title">
+          <span class="material-icons">tune</span>
+          فلترة الإجازات
+        </h2>
+      </div>
+      <div class="card-content">
+        <form [formGroup]="filterForm" class="filters-form">
+          <div class="filters-grid">
+            <div class="form-group">
+              <label for="year" class="form-label">السنة</label>
+              <input
+                type="number"
+                id="year"
+                formControlName="year"
+                class="form-input"
+                min="2000"
+                max="2100"
+                placeholder="اختر السنة"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="month" class="form-label">الشهر</label>
+              <select id="month" formControlName="month" class="form-select">
+                @for (month of months; track month.value) {
+                <option [value]="month.value">{{ month.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="search" class="form-label">البحث</label>
+              <div class="search-input-wrapper">
+                <span class="material-icons search-icon">search</span>
+                <input
+                  type="text"
+                  id="search"
+                  class="form-input search-input"
+                  placeholder="ابحث في الإجازات..."
+                  (input)="onSearchChange($event)"
+                  [value]="searchTerm()"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label invisible">إجراءات</label>
+              <button
+                type="button"
+                class="btn btn-outline w-full"
+                (click)="resetFilters()"
+              >
+                <span class="material-icons">refresh</span>
+                إعادة تعيين
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+    <div class="card">
+      <div class="card-content">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">جاري تحميل بيانات الإجازات...</p>
+        </div>
+        <div class="skeleton-container">
+          @for (item of [1,2,3,4]; track item) {
+          <div class="skeleton-item">
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line short"></div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Empty State -->
+    @if (!isLoading() && filteredVacations().length === 0) {
+    <div class="card">
+      <div class="card-content">
+        <div class="empty-state">
+          <span class="material-icons empty-icon">beach_access</span>
+          <h3 class="empty-title">لا توجد إجازات</h3>
+          <p class="empty-description">
+            @if (searchTerm()) { لم يتم العثور على نتائج للبحث "{{
+              searchTerm()
+            }}" } @else { لا توجد إجازات متاحة للفترة المحددة }
+          </p>
+          <button class="btn btn-primary" (click)="resetFilters()">
+            <span class="material-icons">refresh</span>
+            إعادة تعيين الفلاتر
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Vacations Table/Cards -->
+    @if (!isLoading() && filteredVacations().length > 0) {
+    <div class="card">
+      <div class="card-header">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 1rem;
+          "
+        >
+          <h2 class="card-title">
+            <span class="material-icons">beach_access</span>
+            إجازات {{ getMonthLabel(filterForm.value.month!) }}
+            {{ filterForm.value.year }}
+          </h2>
+          <div class="results-count">
+            {{ filteredVacations().length }} إجازة
+          </div>
+        </div>
+      </div>
+      <div class="card-content">
+        <!-- Desktop Table -->
+        <div class="table-container desktop-table">
+          <table class="vacations-table">
+            <thead>
+              <tr>
+                <th>التاريخ</th>
+                <th>عدد الساعات</th>
+                <th>نوع الإجازة</th>
+                <th>الحالة</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (vacation of filteredVacations(); track vacation.date) {
+              <tr class="table-row">
+                <td class="date-cell">
+                  <div class="date-info">
+                    <div class="date-arabic">
+                      {{ formatDateArabic(vacation.date) }}
+                    </div>
+                  </div>
+                </td>
+                <td class="hours-cell">
+                  <span class="badge badge-primary"
+                    >{{ vacation.hours }} ساعة</span
+                  >
+                </td>
+                <td class="type-cell">
+                  <div class="vacation-type">
+                    <span class="material-icons type-icon">event</span>
+                    <span>إجازة</span>
+                  </div>
+                </td>
+                <td class="status-cell">
+                  <span class="badge badge-success">مؤكدة</span>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-cards">
+          @for (vacation of filteredVacations(); track vacation.date) {
+          <div class="vacation-card">
+            <div class="card-content">
+              <div class="vacation-header">
+                <div class="vacation-type">
+                  <span class="material-icons type-icon">event</span>
+                  <h3 class="type-name">إجازة</h3>
+                </div>
+                <div class="vacation-status approved">مؤكدة</div>
+              </div>
+
+              <div class="vacation-details">
+                <div class="detail-row">
+                  <span class="material-icons detail-icon">date_range</span>
+                  <div class="detail-content">
+                    <div class="detail-label">التاريخ</div>
+                    <div class="detail-value">
+                      {{ formatDateArabic(vacation.date) }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-row">
+                  <span class="material-icons detail-icon">schedule</span>
+                  <div class="detail-content">
+                    <div class="detail-label">عدد الساعات</div>
+                    <div class="detail-value">{{ vacation.hours }} ساعة</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <button
+            class="btn btn-outline"
+            [disabled]="pageNumber() === 1"
+            (click)="changePage(pageNumber() - 1)"
+          >
+            <span class="material-icons">chevron_right</span>
+            السابق
+          </button>
+          <span class="page-info">الصفحة {{ pageNumber() }}</span>
+          <button
+            class="btn btn-outline"
+            [disabled]="filteredVacations().length < pageSize()"
+            (click)="changePage(pageNumber() + 1)"
+          >
+            التالي
+            <span class="material-icons">chevron_left</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
 </div>

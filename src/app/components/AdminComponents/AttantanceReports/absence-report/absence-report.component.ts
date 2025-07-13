@@ -1,4 +1,11 @@
-import { Component, Input, signal, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Input,
+  signal,
+  type OnInit,
+  type OnDestroy,
+  computed,
+} from '@angular/core';
 import {
   ReactiveFormsModule,
   FormGroup,
@@ -9,13 +16,10 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ReportsService } from '../../../../core/services/reports.service';
-import {
-  AbsenceReport,
-  AbsenceDetail,
-} from '../../../../models/absence-report.model';
+import { AbsenceReport } from '../../../../models/absence-report.model';
 
 interface Notification {
-  type: 'success' | 'error' | 'info';
+  type: 'success' | 'error' | 'info' | 'warning';
   message: string;
 }
 
@@ -27,17 +31,51 @@ interface Notification {
   styleUrl: './absence-report.component.scss',
 })
 export class AbsenceReportComponent implements OnInit, OnDestroy {
-  @Input() employeeId: string = '';
+  @Input() employeeId = '';
 
   // Signals for state management
   isLoading = signal<boolean>(true);
   absenceReports = signal<AbsenceReport[]>([]);
   notification = signal<Notification | null>(null);
+  searchTerm = signal<string>('');
 
   // Pagination
   pageNumber = signal<number>(1);
   pageSize = signal<number>(10);
   totalRecords = signal<number>(0);
+
+  // Computed properties
+  filteredAbsences = computed(() => {
+    const reports = this.absenceReports();
+    const allAbsences = reports.flatMap((report) =>
+      report.data.map((absence) => ({
+        ...absence,
+        employeeName: report.employeeName,
+        email: report.email,
+      }))
+    );
+
+    const search = this.searchTerm().toLowerCase();
+    if (!search) return allAbsences;
+
+    return allAbsences.filter((absence) =>
+      absence.date.toLowerCase().includes(search)
+    );
+  });
+
+  absenceStats = computed(() => {
+    const absences = this.filteredAbsences();
+    const totalHours = absences.reduce(
+      (sum, absence) => sum + absence.hours,
+      0
+    );
+
+    return {
+      total: absences.length,
+      totalHours: totalHours,
+      averageHours: absences.length > 0 ? totalHours / absences.length : 0,
+    };
+  });
 
   // Filters
   absenceFilterForm = new FormGroup({
@@ -45,16 +83,9 @@ export class AbsenceReportComponent implements OnInit, OnDestroy {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    dayDate: new FormControl<string>('', {
-      validators: [Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)],
-    }),
-    fromDate: new FormControl<string>('', {
-      validators: [Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)],
-    }),
-    toDate: new FormControl<string>('', {
-      validators: [Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)],
-    }),
-    month: new FormControl<number | null>(null),
+    dayDate: new FormControl<string>(''),
+    fromDate: new FormControl<string>(''),
+    toDate: new FormControl<string>(''),
   });
 
   private subscription: Subscription = new Subscription();
@@ -63,35 +94,9 @@ export class AbsenceReportComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.employeeId) {
+      this.initializeFilters();
       this.loadAbsenceReport();
-      this.subscription.add(
-        this.absenceFilterForm.valueChanges
-          .pipe(
-            debounceTime(300),
-            distinctUntilChanged(
-              (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
-            )
-          )
-          .subscribe(() => {
-            if (this.absenceFilterForm.valid) {
-              console.log(
-                'Absence Form Value Changed:',
-                this.absenceFilterForm.value
-              );
-              this.pageNumber.set(1);
-              this.loadAbsenceReport();
-            } else {
-              console.warn(
-                'Absence Form Invalid:',
-                this.absenceFilterForm.errors
-              );
-              this.showNotification(
-                'error',
-                'يرجى إدخال بيانات صالحة للفلاتر.'
-              );
-            }
-          })
-      );
+      this.setupFormSubscriptions();
     } else {
       this.showNotification('error', 'معرف الموظف غير متوفر.');
       this.isLoading.set(false);
@@ -102,15 +107,60 @@ export class AbsenceReportComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  private initializeFilters(): void {
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+    const firstDay = new Date(currentYear, currentMonth - 1, 1);
+    const lastDay = new Date(
+      currentYear,
+      currentMonth - 1,
+      new Date(currentYear, currentMonth, 0).getDate()
+    );
+
+    this.absenceFilterForm.patchValue({
+      reportType: 1,
+      fromDate: firstDay.toISOString().split('T')[0],
+      toDate: lastDay.toISOString().split('T')[0],
+    });
+  }
+
+  private setupFormSubscriptions(): void {
+    this.subscription.add(
+      this.absenceFilterForm.valueChanges
+        .pipe(
+          debounceTime(300),
+          distinctUntilChanged(
+            (prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)
+          )
+        )
+        .subscribe(() => {
+          if (this.absenceFilterForm.valid) {
+            console.log(
+              'Absence Form Value Changed:',
+              this.absenceFilterForm.value
+            );
+            this.pageNumber.set(1);
+            this.loadAbsenceReport();
+          } else {
+            console.warn(
+              'Absence Form Invalid:',
+              this.absenceFilterForm.errors
+            );
+            this.showNotification('error', 'يرجى إدخال بيانات صالحة للفلاتر.');
+          }
+        })
+    );
+  }
+
   loadAbsenceReport(): void {
     if (!this.employeeId) {
       this.showNotification('error', 'معرف الموظف غير متوفر.');
       this.isLoading.set(false);
       return;
     }
-    this.isLoading.set(true);
 
-    const { reportType, dayDate, fromDate, toDate, month } =
+    this.isLoading.set(true);
+    const { reportType, dayDate, fromDate, toDate } =
       this.absenceFilterForm.value;
 
     if (
@@ -124,31 +174,17 @@ export class AbsenceReportComponent implements OnInit, OnDestroy {
       this.isLoading.set(false);
       return;
     }
-    // if (
-    //   reportType === 1 &&
-    //   (!fromDate ||
-    //     !toDate ||
-    //     !this.absenceFilterForm.controls.fromDate.valid ||
-    //     !this.absenceFilterForm.controls.toDate.valid)
-    // ) {
-    //   this.showNotification(
-    //     'error',
-    //     'يرجى تحديد تواريخ صالحة للتقرير الشهري (YYYY-MM-DD).'
-    //   );
-    //   this.isLoading.set(false);
-    //   return;
-    // }
 
     const filterParams: any = {
       pageNumber: this.pageNumber(),
       pageSize: this.pageSize(),
     };
+
     if (reportType === 0) {
       filterParams.dayDate = dayDate;
     } else {
       filterParams.fromDate = fromDate;
       filterParams.toDate = toDate;
-      // filterParams.month = month || new Date().getMonth() + 1;
     }
 
     console.log('Absence Report Filter Params:', {
@@ -170,30 +206,13 @@ export class AbsenceReportComponent implements OnInit, OnDestroy {
                 0
               ) || 0
             );
-            if (
-              !response.data ||
-              response.data.length === 0 ||
-              response.data.every((report) => report.data.length === 0)
-            ) {
-              // this.showNotification(
-              //   'info',
-              //   'لا توجد بيانات غياب متاحة لهذه الفلاتر.'
-              // );
-            } else {
-              // this.showNotification('success', 'تم تحميل تقرير الغياب بنجاح.');
-            }
           } else {
-            // this.showNotification('error', 'فشل في تحميل تقرير الغياب.');
             this.absenceReports.set([]);
           }
           this.isLoading.set(false);
         },
         error: (error) => {
           console.error('Absence Report Error:', error);
-          // this.showNotification(
-          //   'error',
-          //   error.message || 'حدث خطأ أثناء تحميل تقرير الغياب.'
-          // );
           this.absenceReports.set([]);
           this.isLoading.set(false);
         },
@@ -208,27 +227,23 @@ export class AbsenceReportComponent implements OnInit, OnDestroy {
   }
 
   resetFilters(): void {
-    const currentMonth = new Date().getMonth() + 1;
-    const currentYear = new Date().getFullYear();
-    const firstDay = new Date(currentYear, currentMonth - 1, 1);
-    const lastDay = new Date(
-      currentYear,
-      currentMonth - 1,
-      new Date(currentYear, currentMonth, 0).getDate()
-    );
-    this.absenceFilterForm.reset({
-      reportType: 1,
-      dayDate: '',
-      fromDate: firstDay.toISOString().split('T')[0],
-      toDate: lastDay.toISOString().split('T')[0],
-      month: currentMonth,
-    });
+    this.initializeFilters();
+    this.searchTerm.set('');
     this.loadAbsenceReport();
   }
 
-  showNotification(type: 'success' | 'error' | 'info', message: string): void {
+  onSearchChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm.set(target.value);
+  }
+
+  showNotification(type: Notification['type'], message: string): void {
     this.notification.set({ type, message });
     setTimeout(() => this.notification.set(null), 5000);
+  }
+
+  dismissNotification(): void {
+    this.notification.set(null);
   }
 
   getNotificationIcon(type: string): string {
@@ -237,10 +252,36 @@ export class AbsenceReportComponent implements OnInit, OnDestroy {
         return 'check_circle';
       case 'error':
         return 'error';
+      case 'warning':
+        return 'warning';
       case 'info':
         return 'info';
       default:
         return 'info';
+    }
+  }
+
+  formatDateArabic(dateString: string): string {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long',
+    };
+    return date.toLocaleDateString('ar-SA', options);
+  }
+
+  formatDecimalHours(decimalHours: number): string {
+    const hours = Math.floor(decimalHours);
+    const minutes = Math.round((decimalHours - hours) * 60);
+
+    if (hours === 0) {
+      return `${minutes} دقيقة`;
+    } else if (minutes === 0) {
+      return `${hours} ساعة`;
+    } else {
+      return `${hours} ساعة و ${minutes} دقيقة`;
     }
   }
 }

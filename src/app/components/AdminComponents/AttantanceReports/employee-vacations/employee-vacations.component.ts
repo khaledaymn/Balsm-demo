@@ -1,17 +1,22 @@
-import { Component, Input, signal, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Input,
+  signal,
+  type OnInit,
+  type OnDestroy,
+  computed,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormGroup,
   FormControl,
   Validators,
 } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ReportsService } from '../../../../core/services/reports.service';
-import {
-  EmployeeVacation,
-  EmployeeVacationDetail,
-} from '../../../../models/employee-vacation.model';
+import { EmployeeVacation } from '../../../../models/employee-vacation.model';
 
 interface Notification {
   type: 'success' | 'error' | 'info';
@@ -26,17 +31,44 @@ interface Notification {
   styleUrl: './employee-vacations.component.scss',
 })
 export class EmployeeVacationsComponent implements OnInit, OnDestroy {
-  @Input() employeeId: string = '';
+  @Input() employeeId = '';
 
   // Signals for state management
   isLoading = signal<boolean>(true);
   employeeVacation = signal<EmployeeVacation | null>(null);
   notification = signal<Notification | null>(null);
+  searchTerm = signal<string>('');
 
   // Pagination
   pageNumber = signal<number>(1);
   pageSize = signal<number>(10);
   totalRecords = signal<number>(0);
+
+  // Computed properties
+  filteredVacations = computed(() => {
+    const vacation = this.employeeVacation();
+    if (!vacation) return [];
+
+    const details = vacation.employeeVacationDetails;
+    const search = this.searchTerm().toLowerCase();
+
+    if (!search) return details;
+
+    return details;
+  });
+
+  vacationStats = computed(() => {
+    const vacation = this.employeeVacation();
+    if (!vacation) return { total: 0, used: 0, remaining: 0, pending: 0 };
+
+    const details = vacation.employeeVacationDetails;
+    return {
+      total: details.length,
+      // used: details.filter((d) => d.status === 'approved').length,
+      // remaining: vacation.remainingVacationDays,
+      // pending: details.filter((d) => d.status === 'pending').length,
+    };
+  });
 
   // Filters
   filterForm = new FormGroup({
@@ -54,6 +86,22 @@ export class EmployeeVacationsComponent implements OnInit, OnDestroy {
     }),
   });
 
+  // Constants
+  months = [
+    { value: 1, label: 'يناير' },
+    { value: 2, label: 'فبراير' },
+    { value: 3, label: 'مارس' },
+    { value: 4, label: 'أبريل' },
+    { value: 5, label: 'مايو' },
+    { value: 6, label: 'يونيو' },
+    { value: 7, label: 'يوليو' },
+    { value: 8, label: 'أغسطس' },
+    { value: 9, label: 'سبتمبر' },
+    { value: 10, label: 'أكتوبر' },
+    { value: 11, label: 'نوفمبر' },
+    { value: 12, label: 'ديسمبر' },
+  ];
+
   private subscription: Subscription = new Subscription();
 
   constructor(private reportsService: ReportsService) {}
@@ -62,12 +110,14 @@ export class EmployeeVacationsComponent implements OnInit, OnDestroy {
     if (this.employeeId) {
       this.loadEmployeeVacations();
       this.subscription.add(
-        this.filterForm.valueChanges.subscribe(() => {
-          if (this.filterForm.valid) {
-            this.pageNumber.set(1);
-            this.loadEmployeeVacations();
-          }
-        })
+        this.filterForm.valueChanges
+          .pipe(debounceTime(300), distinctUntilChanged())
+          .subscribe(() => {
+            if (this.filterForm.valid) {
+              this.pageNumber.set(1);
+              this.loadEmployeeVacations();
+            }
+          })
       );
     } else {
       this.showNotification('error', 'معرف الموظف غير متوفر.');
@@ -85,8 +135,10 @@ export class EmployeeVacationsComponent implements OnInit, OnDestroy {
       this.isLoading.set(false);
       return;
     }
+
     this.isLoading.set(true);
     const { year, month } = this.filterForm.value;
+
     this.reportsService
       .getEmployeeVacations(
         this.employeeId,
@@ -132,12 +184,22 @@ export class EmployeeVacationsComponent implements OnInit, OnDestroy {
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
     });
+    this.searchTerm.set('');
     this.loadEmployeeVacations();
+  }
+
+  onSearchChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm.set(target.value);
   }
 
   showNotification(type: 'success' | 'error' | 'info', message: string): void {
     this.notification.set({ type, message });
     setTimeout(() => this.notification.set(null), 5000);
+  }
+
+  dismissNotification(): void {
+    this.notification.set(null);
   }
 
   getNotificationIcon(type: string): string {
@@ -151,5 +213,27 @@ export class EmployeeVacationsComponent implements OnInit, OnDestroy {
       default:
         return 'info';
     }
+  }
+
+  formatDateArabic(dateString: string): string {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long',
+    };
+    return date.toLocaleDateString('ar-SA', options);
+  }
+
+  formatDateRange(startDate: string, endDate: string): string {
+    const start = new Date(startDate).toLocaleDateString('ar-SA');
+    const end = new Date(endDate).toLocaleDateString('ar-SA');
+    return `${start} - ${end}`;
+  }
+
+  getMonthLabel(monthValue: number): string {
+    const month = this.months.find((m) => m.value === monthValue);
+    return month ? month.label : '';
   }
 }
