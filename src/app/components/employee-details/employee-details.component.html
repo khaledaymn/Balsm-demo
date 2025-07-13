@@ -79,7 +79,15 @@
             <span class="material-icons">wc</span>
             الجنس
           </div>
-          <div class="info-value">{{ employee.gender || "غير متوفر" }}</div>
+          <div class="info-value">
+            {{
+              employee.gender
+                ? employee.gender === "Female"
+                  ? "أنثى"
+                  : "ذكر"
+                : "غير متوفر"
+            }}
+          </div>
         </div>
 
         <div class="info-group">
