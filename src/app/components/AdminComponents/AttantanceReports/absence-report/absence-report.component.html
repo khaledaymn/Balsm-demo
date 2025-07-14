@@ -1,4 +1,4 @@
-<div class="absence-container" dir="rtl">
+<div class="vacations-container" dir="rtl">
   <!-- Notification -->
   @if (notification()) {
   <div class="notification-overlay">
@@ -19,50 +19,27 @@
   }
 
   <div class="main-content">
-    <!-- Statistics Header -->
-    @if (absenceStats().total > 0) {
-    <div class="card stats-card">
-      <div class="card-header">
-        <h2 class="card-title">
-          <span class="material-icons">analytics</span>
-          إحصائيات الغياب
-        </h2>
+    <!-- Employee Header -->
+    @if (absenceReports().length > 0) {
+    <div class="employee-header">
+      <div class="employee-info">
+        <h1 class="employee-name">
+          <span class="material-icons">person</span>
+          {{ absenceReports()[0].employeeName }}
+        </h1>
       </div>
-      <div class="card-content">
-        <div class="stats-grid">
-          <div class="stat-item total">
-            <div class="stat-icon">
-              <span class="material-icons">event_busy</span>
-            </div>
-            <div class="stat-info">
-              <div class="stat-number">{{ absenceStats().total }}</div>
-              <div class="stat-label">إجمالي أيام الغياب</div>
-            </div>
-          </div>
-
-          <div class="stat-item hours">
-            <div class="stat-icon">
-              <span class="material-icons">schedule</span>
-            </div>
-            <div class="stat-info">
-              <div class="stat-number">
-                {{ formatDecimalHours(absenceStats().totalHours) }}
-              </div>
-              <div class="stat-label">إجمالي ساعات الغياب</div>
-            </div>
-          </div>
-
-          <div class="stat-item average">
-            <div class="stat-icon">
-              <span class="material-icons">trending_up</span>
-            </div>
-            <div class="stat-info">
-              <div class="stat-number">
-                {{ formatDecimalHours(absenceStats().averageHours) }}
-              </div>
-              <div class="stat-label">متوسط ساعات الغياب</div>
-            </div>
-          </div>
+      <div class="vacation-stats">
+        <div class="stat-card total">
+          <div class="stat-number">{{ absenceStats().total }}</div>
+          <div class="stat-label">إجمالي الغيابات</div>
+        </div>
+        <div class="stat-card hours">
+          <div class="stat-number">{{ formatHours(absenceStats().totalHours) }}</div>
+          <div class="stat-label">إجمالي ساعات الغياب</div>
+        </div>
+        <div class="stat-card average">
+          <div class="stat-number">{{ formatHours(absenceStats().averageHours) }}</div>
+          <div class="stat-label">متوسط ساعات الغياب</div>
         </div>
       </div>
     </div>
@@ -77,64 +54,28 @@
         </h2>
       </div>
       <div class="card-content">
-        <form [formGroup]="absenceFilterForm" class="filters-form">
+        <form [formGroup]="filterForm" class="filters-form">
           <div class="filters-grid">
             <div class="form-group">
-              <label for="reportType" class="form-label">نوع التقرير</label>
-              <select
-                id="reportType"
-                formControlName="reportType"
-                class="form-select"
-              >
-                <option value="0">تقرير يومي</option>
-                <option value="1">تقرير شهري</option>
+              <label for="year" class="form-label">السنة</label>
+              <input
+                type="number"
+                id="year"
+                formControlName="year"
+                class="form-input"
+                min="2000"
+                max="2100"
+                placeholder="اختر السنة"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="month" class="form-label">الشهر</label>
+              <select id="month" formControlName="month" class="form-select">
+                @for (month of months; track month.value) {
+                <option [value]="month.value">{{ month.label }}</option>
+                }
               </select>
-            </div>
-
-            @if (absenceFilterForm.controls.reportType.value === 0) {
-            <div class="form-group">
-              <label for="dayDate" class="form-label">التاريخ</label>
-              <input
-                type="date"
-                id="dayDate"
-                formControlName="dayDate"
-                class="form-input"
-              />
-            </div>
-            } @else {
-            <div class="form-group">
-              <label for="fromDate" class="form-label">من تاريخ</label>
-              <input
-                type="date"
-                id="fromDate"
-                formControlName="fromDate"
-                class="form-input"
-              />
-            </div>
-            <div class="form-group">
-              <label for="toDate" class="form-label">إلى تاريخ</label>
-              <input
-                type="date"
-                id="toDate"
-                formControlName="toDate"
-                class="form-input"
-              />
-            </div>
-            }
-
-            <div class="form-group">
-              <label for="search" class="form-label">البحث</label>
-              <div class="search-input-wrapper">
-                <span class="material-icons search-icon">search</span>
-                <input
-                  type="text"
-                  id="search"
-                  class="form-input search-input"
-                  placeholder="ابحث في التواريخ..."
-                  (input)="onSearchChange($event)"
-                  [value]="searchTerm()"
-                />
-              </div>
             </div>
 
             <div class="form-group">
@@ -178,12 +119,10 @@
     <div class="card">
       <div class="card-content">
         <div class="empty-state">
-          <span class="material-icons empty-icon">event_available</span>
+          <span class="material-icons empty-icon">event_busy</span>
           <h3 class="empty-title">لا توجد حالات غياب</h3>
           <p class="empty-description">
-            @if (searchTerm()) { لم يتم العثور على نتائج للبحث "{{
-              searchTerm()
-            }}" } @else { لا توجد حالات غياب متاحة للفترة المحددة }
+            @if (searchTerm()) { لم يتم العثور على نتائج للبحث "{{ searchTerm() }}" } @else { لا توجد حالات غياب متاحة للفترة المحددة }
           </p>
           <button class="btn btn-primary" (click)="resetFilters()">
             <span class="material-icons">refresh</span>
@@ -196,7 +135,7 @@
 
     <!-- Absence Table/Cards -->
     @if (!isLoading() && filteredAbsences().length > 0) {
-    <div class="card absence-card">
+    <div class="card">
       <div class="card-header">
         <div
           style="
@@ -210,7 +149,7 @@
         >
           <h2 class="card-title">
             <span class="material-icons">event_busy</span>
-            تقرير الغياب
+            تقرير الغياب {{ getMonthLabel(filterForm.value.month!) }} {{ filterForm.value.year }}
           </h2>
           <div class="results-count">
             {{ filteredAbsences().length }} حالة غياب
@@ -220,12 +159,11 @@
       <div class="card-content">
         <!-- Desktop Table -->
         <div class="table-container desktop-table">
-          <table class="absence-table">
+          <table class="vacations-table">
             <thead>
               <tr>
                 <th>التاريخ</th>
                 <th>الموظف</th>
-                <th>البريد الإلكتروني</th>
                 <th>ساعات الغياب</th>
               </tr>
             </thead>
@@ -235,18 +173,15 @@
                 <td class="date-cell">
                   <div class="date-info">
                     <div class="date-arabic">
-                      {{ formatDateArabic(absence.date) }}
+                      {{ absence.date }}
                     </div>
                   </div>
                 </td>
                 <td class="employee-cell">
                   <div class="employee-name">{{ absence.employeeName }}</div>
                 </td>
-                <td class="email-cell">{{ absence.email }}</td>
                 <td class="hours-cell">
-                  <span class="badge badge-danger">{{
-                    formatDecimalHours(absence.hours)
-                  }}</span>
+                  <span class="badge badge-danger">{{ formatHours(absence.hours) }}</span>
                 </td>
               </tr>
               }
@@ -257,30 +192,24 @@
         <!-- Mobile Cards -->
         <div class="mobile-cards">
           @for (absence of filteredAbsences(); track absence.date) {
-          <div class="absence-card-item">
+          <div class="vacation-card">
             <div class="card-content">
-              <div class="absence-header">
-                <div class="date-info">
-                  <div class="date-badge">
-                    <span class="material-icons">event</span>
-                    <div class="date-text">
-                      <div class="date-arabic">
-                        {{ formatDateArabic(absence.date) }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="hours-info">
-                  <div class="hours-badge">
-                    <span class="hours-number">{{
-                      formatDecimalHours(absence.hours)
-                    }}</span>
-                    <span class="hours-label">ساعات الغياب</span>
-                  </div>
+              <div class="vacation-header">
+                <div class="vacation-type">
+                  <span class="material-icons type-icon">event_busy</span>
+                  <h3 class="type-name">غياب</h3>
                 </div>
               </div>
 
-              <div class="absence-details">
+              <div class="vacation-details">
+                <div class="detail-row">
+                  <span class="material-icons detail-icon">date_range</span>
+                  <div class="detail-content">
+                    <div class="detail-label">التاريخ</div>
+                    <div class="detail-value">{{ formatDateArabic(absence.date) }}</div>
+                  </div>
+                </div>
+
                 <div class="detail-row">
                   <span class="material-icons detail-icon">person</span>
                   <div class="detail-content">
@@ -294,6 +223,14 @@
                   <div class="detail-content">
                     <div class="detail-label">البريد الإلكتروني</div>
                     <div class="detail-value">{{ absence.email }}</div>
+                  </div>
+                </div>
+
+                <div class="detail-row">
+                  <span class="material-icons detail-icon">schedule</span>
+                  <div class="detail-content">
+                    <div class="detail-label">ساعات الغياب</div>
+                    <div class="detail-value">{{ formatHours(absence.hours) }}</div>
                   </div>
                 </div>
               </div>

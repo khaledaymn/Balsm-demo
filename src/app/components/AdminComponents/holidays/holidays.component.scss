@@ -336,20 +336,19 @@ $border_radius: 8px;
           }
 
           &.edit-btn {
-            background-color: $warning-light;
-            color: rgba($warning-color, 10%);
+            background-color: $warning-color;
+              color: white;
 
             &:hover {
               background-color: $warning-color;
-              color: white;
               transform: translateY(-2px);
               box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             }
           }
 
           &.delete-btn {
-            background-color: $danger-light;
-            color: rgba($danger-color, 10%);
+            background-color: $danger-color;
+              color: white;
 
             &:hover {
               background-color: $danger-color;

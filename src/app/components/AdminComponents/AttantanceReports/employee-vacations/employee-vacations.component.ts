@@ -161,11 +161,10 @@ export class EmployeeVacationsComponent implements OnInit, OnDestroy {
           this.isLoading.set(false);
         },
         error: (error) => {
-          console.error('Employee Vacations Error:', error);
-          this.showNotification(
-            'error',
-            error.message || 'حدث خطأ أثناء تحميل بيانات الإجازات.'
-          );
+          // this.showNotification(
+          //   'error',
+          //   'حدث خطأ أثناء تحميل بيانات الإجازات.'
+          // );
           this.employeeVacation.set(null);
           this.isLoading.set(false);
         },
@@ -235,5 +234,10 @@ export class EmployeeVacationsComponent implements OnInit, OnDestroy {
   getMonthLabel(monthValue: number): string {
     const month = this.months.find((m) => m.value === monthValue);
     return month ? month.label : '';
+  }
+    formatHours(totalHours: number): string {
+    const hours = Math.floor(totalHours);
+    const minutes = Math.round((totalHours - hours) * 60);
+    return `${hours} ساعة و ${minutes} دقيقة`;
   }
 }

@@ -132,7 +132,6 @@ $border-radius: 0.5rem;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 1.5rem;
   }
 }
 
@@ -172,13 +171,15 @@ $border-radius: 0.5rem;
 }
 
 .vacation-stats {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  width: 100%;
+  // display: grid;
+  // grid-template-columns: repeat(2, 1fr);
+  // gap: 0.75rem;
+  width: 50%;
+      justify-items: end;
+
 
   @media (min-width: 480px) {
-    grid-template-columns: repeat(4, 1fr);
+    // grid-template-columns: repeat(4, 1fr);
   }
 
   @media (min-width: 768px) {
@@ -188,13 +189,12 @@ $border-radius: 0.5rem;
 }
 
 .stat-card {
+  max-width: 40%;
   background: white;
   border: 2px solid $border-color;
   border-radius: $border-radius;
   padding: 0.75rem;
-  text-align: center;
   transition: $transition;
-
   @media (min-width: 768px) {
     padding: 1rem;
   }
@@ -296,7 +296,7 @@ $border-radius: 0.5rem;
   }
 
   @media (min-width: 768px) {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -334,22 +334,7 @@ $border-radius: 0.5rem;
   }
 }
 
-.search-input-wrapper {
-  position: relative;
 
-  .search-icon {
-    position: absolute;
-    right: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: $text-light;
-    font-size: 1.25rem;
-  }
-
-  .search-input {
-    padding-right: 2.5rem;
-  }
-}
 
 // Vacation cards grid
 .vacation-cards-grid {

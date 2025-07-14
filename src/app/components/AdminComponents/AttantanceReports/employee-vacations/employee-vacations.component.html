@@ -33,18 +33,7 @@
           <div class="stat-number">{{ vacationStats().total }}</div>
           <div class="stat-label">إجمالي الإجازات</div>
         </div>
-        <div class="stat-card used">
-          <div class="stat-number">{{ vacationStats().used }}</div>
-          <div class="stat-label">المستخدمة</div>
-        </div>
-        <div class="stat-card remaining">
-          <div class="stat-number">{{ vacationStats().remaining }}</div>
-          <div class="stat-label">المتبقية</div>
-        </div>
-        <div class="stat-card pending">
-          <div class="stat-number">{{ vacationStats().pending }}</div>
-          <div class="stat-label">في الانتظار</div>
-        </div>
+       
       </div>
     </div>
     }
@@ -82,20 +71,7 @@
               </select>
             </div>
 
-            <div class="form-group">
-              <label for="search" class="form-label">البحث</label>
-              <div class="search-input-wrapper">
-                <span class="material-icons search-icon">search</span>
-                <input
-                  type="text"
-                  id="search"
-                  class="form-input search-input"
-                  placeholder="ابحث في الإجازات..."
-                  (input)="onSearchChange($event)"
-                  [value]="searchTerm()"
-                />
-              </div>
-            </div>
+            
 
             <div class="form-group">
               <label class="form-label invisible">إجراءات</label>
@@ -186,8 +162,7 @@
               <tr>
                 <th>التاريخ</th>
                 <th>عدد الساعات</th>
-                <th>نوع الإجازة</th>
-                <th>الحالة</th>
+              
               </tr>
             </thead>
             <tbody>
@@ -196,24 +171,17 @@
                 <td class="date-cell">
                   <div class="date-info">
                     <div class="date-arabic">
-                      {{ formatDateArabic(vacation.date) }}
+                      {{vacation.date }}
                     </div>
                   </div>
                 </td>
                 <td class="hours-cell">
                   <span class="badge badge-primary"
-                    >{{ vacation.hours }} ساعة</span
+                    >
+                    {{ formatHours(vacation.hours) }} </span
                   >
                 </td>
-                <td class="type-cell">
-                  <div class="vacation-type">
-                    <span class="material-icons type-icon">event</span>
-                    <span>إجازة</span>
-                  </div>
-                </td>
-                <td class="status-cell">
-                  <span class="badge badge-success">مؤكدة</span>
-                </td>
+                
               </tr>
               }
             </tbody>
