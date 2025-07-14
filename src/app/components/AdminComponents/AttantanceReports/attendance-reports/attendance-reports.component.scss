@@ -303,6 +303,7 @@ $xl: 1280px;
 
 .stat-badge {
   background: rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   padding: $space-4;
@@ -717,6 +718,7 @@ $xl: 1280px;
   box-shadow: $shadow-xl;
   max-width: 400px;
   margin: 0 auto;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 
   &.notification-success {
@@ -760,6 +762,7 @@ $xl: 1280px;
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;

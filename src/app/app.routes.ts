@@ -85,23 +85,20 @@ export const appRoutes: Routes = [
       },
 
       {
-        path: 'userDashboard',
+        path: 'user',
         component: UserdashboardComponent,
         canActivate: [RoleGuard],
         data: { roles: ['User', 'Admin'] },
         children: [
+          {path: '', redirectTo: '/app/user/attendance-tracker', pathMatch:'full'},
           { path: 'vacations', component: EmployeeVacationsComponent },
-
           { path: 'absence', component: AbsenceReportComponent },
-          { path: '', redirectTo: 'userDashboard', pathMatch: 'full' },
-          // { path: 'dashboard', component: AdminDashboardComponent },
+          { path: 'vacations', component: EmployeeVacationsComponent },
+          { path: 'profile', component: UserProfileComponent },
+          { path: 'salary', component: SalaryDetailsComponent },
+          { path: 'attendance-tracker', component: AttendanceTrackerComponent },
         ],
       },
-      { path: 'absence', component: AbsenceReportComponent },
-
-      { path: 'vacations', component: EmployeeVacationsComponent },
-      { path: 'profile', component: UserProfileComponent },
-      { path: 'salary', component: SalaryDetailsComponent },
       {
         path: 'role-select',
         component: RoleSelectComponent,

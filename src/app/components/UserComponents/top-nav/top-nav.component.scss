@@ -1,10 +1,77 @@
+// Variables
+$primary-color: #008D7F;
+$primary-light: rgba($primary-color, 0.1);
+$secondary-color: #666666;
+$error-color: #F44336;
+$border-color: #E5E9F2;
+$background-color: #F8F9FC;
+$text-primary: #333333;
+$text-secondary: #666666;
+$box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+$border-radius: 0.5rem;
+$transition-duration: 0.3s;
+
 .top-nav-container {
   background-color: white;
-  border-bottom: 1px solid #E5E9F2;
+  border-bottom: 1px solid $border-color;
+  box-shadow: $box-shadow;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .top-nav {
   padding: 0 2rem;
+
+  .nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .menu-toggle-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: $text-primary;
+    font-size: 1.5rem;
+
+    .material-icons {
+      font-size: 1.5rem;
+    }
+  }
+
+  .logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: $error-color;
+    color: white;
+    border: none;
+    border-radius: $border-radius;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color $transition-duration;
+
+    &:hover {
+      background-color: darken($error-color, 10%);
+    }
+
+    .material-icons {
+      font-size: 1.125rem;
+    }
+  }
 
   .nav-list {
     display: flex;
@@ -28,12 +95,39 @@
     }
   }
 
+  .nav-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    box-shadow: $box-shadow;
+    z-index: 99;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height $transition-duration ease-in-out;
+
+    &.nav-dropdown-open {
+      display: block;
+      max-height: 300px; // يمكن تعديله حسب عدد العناصر
+    }
+
+    .nav-list-mobile {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 0.5rem 0;
+      list-style: none;
+    }
+  }
+
   .nav-item {
     position: relative;
 
     &.active {
       .nav-link {
-        color: #008D7F;
+        color: $primary-color;
         font-weight: 600;
       }
 
@@ -44,48 +138,28 @@
         left: 0;
         right: 0;
         height: 2px;
-        background-color: #008D7F;
+        background-color: $primary-color;
       }
-    }
-
-    &.special-work-types {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
     }
   }
 
   .nav-link {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
     padding: 1rem 0;
-    color: #666;
+    color: $secondary-color;
     text-decoration: none;
     font-size: 0.875rem;
     white-space: nowrap;
+    transition: color $transition-duration;
 
     &:hover {
-      color: #008D7F;
+      color: $primary-color;
     }
-  }
 
-  .work-type-labels {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-right: 0.5rem;
-  }
-
-  .work-type-label {
-    padding: 0.25rem 0.5rem;
-    border-radius: 1rem;
-    font-size: 0.75rem;
-    color: white;
-    text-decoration: none;
-    transition: opacity 0.2s ease-in-out;
-
-    &:hover {
-      opacity: 0.8;
+    .material-icons {
+      font-size: 1.25rem;
     }
   }
 }
@@ -98,22 +172,39 @@
   .top-nav {
     padding: 0 1rem;
 
+    .nav-content {
+      flex-direction: row;
+      align-items: center;
+      padding: 0.5rem 0;
+    }
+
+    .nav-controls {
+      order: 1; // لضمان ظهور الـ Hamburger وزر الخروج أولاً
+      width: 100%;
+      justify-content: space-between;
+    }
+
     .nav-list {
-      gap: 1rem;
+      display: none; // إخفاء القائمة الأفقية في الهواتف
+    }
+
+    .nav-dropdown {
+      &.nav-dropdown-open {
+        display: block;
+      }
     }
 
     .nav-link {
-      font-size: 0.75rem;
+      font-size: 0.875rem;
+      padding: 0.75rem 1rem;
+
+      .material-icons {
+        font-size: 1.25rem;
+      }
     }
 
-    .special-work-types {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .work-type-labels {
-      margin-top: 0.5rem;
-      margin-right: 0;
+    .menu-toggle-btn {
+      display: block;
     }
   }
 
@@ -121,4 +212,3 @@
     padding: 0 1rem;
   }
 }
-
