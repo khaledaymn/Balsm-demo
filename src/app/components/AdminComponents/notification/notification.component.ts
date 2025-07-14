@@ -107,7 +107,7 @@ export class NotificationsComponent {
           if (response) {
             this.showNotification(
               'success',
-              `تم تسجيل المغادرة بنجاح: ${notification.title}`
+              `تم تسجيل المغادرة بنجاح`
             );
             const updatedNotifications = this.notifications().filter(
               (n) => n.id !== notification.id
@@ -131,7 +131,7 @@ export class NotificationsComponent {
     this.isLoading.set(true);
     this.notificationService.deleteNotification(notification.id).subscribe({
       next: (response) => {
-        this.showNotification('success', response || 'تم حذف الإشعار بنجاح');
+        this.showNotification('success', 'تم حذف الإشعار بنجاح');
         const updatedNotifications = this.notifications().filter(
           (n) => n.id !== notification.id
         );
@@ -140,7 +140,7 @@ export class NotificationsComponent {
         this.isLoading.set(false);
       },
       error: (error) => {
-        this.showNotification('error', error.message);
+        this.showNotification('error', "حدث خطأ أثناء تسجيل المغادرة ");
         this.isLoading.set(false);
       },
     });
