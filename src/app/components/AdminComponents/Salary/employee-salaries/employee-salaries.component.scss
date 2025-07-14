@@ -1,24 +1,28 @@
 // Variables
 $primary-color: #008D7F;
 $primary-light: rgba($primary-color, 0.1);
-$secondary-color: #2D3748;
-$accent-color: #FFC107;
+$secondary-color: #666666;
 $success-color: #4CAF50;
 $success-light: rgba($success-color, 0.1);
-$info-color: #2196F3;
-$info-light: rgba($info-color, 0.1);
+$error-color: #F44336;
+$error-light: rgba($error-color, 0.1);
 $warning-color: #FF9800;
 $warning-light: rgba($warning-color, 0.1);
-$danger-color: #F44336;
-$danger-light: rgba($danger-color, 0.1);
+$info-color: #2196F3;
+$info-light: rgba($info-color, 0.1);
+$border-color: #E5E9F2;
+$background-color: #F8F9FC;
 $text-primary: #333333;
 $text-secondary: #666666;
 $text-light: #999999;
-$border-color: #E5E9F2;
-$background-color: #F8F9FC;
-$card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-$transition: all 0.3s ease;
-$border-radius: 8px;
+$box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+$border-radius: 0.375rem;
+$transition-duration: 0.2s;
+$accent-color: #00BCD4;
+
+$shadow-light: 0 2px 6px rgba(0, 0, 0, 0.06);
+$shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
+$shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.10);
 
 // Mixins
 @mixin flex-center {
@@ -33,697 +37,748 @@ $border-radius: 8px;
   justify-content: space-between;
 }
 
-@mixin button-style($bg-color, $text-color: white) {
-  background-color: $bg-color;
-  color: $text-color;
-  border: none;
-  border-radius: $border-radius;
-  padding: 0.75rem 1.25rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: $transition;
-  display: flex;
+@mixin button-base {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 2px 5px rgba(rgba($bg-color, 20%), 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: $border-radius;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: $transition-duration;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
 
-  &:hover {
-    background-color: $bg-color;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba($bg-color, 0.3);
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
+}
 
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 3px rgba($bg-color, 0.2);
-  }
-
-  .material-icons {
-    font-size: 1.1rem;
-  }
+@mixin card {
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $shadow-light;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 // Main container
-.employee-list-container {
+.vacations-container {
+  background-color: $background-color;
+  padding: 1rem;
   direction: rtl;
-  padding: 2rem;
-  background-color: white;
-  border-radius: $border-radius;
-  box-shadow: $card-shadow;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+
+  @media (min-width: 768px) {
+    padding: 1.5rem;
+  }
+}
+
+.main-content {
   max-width: 1200px;
-  margin: 2rem auto;
-  position: relative;
-  overflow: hidden;
-  @media print {
-    padding: 0 !important;
-    margin: 0 !important;
-    box-shadow: none !important;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// Card styles
+.card {
+  @include card;
+}
+
+.card-header {
+  padding: 1rem;
+  border-bottom: 1px solid $border-color;
+
+  @media (min-width: 768px) {
+    padding: 1.5rem;
   }
-  // Print header
-  .print-header {
-    display: none;
+}
 
-    @media print {
-      display: flex !important;
-      justify-content: space-between !important;
-      align-items: center !important;
-      // margin: 0 !important;
-      padding: 10px 0 !important;
-      border-bottom: 1px solid $border-color !important;
-    }
+.card-content {
+  padding: 1rem;
 
-    .print-title {
-      font-size: 14pt !important;
-      font-weight: bold !important;
-      color: $text-primary !important;
-    }
-
-    .print-date,
-    .print-time {
-      font-size: 10pt !important;
-      color: $text-secondary !important;
-    }
+  @media (min-width: 768px) {
+    padding: 1.5rem;
   }
+}
 
-  // List header
-  .list-header {
-    @include flex-between;
-    // margin-bottom: 2rem;
-    // padding-bottom: 1.5rem;
-    // border-bottom: 1px solid $border-color;
+.card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: $text-primary;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
 
-    .section-title {
+// Employee header
+.employee-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+}
+
+.employee-info {
+  .employee-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    @media (min-width: 768px) {
       font-size: 1.5rem;
-      font-weight: 600;
-      color: $text-primary;
-      position: relative;
-      padding-right: 1rem;
-
-      &:before {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 1.5rem;
-        background-color: $primary-color;
-        border-radius: 2px;
-      }
-      @media print {
-        display: none;
-
-      }
     }
-
-    .header-actions {
-      display: flex;
-      gap: 0.75rem;
-
-      @media (max-width: 768px) {
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-
-      .export-btn {
-        @include button-style($success-color);
-      }
-
-      .print-btn {
-        @include button-style($info-color);
-      }
-
-      .add-employee-btn {
-        @include button-style($primary-color);
-      }
-    }
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-  }
-
-  // Filters container
-  .filters-container {
-    margin-bottom: 1.5rem;
-
-    .search-box {
-      position: relative;
-      max-width: 500px;
-
-      .material-icons {
-        position: absolute;
-        right: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: $text-secondary;
-      }
-
-      input {
-        width: 100%;
-        padding: 0.875rem 2.5rem 0.875rem 1rem;
-        border: 1px solid $border-color;
-        border-radius: $border-radius;
-        font-size: 0.95rem;
-        transition: $transition;
-        background-color: $background-color;
-
-        &:focus {
-          outline: none;
-          border-color: $primary-color;
-          box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
-          background-color: white;
-        }
-
-        &::placeholder {
-          color: $text-light;
-        }
-      }
-    }
-  }
-
-  // Table styles
-  .table-responsive {
-    overflow-x: auto;
-    margin-bottom: 2rem;
-    border-radius: $border-radius;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
-    &::-webkit-scrollbar {
-      height: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: $background-color;
-      border-radius: 3px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background-color: rgba($text-secondary, 0.3);
-      border-radius: 3px;
-
-      &:hover {
-        background-color: rgba($text-secondary, 0.5);
-      }
-    }
-
-    .employees-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-
-      th,
-      td {
-        padding: 1rem 1.25rem;
-        text-align: right;
-      }
-
-      th {
-        background-color: $background-color;
-        color: $text-primary;
-        font-weight: 600;
-        font-size: 0.95rem;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        cursor: pointer;
-        transition: $transition;
-        white-space: nowrap;
-
-        &:hover {
-          background-color:$background-color;
-          color: $primary-color;
-        }
-
-        &:first-child {
-          border-top-right-radius: $border-radius;
-        }
-
-        &:last-child {
-          border-top-left-radius: $border-radius;
-        }
-
-        .sort-icon {
-          display: inline-flex;
-          margin-right: 0.5rem;
-          vertical-align: middle;
-
-          .material-icons {
-            font-size: 1.1rem;
-            color: $primary-color;
-          }
-        }
-      }
-
-      tbody {
-        tr {
-          transition: $transition;
-
-          &:nth-child(even) {
-            background-color: rgba($background-color, 0.5);
-          }
-
-          &:hover {
-            background-color: rgba($primary-color, 0.05);
-          }
-
-          &:last-child {
-            td:first-child {
-              border-bottom-right-radius: $border-radius;
-            }
-
-            td:last-child {
-              border-bottom-left-radius: $border-radius;
-            }
-          }
-        }
-      }
-
-      td {
-        border-bottom: 1px solid $border-color;
-        font-size: 0.95rem;
-        color: $text-primary;
-
-        &.employee-name {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          font-weight: 500;
-
-          .employee-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: $primary-light;
-            color: $primary-color;
-            @include flex-center;
-            font-weight: 600;
-            font-size: 1rem;
-            flex-shrink: 0;
-          }
-        }
-
-        &.salary-cell {
-          font-weight: 500;
-          color: $primary-color;
-        }
-
-        &.action-cell {
-          white-space: nowrap;
-
-          .action-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: none;
-            background-color: transparent;
-            cursor: pointer;
-            transition: $transition;
-            @include flex-center;
-
-            .material-icons {
-              font-size: 1.1rem;
-            }
-
-            &.details-btn {
-              color: $info-color;
-
-              &:hover {
-                background-color: $info-light;
-              }
-            }
-
-            &.edit-btn {
-              color: $warning-color;
-
-              &:hover {
-                background-color: $warning-light;
-              }
-            }
-
-            &.delete-btn {
-              color: $danger-color;
-
-              &:hover {
-                background-color: $danger-light;
-              }
-            }
-          }
-        }
-      }
-
-      @media (max-width: 992px) {
-        th,
-        td {
-          padding: 0.875rem 1rem;
-        }
-      }
-
-      @media (max-width: 768px) {
-        thead {
-          display: none;
-        }
-
-        tbody {
-          tr {
-            display: block;
-            border: 1px solid $border-color;
-            border-radius: $border-radius;
-            margin-bottom: 1rem;
-            padding: 1rem;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-
-            &:last-child {
-              margin-bottom: 0;
-            }
-          }
-
-          td {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid rgba($border-color, 0.5);
-
-            &:before {
-              content: attr(data-label);
-              font-weight: 600;
-              color: $text-secondary;
-            }
-
-            &:last-child {
-              border-bottom: none;
-            }
-
-            &.employee-name {
-              flex-direction: row-reverse;
-              justify-content: space-between;
-
-              &:before {
-                content: "الاسم";
-                font-weight: 600;
-                color: $text-secondary;
-              }
-            }
-
-            &.action-cell {
-              justify-content: flex-end;
-              gap: 0.5rem;
-
-              &:before {
-                content: "الإجراءات";
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // Notification
-  .notification {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 1rem 2rem;
-    border-radius: $border-radius;
-    color: white;
-    font-size: 1rem;
-    z-index: 1000;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    animation: slideIn 0.3s ease-in-out, slideOut 0.3s ease-in-out 2.7s forwards;
-
-    &.success {
-      background-color: $success-color;
-    }
-
-    &.error {
-      background-color: $danger-color;
-    }
-
-    &.warning {
-      background-color: $warning-color;
-    }
-
-    &.info {
-      background-color: $info-color;
-    }
-
-    p {
-      margin: 0;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      &:before {
-        content: '';
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: white;
-      }
-    }
-  }
-
-  // Confirmation box
-  .confirmation-box {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    @include flex-center;
-    z-index: 1000;
-    animation: fadeIn 0.2s ease-in-out;
-
-    .confirmation-content {
-      background-color: white;
-      padding: 2rem;
-      border-radius: $border-radius;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-      animation: scaleIn 0.3s ease-in-out;
-
-      p {
-        font-size: 1.1rem;
-        margin-bottom: 1.5rem;
-        color: $text-primary;
-      }
-
-      .confirmation-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-
-        button {
-          padding: 0.75rem 2rem;
-          border: none;
-          border-radius: $border-radius;
-          font-weight: 500;
-          cursor: pointer;
-          transition: $transition;
-
-          &.confirm-btn {
-            background-color: $danger-color;
-            color: white;
-
-            &:hover {
-              background-color: $danger-color;
-            }
-          }
-
-          &.cancel-btn {
-            background-color: $background-color;
-            color: $text-primary;
-
-            &:hover {
-              background-color: $background-color;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // Empty state
-  .empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
 
     .material-icons {
-      font-size: 4rem;
-      color: rgba($text-secondary, 0.3);
-      margin-bottom: 1rem;
-    }
+      color: $primary-color;
+      font-size: 1.5rem;
 
-    p {
-      font-size: 1.1rem;
-      color: $text-secondary;
-      margin-bottom: 1.5rem;
-    }
-
-    .reset-btn {
-      @include button-style($primary-color);
-      margin: 0 auto;
-    }
-  }
-
-  // Print styles
-  @media print {
-    .employee-list-container {
-      padding: 0 !important;
-      margin: 0 !important;
-      box-shadow: none !important;
-    }
-    .print-header {
-      display: flex !important;
-      justify-content: space-between !important;
-      align-items: center !important;
-      padding: 10px 0 !important;
-      border-bottom: 1px solid #ddd !important;
-    }
-    .print-title {
-      font-size: 14pt !important;
-      font-weight: bold !important;
-      color: $text-primary !important;
-    }
-    .print-date,
-    .print-time {
-      font-size: 10pt !important;
-      color: $text-secondary !important;
-    }
-    .employees-table {
-      width: 100% !important;
-      border-collapse: collapse !important;
-      font-size: 10pt !important;
-    }
-    .employees-table th,
-    .employees-table td {
-      border: 1px solid #ddd !important;
-      padding: 8px !important;
-      text-align: right !important;
-    }
-    .employees-table th {
-      background-color: #f5f5f5 !important;
-      color: black !important;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-    .employees-table tr:nth-child(even) td {
-      background-color: #f9f9f9 !important;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-    .employee-avatar {
-      display: none !important;
-    }
-    // .salary-cell::after {
-    //   content: " ريال";
-    // }
-    .employees-table th:nth-child(1)
-    {
-      width: 30% !important;
-    }
-    .employees-table th:nth-child(2),
-    .employees-table td:nth-child(2) {
-      width: 30% !important;
-    }
-    .employees-table th:nth-child(3),
-    .employees-table td:nth-child(3) {
-      width: 30% !important;
-    }
-    .print-hide,
-    .filters-container,
-    .header-actions,
-    .notification,
-    .confirmation-box,
-    app-add-employee,
-    app-edit-employee,
-    app-employee-details {
-      display: none !important;
-    }
-    @page {
-      size: A4 landscape;
-      margin: 1cm;
+      @media (min-width: 768px) {
+        font-size: 1.75rem;
+      }
     }
   }
 }
 
-// Access denied
-.access-denied {
-  text-align: center;
-  padding: 3rem;
-  background-color: white;
+.vacation-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+
+  @media (min-width: 480px) {
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    width: auto;
+    min-width: 320px;
+  }
+}
+
+.stat-card {
+  flex: 1 1 100%;
+  max-width: 100%;
+  background: white;
+  border: 2px solid $border-color;
   border-radius: $border-radius;
-  box-shadow: $card-shadow;
-  max-width: 500px;
-  margin: 3rem auto;
+  padding: 0.75rem;
+  transition: $transition-duration;
 
-  p {
-    font-size: 1.2rem;
-    color: $danger-color;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
+  @media (min-width: 480px) {
+    flex: 1 1 calc(50% - 0.5rem);
+    max-width: calc(50% - 0.5rem);
+  }
 
-    &:before {
-      content: 'block';
-      font-family: 'Material Icons';
+  @media (min-width: 768px) {
+    flex: 1 1 calc(33.33% - 0.67rem);
+    max-width: calc(33.33% - 0.67rem);
+    padding: 1rem;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-medium;
+  }
+
+  &.total {
+    border-color: $primary-color;
+    background: $primary-light;
+
+    .stat-number {
+      color: $primary-color;
+    }
+  }
+
+  &.total-salary {
+    border-color: $warning-color;
+    background: $warning-light;
+
+    .stat-number {
+      color: $warning-color;
+    }
+  }
+
+  &.average {
+    border-color: $success-color;
+    background: $success-light;
+
+    .stat-number {
+      color: $success-color;
+    }
+  }
+
+  .stat-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+
+    @media (min-width: 768px) {
       font-size: 1.5rem;
     }
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: $text-secondary;
+    font-weight: 500;
+
+    @media (min-width: 768px) {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Button styles
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, $primary-color 0%,  rgba($primary-color, 5%) 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-duration ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: $shadow-light;
+  }
+
+  .material-icons {
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  &.w-full {
+    width: 100%;
+  }
+}
+
+// Form styles
+.filters-form {
+  margin: 0;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+
+  @media (min-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $text-primary;
+
+  &.invisible {
+    visibility: hidden;
+  }
+}
+
+.form-input,
+.form-select {
+  padding: 0.75rem;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  font-size: 0.875rem;
+  background: white;
+  transition: $transition-duration;
+  width: 100%;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px $primary-light;
+  }
+}
+
+.search-input-wrapper {
+  position: relative;
+
+  .search-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-light;
+  }
+
+  .search-input {
+    padding-right: 2.5rem;
+  }
+}
+
+// Salary cards grid
+.vacation-card {
+  @include card;
+  transition: $transition-duration;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-medium;
+  }
+
+  .vacation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 0.75rem;
+
+    .vacation-type {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+      min-width: 0;
+
+      .type-icon {
+        color: $primary-color;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+
+      .type-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0;
+        word-break: break-word;
+      }
+    }
+  }
+
+  .vacation-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .detail-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid $border-color;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .detail-icon {
+        color: $secondary-color;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+
+      .detail-content {
+        flex: 1;
+        min-width: 0;
+
+        .detail-label {
+          font-size: 0.75rem;
+          color: $text-secondary;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+          font-size: 0.875rem;
+          color: $text-primary;
+          font-weight: 500;
+          word-break: break-word;
+        }
+      }
+    }
+  }
+
+  .action-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+
+    &.details-btn {
+      color: $info-color;
+
+      &:hover {
+        background: $info-light;
+        border-radius: 50%;
+        padding: 0.25rem;
+      }
+    }
+  }
+}
+
+// Notification styles
+.notification-overlay {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  max-width: calc(100vw - 2rem);
+  width: 100%;
+}
+
+.notification {
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: $shadow-light;
+  font-weight: 500;
+  font-size: 1rem;
+  border: 1px solid transparent;
+  max-width: 400px;
+  margin: 0 auto;
+
+  &.success {
+    background: linear-gradient(135deg, $success-light 0%, rgba($success-color, 0.1) 100%);
+    color: $success-color;
+    border-color: rgba($success-color, 0.1);
+  }
+
+  &.error {
+    background: linear-gradient(135deg, $error-light 0%, rgba($error-color, 0.1) 100%);
+    color: $error-color;
+    border-color: rgba($error-color, 0.1);
+  }
+
+  &.info {
+    background: linear-gradient(135deg, $info-light 0%, rgba($info-color, 0.1) 100%);
+    color: $info-color;
+    border-color: rgba($info-color, 0.1);
+  }
+
+  .material-icons {
+    font-size: 1.5rem;
+  }
+
+  .notification-close {
+    background: none;
+    border: none;
+    color: $text-primary;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    margin-right: auto;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .material-icons {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Loading states
+.loading-state {
+  @include flex-center;
+  flex-direction: column;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid $border-color;
+  border-top-color: $primary-color;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  color: $text-secondary;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.skeleton-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.skeleton-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 0.25rem;
+
+  &.skeleton-line {
+    height: 1rem;
+
+    &.short {
+      width: 60%;
+    }
+  }
+}
+
+// Empty state
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+
+  .empty-icon {
+    font-size: 4rem;
+    color: $text-light;
+    margin-bottom: 1rem;
+  }
+
+  .empty-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .empty-description {
+    color: $text-secondary;
+    margin: 0 0 1.5rem 0;
+  }
+}
+
+// Table styles for desktop/tablet
+.table-container {
+  overflow-x: auto;
+  border-radius: $border-radius;
+  border: 1px solid $border-color;
+
+  &.desktop-table {
+    display: none;
+
+    @media (min-width: 768px) {
+      display: block;
+    }
+  }
+}
+
+.vacations-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+
+  th {
+    background: linear-gradient(135deg, $background-color 0%,  rgba($background-color, 2%) 100%);
+    padding: 1rem;
+    text-align: right;
+    font-weight: 600;
+    color: $text-primary;
+    border-bottom: 2px solid $border-color;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    cursor: pointer;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba($primary-color, 0.05) 0%, rgba($primary-color, 0.1) 100%);
+      color: $primary-color;
+    }
+  }
+
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid $border-color;
+    vertical-align: middle;
+    font-size: 0.875rem;
+  }
+
+  .table-row {
+    transition: all $transition-duration ease;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba($primary-color, 0.05) 0%, rgba($primary-color, 0.1) 100%);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+}
+
+.employee-cell,
+.salary-cell {
+  text-align: center;
+}
+
+.employee-name {
+  font-weight: 500;
+  color: $text-primary;
+}
+
+.action-cell {
+  .action-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+
+    &.details-btn {
+      color: $info-color;
+
+      &:hover {
+        background: $info-light;
+        border-radius: 50%;
+        padding: 0.25rem;
+      }
+    }
+  }
+}
+
+// Mobile cards
+.mobile-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+// Results count
+.results-count {
+  font-size: 0.875rem;
+  color: $text-secondary;
+  background: $background-color;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+}
+
+.print-header {
+  display: none;
+
+  @media print {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid $border-color;
+  }
+
+  .print-title {
+    font-size: 14pt;
+    font-weight: bold;
+    color: $text-primary;
+  }
+
+  .print-date,
+  .print-time {
+    font-size: 10pt;
+    color: $text-secondary;
   }
 }
 
 // Animations
-@keyframes slideIn {
-  from {
-    top: -50px;
-    opacity: 0;
-  }
+@keyframes spin {
   to {
-    top: 20px;
-    opacity: 1;
+    transform: rotate(360deg);
   }
 }
 
-@keyframes slideOut {
-  from {
-    top: 20px;
-    opacity: 1;
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
   }
-  to {
-    top: -50px;
-    opacity: 0;
+  100% {
+    background-position: -200% 0;
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+// Print styles
+@media print {
+  .vacations-container {
+    background: white !important;
+    padding: 0 !important;
   }
-  to {
-    opacity: 1;
+
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+
+  .retry-btn,
+  .filters-card,
+  .notification-overlay,
+  .print-hide {
+    display: none !important;
+  }
+
+  .mobile-cards {
+    display: none !important;
+  }
+
+  .desktop-table {
+    display: block !important;
+  }
+
+  .vacations-table {
+    font-size: 10pt !important;
+
+    th,
+    td {
+      padding: 4px !important;
+      border: 1px solid #ccc !important;
+    }
   }
 }
 
-@keyframes scaleIn {
-  from {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+// Ensure no horizontal scroll
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
 }

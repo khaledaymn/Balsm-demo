@@ -16,13 +16,16 @@ export class SalaryService {
 
   constructor(private http: HttpClient) {}
 
-  getAllEmployeesSalaries(): Observable<EmployeeSalary[]> {
+  getAllEmployeesSalaries(  month: number,
+    year: number): Observable<EmployeeSalary[]> {
     const headers = new HttpHeaders({ accept: '*/*' });
-
+ let params = new HttpParams()
+      .set('month', month.toString())
+      .set('year', year.toString());
     return this.http
-      .get<EmployeeSalary[]>(`${this.baseUrl}/GetAllEmployeesSalaries`, {
-        headers,
-      })
+      .get<EmployeeSalary[]>(`${this.baseUrl}/GetAllEmployeesSalaries`, 
+        { headers, params }
+      )
       .pipe(
         catchError((error) => {
           console.error('Error fetching employee salaries:', error);

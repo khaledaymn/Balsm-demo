@@ -1,129 +1,301 @@
-<div class="employee-list-container">
+<div class="vacations-container" dir="rtl">
+  <!-- Print Header -->
   <div class="print-header">
-    <div class="print-title">قائمة الموظفين</div>
+    <div class="print-title">تقرير رواتب الموظفين</div>
     <div class="print-date">تاريخ الطباعة: {{ getCurrentDate() }}</div>
     <div class="print-time">وقت الطباعة: {{ getCurrentTime() }}</div>
   </div>
 
-  <div class="list-header">
-    <h2 class="section-title">رواتب الموظفين</h2>
-    <div class="header-actions">
-      <button
-        class="export-btn"
-        (click)="exportToExcel()"
-        title="تصدير إلى Excel"
-      >
-        <span class="material-icons">file_download</span>
-        تصدير Excel
-      </button>
-      <button
-        class="print-btn"
-        (click)="printEmployeeList()"
-        title="طباعة القائمة"
-      >
-        <span class="material-icons">print</span>
-        طباعة
-      </button>
-    </div>
-  </div>
-
-  <div class="filters-container">
-    <div class="search-box">
-      <span class="material-icons">search</span>
-      <input
-        type="text"
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="onSearchChange()"
-        placeholder="بحث عن موظف..."
-      />
-    </div>
-  </div>
-
-  <div class="table-responsive">
-    <table class="employees-table">
-      <thead>
-        <tr>
-          <th (click)="sortBy('name')">
-            الاسم
-            <span class="sort-icon" *ngIf="sortField === 'name'">
-              <span class="material-icons">{{
-                sortDirection === "asc" ? "arrow_upward" : "arrow_downward"
-              }}</span>
-            </span>
-          </th>
-          <th (click)="sortBy('email')">
-            البريد الإلكتروني
-            <span class="sort-icon" *ngIf="sortField === 'email'">
-              <span class="material-icons">{{
-                sortDirection === "asc" ? "arrow_upward" : "arrow_downward"
-              }}</span>
-            </span>
-          </th>
-          <th (click)="sortBy('salary')">
-            الراتب
-            <span class="sort-icon" *ngIf="sortField === 'salary'">
-              <span class="material-icons">{{
-                sortDirection === "asc" ? "arrow_upward" : "arrow_downward"
-              }}</span>
-            </span>
-          </th>
-          <th class="print-hide">التفاصيل</th>
-          <!-- <th class="print-hide">التعديل</th> -->
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let employee of filteredEmployees">
-          <td class="employee-name">
-            <div class="employee-avatar">
-              {{ employee.name.charAt(0) || "" }}
-            </div>
-            <div>{{ employee.name || "" }}</div>
-          </td>
-          <td data-label="البريد الإلكتروني">{{ employee.email || "" }}</td>
-          <td data-label="الراتب" class="salary-cell">
-            {{ employee.salary }} ريال
-          </td>
-          <td class="action-cell print-hide">
-            <a
-              [routerLink]="['/app/admin/employee-salary-details', employee.id]"
-              routerLinkActive="active"
-            >
-              <button class="action-btn details-btn" title="التفاصيل">
-                <span class="material-icons">visibility</span>
-              </button>
-            </a>
-          </td>
-          <!-- <td class="action-cell print-hide">
-            <a
-              Bue
-              [routerLink]="['/app/admin/edit-employee', employee.id]"
-              routerLinkActive="active"
-            >
-              <button class="action-btn edit-btn" title="تعديل">
-                <span class="material-icons">edit</span>
-              </button>
-            </a>
-          </td> -->
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
   <!-- Notification -->
-  <div class="notification" *ngIf="notification" [ngClass]="notification.type">
-    <p>{{ notification.message }}</p>
+  @if (notification()) {
+  <div class="notification-overlay">
+    <div class="notification" [class]="'notification-' + notification()!.type">
+      <span class="material-icons notification-icon">
+      </span>
+      <span class="notification-message">{{ notification()!.message }}</span>
+      <button
+        class="notification-close"
+        aria-label="إغلاق الإشعار"
+      >
+        <span class="material-icons">close</span>
+      </button>
+    </div>
   </div>
+  }
 
-  <!-- Confirmation Box -->
+  <div class="main-content">
+    <!-- Employee Header -->
+    @if (filteredSalaries().length > 0) {
+    <div class="employee-header">
+      <div class="employee-info">
+        <h1 class="employee-name">
+          <span class="material-icons">person</span>
+          رواتب الموظفين
+        </h1>
+      </div>
+      <div class="vacation-stats">
+        <div class="stat-card total">
+          <div class="stat-number">{{ salaryStats().totalEmployees }}</div>
+          <div class="stat-label">إجمالي الموظفين</div>
+        </div>
+        <div class="stat-card total-salary">
+          <div class="stat-number">{{ salaryStats().totalSalary | number:'1.2-2' }} ريال</div>
+          <div class="stat-label">إجمالي الرواتب</div>
+        </div>
+        <div class="stat-card average">
+          <div class="stat-number">{{ salaryStats().averageSalary | number:'1.2-2' }} ريال</div>
+          <div class="stat-label">متوسط الراتب</div>
+        </div>
+      </div>
+    </div>
+    }
 
-  <div
-    class="empty-state"
-    *ngIf="filteredEmployees && filteredEmployees.length === 0"
-  >
-    <span class="material-icons">search_off</span>
-    <p>لم يتم العثور على موظفين مطابقين لمعايير البحث</p>
-    <button class="reset-btn" (click)="resetFilters()">
-      إعادة ضبط الفلاتر
-    </button>
+    <!-- Filters Card -->
+    <div class="card filters-card">
+      <div class="card-header">
+        <h2 class="card-title">
+          <span class="material-icons">tune</span>
+          فلترة تقرير الرواتب
+        </h2>
+      </div>
+      <div class="card-content">
+        <form [formGroup]="filterForm" class="filters-form">
+          <div class="filters-grid">
+            <div class="form-group">
+              <label for="year" class="form-label">السنة</label>
+              <input
+                type="number"
+                id="year"
+                formControlName="year"
+                class="form-input"
+                min="2000"
+                max="2100"
+                placeholder="اختر السنة"
+              />
+            </div>
+            <div class="form-group">
+              <label for="month" class="form-label">الشهر</label>
+              <select id="month" formControlName="month" class="form-select">
+                @for (month of months; track month.value) {
+                <option [value]="month.value">{{ month.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="search" class="form-label">البحث</label>
+              <div class="search-input-wrapper">
+                <span class="material-icons search-icon">search</span>
+                <input
+                  type="text"
+                  id="search"
+                  class="form-input search-input"
+                  placeholder="ابحث عن موظف..."
+                  (input)="onSearchChange($event)"
+                  [value]="searchTerm()"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label invisible">إجراءات</label>
+              <button
+                type="button"
+                class="btn btn-outline w-full"
+                (click)="resetFilters()"
+              >
+                <span class="material-icons">refresh</span>
+                إعادة تعيين
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+    <div class="card">
+      <div class="card-content">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">جاري تحميل تقرير الرواتب...</p>
+        </div>
+        <div class="skeleton-container">
+          @for (item of [1,2,3,4]; track item) {
+          <div class="skeleton-item">
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line short"></div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Empty State -->
+    @if (!isLoading() && filteredSalaries().length === 0) {
+    <div class="card">
+      <div class="card-content">
+        <div class="empty-state">
+          <span class="material-icons empty-icon">account_balance</span>
+          <h3 class="empty-title">لا توجد رواتب</h3>
+          <p class="empty-description">
+            @if (searchTerm()) { لم يتم العثور على نتائج للبحث "{{ searchTerm() }}" } @else { لا توجد رواتب متاحة للفترة المحددة }
+          </p>
+          <button class="btn btn-primary print-hide " (click)="resetFilters()">
+            <span class="material-icons">refresh</span>
+            إعادة تعيين الفلاتر
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Salaries Table/Cards -->
+    @if (!isLoading() && filteredSalaries().length > 0) {
+    <div class="card">
+      <div class="card-header">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 1rem;
+          "
+        >
+          <h2 class="card-title">
+            <span class="material-icons">account_balance</span>
+            تقرير الرواتب {{ getMonthLabel(filterForm.value.month!) }} {{ filterForm.value.year }}
+          </h2>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button class="retry-btn print-hide" (click)="printEmployeeList()">
+              <span class="material-icons">print</span>
+              طباعة
+            </button>
+            <button class="retry-btn print-hide" (click)="exportToExcel()">
+              <span class="material-icons">file_download</span>
+              تصدير إلى Excel
+            </button>
+            <div class="results-count">
+              {{ filteredSalaries().length }} راتب
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-content">
+        <!-- Desktop Table -->
+        <div class="table-container desktop-table">
+          <table class="vacations-table">
+            <thead>
+              <tr>
+                <th (click)="sortBy('employeeName')">الاسم</th>
+                <!-- <th (click)="sortBy('email')">البريد الإلكتروني</th> -->
+                <th (click)="sortBy('netSalary')">الراتب الصافي</th>
+                <th class="print-hide">التفاصيل</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (salary of filteredSalaries(); track salary.employeeId) {
+              <tr class="table-row">
+                <td class="employee-cell">
+                  <div class="employee-name">{{ salary.employeeName }}</div>
+                </td>
+                <!-- <td class="email-cell">{{ salary.email || '' }}</td> -->
+                <td class="salary-cell">{{ salary.netSalary | number:'1.2-2' }} ريال</td>
+                <td class="action-cell print-hide">
+                  <a
+                    [routerLink]="['/app/admin/employee-salary-details', salary.employeeId]"
+                    routerLinkActive="active"
+                  >
+                    <button class="action-btn details-btn" title="التفاصيل">
+                      <span class="material-icons">visibility</span>
+                    </button>
+                  </a>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-cards">
+          @for (salary of filteredSalaries(); track salary.employeeId) {
+          <div class="vacation-card">
+            <div class="card-content">
+              <div class="vacation-header">
+                <div class="vacation-type">
+                  <span class="material-icons type-icon">account_balance</span>
+                  <h3 class="type-name">راتب</h3>
+                </div>
+              </div>
+              <div class="vacation-details">
+                <div class="detail-row">
+                  <span class="material-icons detail-icon">person</span>
+                  <div class="detail-content">
+                    <div class="detail-label">الموظف</div>
+                    <div class="detail-value">{{ salary.employeeName }}</div>
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="material-icons detail-icon">email</span>
+                  <div class="detail-content">
+                    <div class="detail-label">البريد الإلكتروني</div>
+                    <!-- <div class="detail-value">{{ salary.email || '' }}</div> -->
+                  </div>
+                </div>
+                <div class="detail-row">
+                  <span class="material-icons detail-icon">account_balance_wallet</span>
+                  <div class="detail-content">
+                    <div class="detail-label">الراتب الصافي</div>
+                    <div class="detail-value">{{ salary.netSalary | number:'1.2-2' }} ريال</div>
+                  </div>
+                </div>
+                <div class="detail-row print-hide">
+                  <span class="material-icons detail-icon">visibility</span>
+                  <div class="detail-content">
+                    <div class="detail-label">الإجراءات</div>
+                    <div class="detail-value">
+                      <a
+                        [routerLink]="['/app/admin/employee-salary-details', salary.employeeId]"
+                        routerLinkActive="active"
+                      >
+                        <button class="action-btn details-btn" title="التفاصيل">
+                          <span class="material-icons">visibility</span>
+                        </button>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+
+        <!-- Pagination -->
+        <!-- <div class="pagination">
+          <button
+            class="btn btn-outline"
+            [disabled]="pageNumber() === 1"
+            (click)="changePage(pageNumber() - 1)"
+          >
+            <span class="material-icons">chevron_right</span>
+            السابق
+          </button>
+          <span class="page-info">الصفحة {{ pageNumber() }}</span>
+          <button
+            class="btn btn-outline"
+            [disabled]="filteredSalaries().length < pageSize()"
+            (click)="changePage(pageNumber() + 1)"
+          >
+            التالي
+            <span class="material-icons">chevron_left</span>
+          </button>
+        </div> -->
+      </div>
+    </div>
+    }
   </div>
 </div>

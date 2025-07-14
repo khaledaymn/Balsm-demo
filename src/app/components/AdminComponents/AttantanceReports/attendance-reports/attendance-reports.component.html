@@ -317,13 +317,13 @@
           <div class="modal-filters">
             <form [formGroup]="employeeFilterForm">
               <div class="filter-row">
-                <div class="filter-item">
+                <!-- <div class="filter-item">
                   <label for="reportType">نوع التقرير</label>
                   <select id="reportType" formControlName="reportType" class="filter-select">
                     <option value="0">تقرير يومي</option>
                     <option value="1">تقرير شهري</option>
                   </select>
-                </div>
+                </div> -->
 
                 @if (employeeFilterForm.controls.reportType.value === 0) {
                   <div class="filter-item">
@@ -378,7 +378,7 @@
                   <tbody>
                     @for (record of employeeAttendance(); track record.date) {
                       <tr>
-                        <td>{{ formatDateArabic(record.date) }}</td>
+                        <td>{{ record.date |date}}</td>
                         <td>{{ record.timeOfAttend }}</td>
                         <td>{{ record.timeOfLeave }}</td>
                         <td>{{ record.branchName }}</td>
