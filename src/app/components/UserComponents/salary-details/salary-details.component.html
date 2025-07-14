@@ -16,150 +16,250 @@
   }
 
   <!-- Header -->
-  <div class="salary-header">
+  <div class="salary-header" @slideIn>
     <div class="header-content">
-      <h2>تفاصيل الراتب</h2>
-      <p class="header-description">عرض تفاصيل راتبك للشهر المحدد</p>
+
+      <!-- <span class="material-icons">account_balance_wallet</span> -->
+      <h1>تفاصيل الراتب</h1>
+      <p class="header-description">عرض تفاصيل راتبك الشهري مع جميع البدلات والخصومات</p>
     </div>
   </div>
 
   <!-- Period Selection -->
   <div class="period-selection" @fadeIn>
-    <div class="select-group">
-      <label for="month">الشهر:</label>
-      <select
-        id="month"
-        [(ngModel)]="selectedMonth"
-        (ngModelChange)="onPeriodChange()"
-        aria-label="اختر الشهر"
-      >
-        @for (month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track month) {
-        <option [value]="month">{{ month }}</option>
-        }
-      </select>
-    </div>
-    <div class="select-group">
-      <label for="year">السنة:</label>
-      <select
-        id="year"
-        [(ngModel)]="selectedYear"
-        (ngModelChange)="onPeriodChange()"
-        aria-label="اختر السنة"
-      >
-        @for (year of [2023, 2024, 2025]; track year) {
-        <option [value]="year">{{ year }}</option>
-        }
-      </select>
+    <div class="selection-card">
+      <h3>اختر الفترة</h3>
+      <div class="select-container">
+        <div class="select-group">
+          <label for="month">الشهر:</label>
+          <select
+            id="month"
+            [(ngModel)]="selectedMonth"
+            (ngModelChange)="onPeriodChange()"
+            aria-label="اختر الشهر"
+          >
+            @for (month of getMonthOptions(); track month.value) {
+            <option [value]="month.value">{{ month.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="select-group">
+          <label for="year">السنة:</label>
+          <select
+            id="year"
+            [(ngModel)]="selectedYear"
+            (ngModelChange)="onPeriodChange()"
+            aria-label="اختر السنة"
+          >
+            @for (year of [2023, 2024, 2025]; track year) {
+            <option [value]="year">{{ year }}</option>
+            }
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Loading State -->
   @if (isLoading()) {
   <div class="loading-state" @fadeIn>
-    <div class="spinner"></div>
-    <p>جاري تحميل تفاصيل الراتب...</p>
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <h3>جاري تحميل البيانات</h3>
+      <p>يرجى الانتظار بينما نقوم بتحميل تفاصيل راتبك...</p>
+    </div>
   </div>
   }
 
   <!-- Empty State -->
   @if (!isLoading() && !salaryDetails()) {
   <div class="empty-state" @fadeIn>
-    <span class="material-icons">money_off</span>
-    <p>لا توجد بيانات راتب متاحة</p>
+    <div class="empty-content">
+      <span class="material-icons">money_off</span>
+      <h3>لا توجد بيانات راتب</h3>
+      <p>لا توجد بيانات راتب متاحة للفترة المحددة</p>
+      <button class="retry-btn" (click)="onPeriodChange()">
+        <span class="material-icons">refresh</span>
+        إعادة المحاولة
+      </button>
+    </div>
   </div>
   }
 
   <!-- Salary Details -->
   @if (!isLoading() && salaryDetails()) {
-  <div class="salary-card" @fadeIn>
-    <div class="section">
-      <h4 class="section-title">
-        <span class="material-icons" aria-hidden="true">person</span>
-        معلومات الموظف
-      </h4>
-      <div class="section-content">
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">badge</span>
-          <span class="label">اسم الموظف</span>
-          <span class="value">{{ salaryDetails()!.employeeName }}</span>
+  <div class="salary-content" @fadeIn>
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <!-- <div class="summary-card total-salary">
+        <div class="card-icon">
+          <span class="material-icons">savings</span>
+        </div>
+        <div class="card-content">
+          <h3>إجمالي الراتب</h3>
+          <p class="amount">{{ salaryDetails()!.totalSalary | number : "1.2-2" }} ريال</p>
+        </div>
+      </div> -->
+      
+      <div class="summary-card base-salary">
+        <div class="card-icon">
+          <span class="material-icons">account_balance</span>
+        </div>
+        <div class="card-content">
+          <h3>الراتب الأساسي</h3>
+          <p class="amount">{{ salaryDetails()!.baseSalary | number : "1.2-2" }} ريال</p>
+        </div>
+      </div>
+
+      <div class="summary-card overtime">
+        <div class="card-icon">
+          <span class="material-icons">schedule</span>
+        </div>
+        <div class="card-content">
+          <h3>العمل الإضافي</h3>
+          <p class="amount">{{ salaryDetails()!.overTimeSalary | number : "1.2-2" }} ريال</p>
+        </div>
+      </div>
+
+      <div class="summary-card deductions">
+        <div class="card-icon">
+          <span class="material-icons">remove_circle</span>
+        </div>
+        <div class="card-content">
+          <h3>إجمالي الخصومات</h3>
+          <p class="amount">{{ getTotalDeductions() | number : "1.2-2" }} ريال</p>
         </div>
       </div>
     </div>
 
-    <div class="section">
-      <h4 class="section-title">
-        <span class="material-icons" aria-hidden="true">attach_money</span>
-        تفاصيل الراتب
-      </h4>
-      <div class="section-content">
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">account_balance</span>
-          <span class="label">الراتب الأساسي</span>
-          <span class="value">{{
-            salaryDetails()!.baseSalary | number : "1.0-2"
-          }}</span>
+    <!-- Detailed Breakdown -->
+    <div class="details-grid">
+      <!-- Employee Information -->
+      <div class="detail-section employee-info">
+        <div class="section-header">
+          <span class="material-icons">person</span>
+          <h2>معلومات الموظف</h2>
         </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">schedule</span>
-          <span class="label">ساعات العمل الإضافي</span>
-          <span class="value">{{ salaryDetails()!.overTime }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">add_circle</span>
-          <span class="label">راتب العمل الإضافي</span>
-          <span class="value">{{
-            salaryDetails()!.overTimeSalary | number : "1.0-2"
-          }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">access_time</span>
-          <span class="label">ساعات التأخير</span>
-          <span class="value">{{ salaryDetails()!.lateTime }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">remove_circle</span>
-          <span class="label">خصم التأخير</span>
-          <span class="value">{{
-            salaryDetails()!.lateTimeSalary | number : "1.0-2"
-          }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">event_busy</span>
-          <span class="label">أيام الغياب</span>
-          <span class="value">{{ salaryDetails()!.numberOfAbsentDays }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">money_off</span>
-          <span class="label">خصم الغياب</span>
-          <span class="value">{{
-            salaryDetails()!.absentDaysSalary | number : "1.0-2"
-          }}</span>
-        </div>
-        <div class="detail-item total">
-          <span class="material-icons" aria-hidden="true">savings</span>
-          <span class="label">إجمالي الراتب</span>
-          <span class="value">{{
-            salaryDetails()!.totalSalary | number : "1.0-2"
-          }}</span>
+        <div class="section-content">
+          <div class="info-item">
+            <span class="material-icons">badge</span>
+            <div class="info-details">
+              <span class="label">اسم الموظف</span>
+              <span class="value">{{ salaryDetails()!.employeeName }}</span>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Earnings Section -->
+      <div class="detail-section earnings">
+        <div class="section-header">
+          <span class="material-icons">add_circle</span>
+          <h2>الأرباح والبدلات</h2>
+        </div>
+        <div class="section-content">
+          <div class="info-item">
+            <span class="material-icons">account_balance</span>
+            <div class="info-details">
+              <span class="label">الراتب الأساسي</span>
+              <span class="value positive">{{ salaryDetails()!.baseSalary | number : "1.2-2" }} ريال</span>
+            </div>
+          </div>
+          
+          <div class="info-item">
+            <span class="material-icons">schedule</span>
+            <div class="info-details">
+              <span class="label">ساعات العمل الإضافي</span>
+              <span class="value">{{ formatHours(salaryDetails()!.overTime) }}</span>
+            </div>
+          </div>
+          
+          <div class="info-item">
+            <span class="material-icons">payments</span>
+            <div class="info-details">
+              <span class="label">راتب العمل الإضافي</span>
+              <span class="value positive">{{ salaryDetails()!.overTimeSalary | number : "1.2-2" }} ريال</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deductions Section -->
+      <div class="detail-section deductions">
+        <div class="section-header">
+          <span class="material-icons">remove_circle</span>
+          <h2>الخصومات</h2>
+        </div>
+        <div class="section-content">
+          <div class="info-item">
+            <span class="material-icons">access_time</span>
+            <div class="info-details">
+              <span class="label">ساعات التأخير</span>
+              <span class="value">{{ formatHours(salaryDetails()!.lateTime) }}</span>
+            </div>
+          </div>
+          
+          <div class="info-item">
+            <span class="material-icons">money_off</span>
+            <div class="info-details">
+              <span class="label">خصم التأخير</span>
+              <span class="value negative">{{ salaryDetails()!.lateTimeSalary | number : "1.2-2" }} ريال</span>
+            </div>
+          </div>
+          
+          <div class="info-item">
+            <span class="material-icons">event_busy</span>
+            <div class="info-details">
+              <span class="label">أيام الغياب</span>
+              <span class="value">{{ formatDays(salaryDetails()!.numberOfAbsentDays) }}</span>
+            </div>
+          </div>
+          
+          <div class="info-item">
+            <span class="material-icons">remove</span>
+            <div class="info-details">
+              <span class="label">خصم الغياب</span>
+              <span class="value negative">{{ salaryDetails()!.absentDaysSalary | number : "1.2-2" }} ريال</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Period Information -->
+      <!-- <div class="detail-section period-info">
+        <div class="section-header">
+          <span class="material-icons">calendar_today</span>
+          <h2>فترة الراتب</h2>
+        </div>
+        <div class="section-content">
+          <div class="info-item">
+            <span class="material-icons">date_range</span>
+            <div class="info-details">
+              <span class="label">الشهر</span>
+              <span class="value">{{ getMonthName(salaryDetails()!.month) }}</span>
+            </div>
+          </div>
+          
+          <div class="info-item">
+            <span class="material-icons">event</span>
+            <div class="info-details">
+              <span class="label">السنة</span>
+              <span class="value">{{ salaryDetails()!.year }}</span>
+            </div>
+          </div>
+        </div>
+      </div> -->
     </div>
 
-    <div class="section">
-      <h4 class="section-title">
-        <span class="material-icons" aria-hidden="true">calendar_today</span>
-        الفترة
-      </h4>
-      <div class="section-content">
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">date_range</span>
-          <span class="label">الشهر</span>
-          <span class="value">{{ salaryDetails()!.month }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">event</span>
-          <span class="label">السنة</span>
-          <span class="value">{{ salaryDetails()!.year }}</span>
+    <!-- Final Total -->
+    <div class="final-total">
+      <div class="total-card">
+        <!-- <div class="total-icon">
+          <span class="material-icons">account_balance_wallet</span>
+        </div> -->
+        <div class="total-content">
+          <h2>صافي الراتب المستحق</h2>
+          <p class="final-amount">{{ salaryDetails()!.totalSalary | number : "1.2-2" }} ريال سعودي</p>
         </div>
       </div>
     </div>

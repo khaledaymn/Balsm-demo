@@ -17,7 +17,7 @@ export class RoleSelectComponent {
     if (role === 'admin') {
       this.router.navigate(['/app/admin']);
     } else if (role === 'employee') {
-      this.router.navigate(['/app/userDashboard']);
+      this.router.navigate(['/app/user']);
     }
   }
 

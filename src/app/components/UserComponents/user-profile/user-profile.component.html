@@ -1,4 +1,4 @@
-<div class="container">
+<div class="profile-container">
   <!-- Notification -->
   @if (notification()) {
   <div
@@ -6,6 +6,7 @@
     [class]="notification()?.type"
     role="alert"
     aria-live="assertive"
+    @fadeIn
   >
     <span class="material-icons">
       {{ getNotificationIcon(notification()!.type) }}
@@ -14,162 +15,322 @@
   </div>
   }
 
-  <!-- Header -->
-  <div class="profile-header">
-    <div class="header-content">
-      <h2>الملف الشخصي</h2>
-      <p class="header-description">عرض وإدارة تفاصيل حسابك الشخصي</p>
-    </div>
-  </div>
-
   <!-- Loading State -->
   @if (isLoading()) {
-  <div class="loading-state">
-    <div class="spinner"></div>
-    <p>جاري تحميل بيانات الملف الشخصي...</p>
+  <div class="loading-container" @fadeIn>
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <h3>جاري تحميل البيانات</h3>
+      <p>يرجى الانتظار بينما نقوم بتحميل ملفك الشخصي...</p>
+    </div>
   </div>
   }
 
-  <!-- Empty State -->
+  <!-- Error State -->
   @if (!isLoading() && !employee()) {
-  <div class="empty-state">
-    <span class="material-icons">person_off</span>
-    <p>لا توجد بيانات للملف الشخصي متاحة</p>
+  <div class="error-container" @fadeIn>
+    <div class="error-content">
+      <span class="material-icons">person_off</span>
+      <h3>لا توجد بيانات</h3>
+      <p>لا توجد بيانات للملف الشخصي متاحة</p>
+      <button class="retry-btn" (click)="ngOnInit()">
+        <span class="material-icons">refresh</span>
+        إعادة المحاولة
+      </button>
+    </div>
   </div>
   }
 
-  <!-- Profile Details -->
+  <!-- Profile Content -->
   @if (!isLoading() && employee()) {
-  <div class="profile-card">
-    <div class="profile-avatar">
-      <span class="material-icons">account_circle</span>
-      <h3>{{ employee()!.name }}</h3>
-    </div>
-
-    <!-- Personal Info Section -->
-    <div class="section">
-      <h4 class="section-title">
-        <span class="material-icons" aria-hidden="true">person</span>
-        المعلومات الشخصية
-      </h4>
-      <div class="section-content">
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">badge</span>
-          <span class="label">الاسم</span>
-          <span class="value">{{ employee()!.name }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">email</span>
-          <span class="label">البريد الإلكتروني</span>
-          <span class="value">{{ employee()!.email }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">phone</span>
-          <span class="label">رقم الهاتف</span>
-          <span class="value">{{ employee()!.phoneNumber }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">wc</span>
-          <span class="label">الجنس</span>
-          <span class="value">{{
-            employee()!.gender === "Male" ? "ذكر" : "أنثى"
-          }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">cake</span>
-          <span class="label">تاريخ الميلاد</span>
-          <span class="value">{{
-            employee()!.dateOfBarth | date : "yyyy-MM-dd"
-          }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Employment Details Section -->
-    <div class="section">
-      <h4 class="section-title">
-        <span class="material-icons" aria-hidden="true">work</span>
-        تفاصيل التوظيف
-      </h4>
-      <div class="section-content">
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">fingerprint</span>
-          <span class="label">الرقم القومي</span>
-          <span class="value">{{ employee()!.nationalId }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">attach_money</span>
-          <span class="label">الراتب</span>
-          <span class="value">{{ employee()!.salary | number : "1.0-2" }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">event</span>
-          <span class="label">تاريخ التوظيف</span>
-          <span class="value">{{
-            employee()!.hiringDate | date : "yyyy-MM-dd"
-          }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true"
-            >admin_panel_settings</span
-          >
-          <span class="label">الأدوار</span>
-          <span class="value">{{ employee()!.roles.join(", ") }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Branch Info Section -->
-    <div class="section">
-      <h4 class="section-title">
-        <span class="material-icons" aria-hidden="true">location_on</span>
-        معلومات الفرع
-      </h4>
-      <div class="section-content">
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">business</span>
-          <span class="label">اسم الفرع</span>
-          <span class="value">{{ employee()!.branch.name }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="material-icons" aria-hidden="true">map</span>
-          <span class="label">إحداثيات الفرع</span>
-          <span class="value"
-            >{{ employee()!.branch.latitude }},
-            {{ employee()!.branch.longitude }}</span
-          >
-        </div>
-      </div>
-    </div>
-
-    <!-- Shifts Section -->
-    <div class="section">
-      <h4 class="section-title">
-        <span class="material-icons" aria-hidden="true">schedule</span>
-        الورديات
-      </h4>
-      <div class="section-content">
-        <button
-          class="toggle-shifts-btn"
-          (click)="toggleShifts()"
-          [attr.aria-expanded]="isShiftsExpanded()"
-          aria-label="تبديل عرض الورديات"
-        >
-          <span class="material-icons">
-            {{ isShiftsExpanded() ? "expand_less" : "expand_more" }}
-          </span>
-          {{ isShiftsExpanded() ? "إخفاء الورديات" : "عرض الورديات" }}
-        </button>
-        @if (isShiftsExpanded()) {
-        <div class="shifts-list">
-          @for (shift of employee()!.shift; track shift.id) {
-          <div class="shift-item">
-            <span class="material-icons" aria-hidden="true">access_time</span>
-            <span>من {{ shift.startTime }} إلى {{ shift.endTime }}</span>
+  <div class="profile-content" @fadeIn>
+    <!-- Modern Profile Header -->
+    <div class="profile-header" @slideIn>
+      <div class="header-gradient"></div>
+      <div class="header-content">
+        <div class="profile-avatar">
+          <div class="avatar-circle">
+            <span class="material-icons">account_circle</span>
           </div>
-          }
+          <div class="status-badge online">
+            <span class="material-icons">check_circle</span>
+          </div>
         </div>
-        }
+        <div class="profile-info">
+          <h1 class="profile-name">{{ employee()!.name }}</h1>
+          <p class="profile-email">{{ employee()!.email }}</p>
+         <!-- <div class="profile-tags">
+             <span class="tag primary">
+              <span class="material-icons">badge</span>
+              {{ employee()!.nationalId }}
+            </span> -->
+            <!-- <span class="tag success">
+              <span class="material-icons">verified</span>
+              موظف نشط
+            </span> 
+          </div> -->
+        </div>
+        <!-- <div class="profile-actions">
+          <button class="action-btn primary">
+            <span class="material-icons">edit</span>
+            تعديل الملف
+          </button>
+        </div> -->
+      </div>
+    </div>
+
+    <!-- Enhanced Statistics Cards -->
+    <div class="stats-grid" @fadeIn>
+      <div class="stat-card salary">
+        <div class="stat-icon">
+          <span class="material-icons">payments</span>
+        </div>
+        <div class="stat-content">
+          <h3>الراتب الشهري</h3>
+          <p class="stat-value">{{ employee()!.salary | number : "1.2-2" }}</p>
+          <span class="stat-unit">ريال سعودي</span>
+        </div>
+        <div class="stat-trend up">
+          <span class="material-icons">trending_up</span>
+        </div>
+      </div>
+
+      <div class="stat-card experience">
+        <div class="stat-icon">
+          <span class="material-icons">work_history</span>
+        </div>
+        <div class="stat-content">
+          <h3>سنوات الخبرة</h3>
+          <p class="stat-value">{{ getYearsOfExperience() }}</p>
+          <span class="stat-unit">في الشركة</span>
+        </div>
+        <div class="stat-trend neutral">
+          <span class="material-icons">schedule</span>
+        </div>
+      </div>
+
+      <div class="stat-card branch" *ngIf="employee()!.branch">
+        <div class="stat-icon">
+          <span class="material-icons">location_city</span>
+        </div>
+        <div class="stat-content">
+          <h3>الفرع</h3>
+          <p class="stat-value">{{ employee()!.branch.name }}</p>
+          <span class="stat-unit">مكان العمل</span>
+        </div>
+        <div class="stat-trend neutral">
+          <span class="material-icons">place</span>
+        </div>
+      </div>
+
+      <div class="stat-card roles">
+        <div class="stat-icon">
+          <span class="material-icons">admin_panel_settings</span>
+        </div>
+        <div class="stat-content">
+          <h3>الأدوار</h3>
+          <p class="stat-value">{{ employee()!.roles }}</p>
+          <span class="stat-unit">دور وظيفي</span>
+        </div>
+        <div class="stat-trend neutral">
+          <span class="material-icons">security</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modern Information Cards -->
+    <div class="info-grid" @fadeIn>
+      <!-- Personal Information Card -->
+      <div class="info-card personal">
+        <div class="card-header">
+          <div class="header-icon">
+            <span class="material-icons">person</span>
+          </div>
+          <h2>المعلومات الشخصية</h2>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <div class="info-item">
+              <span class="material-icons">badge</span>
+              <div class="item-content">
+                <span class="label">الاسم الكامل</span>
+                <span class="value">{{ employee()!.name }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <span class="material-icons">email</span>
+              <div class="item-content">
+                <span class="label">البريد الإلكتروني</span>
+                <span class="value">{{ employee()!.email }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <span class="material-icons">phone</span>
+              <div class="item-content">
+                <span class="label">رقم الهاتف</span>
+                <span class="value">{{ employee()!.phoneNumber }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <span class="material-icons">wc</span>
+              <div class="item-content">
+                <span class="label">الجنس</span>
+                <span class="value">{{
+                  getGenderText(employee()!.gender)
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <span class="material-icons">cake</span>
+              <div class="item-content">
+                <span class="label">تاريخ الميلاد</span>
+                <span class="value">{{
+                  formatDate(employee()!.dateOfBarth)
+                }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Employment Information Card -->
+      <div class="info-card employment">
+        <div class="card-header">
+          <div class="header-icon">
+            <span class="material-icons">work</span>
+          </div>
+          <h2>معلومات التوظيف</h2>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <div class="info-item">
+              <span class="material-icons">fingerprint</span>
+              <div class="item-content">
+                <span class="label">الرقم القومي</span>
+                <span class="value">{{ employee()!.nationalId }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <span class="material-icons">payments</span>
+              <div class="item-content">
+                <span class="label">الراتب الأساسي</span>
+                <span class="value"
+                  >{{ employee()!.salary | number : "1.2-2" }} ريال</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <span class="material-icons">event</span>
+              <div class="item-content">
+                <span class="label">تاريخ التوظيف</span>
+                <span class="value">{{
+                  formatDate(employee()!.hiringDate)
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <span class="material-icons">admin_panel_settings</span>
+              <div class="item-content">
+                <span class="label">الأدوار الوظيفية</span>
+                <span class="value">{{ getRolesText() }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Branch Information Card -->
+      <div class="info-card branch-info" *ngIf="employee()!.branch">
+        <div class="card-header">
+          <div class="header-icon">
+            <span class="material-icons">location_city</span>
+          </div>
+          <h2>معلومات الفرع</h2>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <div class="info-item">
+              <span class="material-icons">business</span>
+              <div class="item-content">
+                <span class="label">اسم الفرع</span>
+                <span class="value">{{ employee()!.branch.name }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <span class="material-icons">map</span>
+              <div class="item-content">
+                <span class="label">الإحداثيات</span>
+                <span class="value"
+                  >{{ employee()!.branch.latitude }},
+                  {{ employee()!.branch.longitude }}</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shifts Information Card -->
+      <div class="info-card shifts" *ngIf="employee()!.shift.length">
+        <div class="card-header">
+          <div class="header-icon">
+            <span class="material-icons">schedule</span>
+          </div>
+          <h2>الورديات</h2>
+          <!-- <button
+            class="expand-btn"
+            (click)="toggleShifts()"
+            [class.expanded]="isShiftsExpanded()"
+          >
+            <span class="material-icons">
+              {{ isShiftsExpanded() ? "expand_less" : "expand_more" }}
+            </span>
+          </button> -->
+        </div>
+        <div class="card-body">
+          <div class="shifts-summary">
+            <span class="shifts-count"
+              >{{ employee()!.shift.length }} ورديات</span
+            >
+          </div>
+
+          
+          <div class="shifts-list" @expand>
+            @for (shift of employee()!.shift; track shift.id) {
+            <div class="shift-item">
+              <div class="shift-time">
+                <span class="material-icons">access_time</span>
+                <span>{{ shift.startTime }} - {{ shift.endTime }}</span>
+              </div>
+            </div>
+            }
+          </div>
+          
+        </div>
       </div>
     </div>
   </div>

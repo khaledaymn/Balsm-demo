@@ -1,0 +1,36 @@
+.dashboard-container {
+  min-height: 100vh;
+  background-color: #F8F9FC;
+  direction: rtl;
+  font-family: 'Tajawal', 'Arial', sans-serif;
+}
+
+.dashboard-content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .content-header {
+    margin-bottom: 3rem;
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #333333;
+      margin: 0;
+      text-align: center;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 1rem;
+
+    .content-header {
+      .page-title {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}

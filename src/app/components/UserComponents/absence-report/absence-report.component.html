@@ -1,153 +1,272 @@
-<div class="container">
+<div class="absence-container">
   <!-- Notification -->
-  <!-- @if (notification()) {
+  @if (notification()) {
   <div
     class="notification"
     [class]="notification()?.type"
     role="alert"
     aria-live="assertive"
+    @fadeIn
   >
     <span class="material-icons">
       {{ getNotificationIcon(notification()!.type) }}
     </span>
     {{ notification()?.message }}
   </div>
-  } -->
+  }
 
-  <!-- Header -->
-  <div class="absence-header">
-    <h2>تقرير الغياب</h2>
-    <p class="header-description">
-      عرض تفاصيل الغياب اليومية أو الشهرية الخاصة بك
-    </p>
+  <!-- Modern Header -->
+  <div class="absence-header" @slideIn>
+    <div class="header-content">
+      <!-- <div class="header-icon">
+        <span class="material-icons">event_busy</span>
+      </div> -->
+      <div class="header-text">
+        <h1>تقرير الغياب</h1>
+        <p class="header-description">
+          عرض تفاصيل الغياب والإحصائيات الخاصة بك
+        </p>
+      </div>
+    </div>
   </div>
 
-  <!-- Filters -->
-  <form [formGroup]="absenceFilterForm" class="filters">
-    <div class="filter-group">
-      <label for="reportType">نوع التقرير:</label>
-      <select
-        id="reportType"
-        formControlName="reportType"
-        aria-label="نوع التقرير"
-      >
-        <option value="0">يومي</option>
-        <option value="1">شهري</option>
-      </select>
+  <!-- Period Selection -->
+  <div class="period-selection" @fadeIn>
+    <div class="selection-card">
+      <h3>
+        <span class="material-icons">filter_list</span>
+        فلاتر التقرير
+      </h3>
+      <form [formGroup]="absenceFilterForm" class="filters-form">
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label for="reportType">نوع التقرير</label>
+            <select
+              id="reportType"
+              formControlName="reportType"
+              class="form-control type-group"
+            >
+              <option value="0">يومي</option>
+              <option value="1">شهري</option>
+            </select>
+          </div>
+
+          @if (absenceFilterForm.controls.reportType.value == 0) {
+          <div class="filter-group">
+            <label for="dayDate">تاريخ معين</label>
+            <input
+              type="date"
+              id="dayDate"
+              formControlName="dayDate"
+              class="form-control"
+              aria-label="تاريخ معين"
+            />
+          </div>
+          } @if (absenceFilterForm.controls.reportType.value == 1) {
+          <div class="filter-group">
+            <label for="fromDate">من تاريخ</label>
+            <input
+              type="date"
+              id="fromDate"
+              formControlName="fromDate"
+              class="form-control"
+              aria-label="من تاريخ"
+            />
+          </div>
+          <div class="filter-group">
+            <label for="toDate">إلى تاريخ</label>
+            <input
+              type="date"
+              id="toDate"
+              formControlName="toDate"
+              class="form-control"
+              aria-label="إلى تاريخ"
+            />
+          </div>
+          }
+
+          <div class="filter-actions">
+            <button
+              class="reset-btn"
+              type="button"
+              (click)="resetFilters()"
+              aria-label="إعادة ضبط الفلاتر"
+            >
+              <span class="material-icons">refresh</span>
+              إعادة ضبط
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
-    @if (absenceFilterForm.controls.reportType.value == 0) {
-    <div class="filter-group">
-      <label for="dayDate">تاريخ معين:</label>
-      <input
-        type="date"
-        id="dayDate"
-        formControlName="dayDate"
-        aria-label="تاريخ معين"
-      />
-    </div>
-    } @if (absenceFilterForm.controls.reportType.value == 1) {
-    <div class="filter-group">
-      <label for="fromDate">من تاريخ:</label>
-      <input
-        type="date"
-        id="fromDate"
-        formControlName="fromDate"
-        aria-label="من تاريخ"
-      />
-    </div>
-    <div class="filter-group">
-      <label for="toDate">إلى تاريخ:</label>
-      <input
-        type="date"
-        id="toDate"
-        formControlName="toDate"
-        aria-label="إلى تاريخ"
-      />
-    </div>
-    <!-- <div class="filter-group">
-      <label for="month">الشهر:</label>
-      <select id="month" formControlName="month" aria-label="تصفية حسب الشهر">
-        <option [value]="null" disabled>اختر الشهر</option>
-        @for (m of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track m) {
-        <option [value]="m">{{ m }}</option>
-        }
-      </select>
-    </div> -->
-    }
-    <button
-      class="reset-btn"
-      type="button"
-      (click)="resetFilters()"
-      aria-label="إعادة ضبط الفلاتر"
-    >
-      <span class="material-icons">refresh</span>
-    </button>
-  </form>
+  </div>
 
   <!-- Loading State -->
   @if (isLoading()) {
-  <div class="loading-state">
-    <div class="spinner"></div>
-    <p>جاري تحميل تقرير الغياب...</p>
+  <div class="loading-state" @fadeIn>
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <h3>جاري تحميل البيانات</h3>
+      <p>يرجى الانتظار بينما نقوم بتحميل تقرير الغياب...</p>
+    </div>
   </div>
   }
 
   <!-- Empty State -->
-  @if (!isLoading() && absenceReports().length === 0) {
-  <div class="empty-state">
-    <span class="material-icons">event_busy</span>
-    <p>لا توجد سجلات غياب متاحة لهذه الفلاتر</p>
-    <button
-      class="reset-btn"
-      type="button"
-      (click)="resetFilters()"
-      aria-label="إعادة ضبط الفلاتر"
-    >
-      إعادة ضبط الفلاتر
-    </button>
+  @if (!isLoading() && (!absenceReports().length || isEmpty())) {
+  <div class="empty-state" @fadeIn>
+    <div class="empty-content">
+      <span class="material-icons">event_available</span>
+      <h3>لا توجد سجلات غياب</h3>
+      <p>لا توجد سجلات غياب متاحة للفترة المحددة</p>
+      <button
+        class="retry-btn"
+        type="button"
+        (click)="resetFilters()"
+        aria-label="إعادة ضبط الفلاتر"
+      >
+        <span class="material-icons">refresh</span>
+        إعادة ضبط الفلاتر
+      </button>
+    </div>
   </div>
   }
 
-  <!-- Absence Report Table -->
-  @if (!isLoading() && absenceReports().length > 0) {
-  <div class="absence-table-container">
-    <table class="absence-table" role="grid">
-      <thead>
-        <tr>
-          <th scope="col">التاريخ</th>
-          <th scope="col">ساعات الغياب</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (report of absenceReports(); track report.email) { @for (detail of
-        report.data; track detail.date) {
-        <tr>
-          <td data-label="التاريخ">{{ detail.date | date : "yyyy-MM-dd" }}</td>
-          <td data-label="ساعات الغياب">
-            {{ detail.hours | number : "1.0-2" }}
-          </td>
-        </tr>
-        } }
-      </tbody>
-    </table>
+  <!-- Absence Content -->
+  @if (!isLoading() && absenceReports().length > 0 && hasReport()) {
+  <div class="absence-content" @fadeIn>
+    <!-- Summary Cards -->
+    @if (absenceSummary()) {
+    <div class="summary-section">
+      <div class="employee-summary">
+        <div class="summary-card">
+          <div class="summary-icon">
+            <span class="material-icons">person</span>
+          </div>
+          <div class="summary-content">
+            <h3>{{ absenceSummary()!.employeeName }}</h3>
+            <p>تقرير الغياب - {{ getReportTypeText() }}</p>
+          </div>
+        </div>
+      </div>
 
-    <!-- Pagination -->
-    <div class="pagination">
-      <button
-        [disabled]="pageNumber() === 1"
-        (click)="changePage(pageNumber() - 1)"
-        aria-label="الصفحة السابقة"
-      >
-        <span class="material-icons">chevron_right</span>
-      </button>
-      <span>الصفحة {{ pageNumber() }}</span>
-      <button
-        [disabled]="totalRecords() < pageSize()"
-        (click)="changePage(pageNumber() + 1)"
-        aria-label="الصفحة التالية"
-      >
-        <span class="material-icons">chevron_left</span>
-      </button>
+      <div class="stats-cards">
+        <div class="stat-card total-hours">
+          <div class="card-icon">
+            <span class="material-icons">schedule</span>
+          </div>
+          <div class="card-content">
+            <h3>إجمالي ساعات الغياب</h3>
+            <p class="stat-value">
+              {{ formatHours(absenceSummary()!.totalAbsenceHours) }}
+            </p>
+          </div>
+        </div>
+
+        <div class="stat-card total-days">
+          <div class="card-icon">
+            <span class="material-icons">event_busy</span>
+          </div>
+          <div class="card-content">
+            <h3>إجمالي أيام الغياب</h3>
+            <p class="stat-value">
+              {{ absenceSummary()!.totalAbsenceDays }} يوم
+            </p>
+          </div>
+        </div>
+
+        <div class="stat-card average">
+          <div class="card-icon">
+            <span class="material-icons">analytics</span>
+          </div>
+          <div class="card-content">
+            <h3>متوسط الغياب اليومي</h3>
+            <p class="stat-value">
+              {{ formatHours(absenceSummary()!.averageAbsencePerDay) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Enhanced Table -->
+    <div class="table-section">
+      <div class="table-header">
+        <h2>
+          <span class="material-icons">table_chart</span>
+          سجلات الغياب التفصيلية
+        </h2>
+        <div class="table-stats">
+          <span class="stat-item">
+            <span class="material-icons">event_busy</span>
+            {{ totalRecords() }} سجل
+          </span>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="modern-table" role="grid">
+          <thead>
+            <tr>
+              <th scope="col">
+                <span class="material-icons">today</span>
+                التاريخ
+              </th>
+              <th scope="col">
+                <span class="material-icons">schedule</span>
+                ساعات الغياب
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (report of absenceReports(); track report.email) { @for (detail
+            of report.data; track detail.date) {
+            <tr class="table-row">
+              <td data-label="التاريخ">
+                <div class="cell-content">
+                  <span class="material-icons">calendar_today</span>
+                  {{ detail.date | date : "yyyy-MM-dd" }}
+                </div>
+              </td>
+              <td data-label="ساعات الغياب">
+                <div class="cell-content hours">
+                  <span class="material-icons">access_time</span>
+                  {{ formatHours(detail.hours) }}
+                </div>
+              </td>
+            </tr>
+            } }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Enhanced Pagination -->
+      <div class="pagination-section">
+        <div class="pagination-info">
+          <span>الصفحة {{ pageNumber() }}</span>
+        </div>
+        <div class="pagination-controls">
+          <button
+            class="pagination-btn"
+            [disabled]="pageNumber() === 1"
+            (click)="changePage(pageNumber() - 1)"
+            aria-label="الصفحة السابقة"
+          >
+            <span class="material-icons">chevron_right</span>
+            السابق
+          </button>
+          <button
+            class="pagination-btn"
+            [disabled]="totalRecords() < pageSize()"
+            (click)="changePage(pageNumber() + 1)"
+            aria-label="الصفحة التالية"
+          >
+            التالي
+            <span class="material-icons">chevron_left</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
   }

@@ -1,4 +1,4 @@
-<div class="top-nav-container">
+<!-- <div class="top-nav-container">
   <nav class="top-nav">
     <ul class="nav-list">
       <li class="nav-item" routerLinkActive="active">
@@ -14,6 +14,96 @@
   </nav>
 
   <div class="attendance-container">
-    <!-- <app-attendance-tracker></app-attendance-tracker> -->
+    <!-- <app-attendance-tracker></app-attendance-tracker>
+  </div>
+</div> -->
+
+<!-- ========================================================= -->
+
+<div class="top-nav-container">
+  <nav class="top-nav">
+    <div class="nav-content">
+      <ul class="nav-list">
+        <li class="nav-item" routerLinkActive="active">
+          <a [routerLink]="['/app/user/profile']" class="nav-link">
+            <span class="material-icons">person</span>
+            الملف الشخصي
+          </a>
+        </li>
+        <li class="nav-item" routerLinkActive="active">
+          <a [routerLink]="['/app/user/salary']" class="nav-link">
+            <span class="material-icons">payments</span>
+            الراتب
+          </a>
+        </li>
+        <li class="nav-item" routerLinkActive="active">
+          <a [routerLink]="['/app/user/vacations']" class="nav-link">
+            <span class="material-icons">beach_access</span>
+            الإجازات
+          </a>
+        </li>
+        <li class="nav-item" routerLinkActive="active">
+          <a [routerLink]="['/app/user/absence']" class="nav-link">
+            <span class="material-icons">event_busy</span>
+            الغياب
+          </a>
+        </li>
+        <li class="nav-item" routerLinkActive="active">
+          <a [routerLink]="['/app/user/attendance-tracker']" class="nav-link">
+            <span class="material-icons">check_circle</span>
+            تتبع الحضور
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-controls">
+        <button class="menu-toggle-btn" (click)="toggleMenu()" title="فتح القائمة" *ngIf="isMobile">
+          <span class="material-icons">menu</span>
+        </button>
+        <button class="logout-btn" (click)="logout()" title="تسجيل الخروج">
+          <span class="material-icons">logout</span>
+          خروج
+        </button>
+      </div>
+
+      <div class="nav-dropdown" [ngClass]="{'nav-dropdown-open': isMenuOpen}" *ngIf="isMobile">
+        <ul class="nav-list-mobile">
+          <li class="nav-item" routerLinkActive="active" (click)="closeMenu()">
+            <a [routerLink]="['/app/user/profile']" class="nav-link">
+              <span class="material-icons">person</span>
+              الملف الشخصي
+            </a>
+          </li>
+          <li class="nav-item" routerLinkActive="active" (click)="closeMenu()">
+            <a [routerLink]="['/app/user/salary']" class="nav-link">
+              <span class="material-icons">payments</span>
+              الراتب
+            </a>
+          </li>
+          <li class="nav-item" routerLinkActive="active" (click)="closeMenu()">
+            <a [routerLink]="['/app/user/vacations']" class="nav-link">
+              <span class="material-icons">beach_access</span>
+              الإجازات
+            </a>
+          </li>
+          <li class="nav-item" routerLinkActive="active" (click)="closeMenu()">
+            <a [routerLink]="['/app/user/absence']" class="nav-link">
+              <span class="material-icons">event_busy</span>
+              الغياب
+            </a>
+          </li>
+          <li class="nav-item" routerLinkActive="active" (click)="closeMenu()">
+            <a [routerLink]="['/app/user/attendance-tracker']" class="nav-link">
+              <span class="material-icons">check_circle</span>
+              تتبع الحضور
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="attendance-container">
+    <!-- Attendance tracker will be included in specific pages -->
   </div>
 </div>
