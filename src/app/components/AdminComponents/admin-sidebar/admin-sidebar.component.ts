@@ -23,6 +23,7 @@ export class AdminSidebarComponent implements OnInit {
   @Input() isMobile = false;
   @Output() toggleSidebar = new EventEmitter<void>();
   currentRoute: string = '';
+  isLogoutConfirmationVisible = false;
 
   navItems: NavItem[] = [
     { label: 'لوحة القيادة', icon: 'dashboard', route: '/app/admin' },
@@ -158,11 +159,25 @@ export class AdminSidebarComponent implements OnInit {
     this.toggleSidebar.emit();
   }
 
-  onLogout(): void {
-    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-      this.authService.logout();
-      this.router.navigate(['/login']);
-    }
+  // onLogout(): void {
+  //   if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+  //     this.authService.logout();
+  //     this.router.navigate(['/login']);
+  //   }
+  // }
+
+  showLogoutConfirmation(): void {
+    this.isLogoutConfirmationVisible = true;
+  }
+
+  confirmLogout(): void {
+    this.isLogoutConfirmationVisible = false;
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  cancelLogout(): void {
+    this.isLogoutConfirmationVisible = false;
   }
 
   onRoleSwitch() {
