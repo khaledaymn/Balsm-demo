@@ -8,6 +8,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Shift } from '../../../models/shifts.model';
 import { AttendanceService } from '../../../core/services/Attendance/attendance.service';
 import { LocationService } from '../../../core/services/Attendance/location.service';
+import { Router } from '@angular/router';
+import { interval } from 'rxjs';
 
 @Component({
   selector: 'app-attendance-tracker',
@@ -25,12 +27,17 @@ export class AttendanceTrackerComponent implements OnInit {
   today: Date = new Date();
 
   constructor(
+    private route: Router,
     private attendanceService: AttendanceOperationsService,
     private a: AttendanceService,
     private authService: AuthService,
     private timeValidationService: TimeValidationService,
     private locationService: LocationService
-  ) {}
+  ) {
+    interval(60000).subscribe(() => {
+      // this.route.navigate(['/app/user/test']);
+    });
+  }
 
   ngOnInit(): void {
     this.userId = this.authService.getUserId();

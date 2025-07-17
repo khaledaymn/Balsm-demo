@@ -23,6 +23,8 @@ export class ResetPasswordComponent {
   isLoading = signal(false);
   errorMessage = signal('');
   submitted = signal(false);
+  showPasswordField = signal(false);
+  showConfirmPasswordField = signal(false);
   email: string | null = null;
 
   constructor(
@@ -31,6 +33,7 @@ export class ResetPasswordComponent {
     private router: Router,
     private route: ActivatedRoute
   ) {
+    // Form initialization with validators
     this.resetPasswordForm = this.fb.group(
       {
         email: ['', [Validators.required, Validators.email]],
@@ -49,6 +52,7 @@ export class ResetPasswordComponent {
       { validators: this.passwordMatchValidator }
     );
 
+    // Pre-fill email from query params
     this.email = this.route.snapshot.queryParamMap.get('email');
     if (this.email) {
       this.resetPasswordForm.patchValue({ email: this.email });
@@ -62,14 +66,48 @@ export class ResetPasswordComponent {
     });
   }
 
+  // Custom validator for password matching
   passwordMatchValidator(form: FormGroup): { mismatch: boolean } | null {
     const password = form.get('password')?.value;
     const confirmPassword = form.get('confirmPassword')?.value;
     return password === confirmPassword ? null : { mismatch: true };
   }
 
+  // Getters for form controls
+  get emailControl() {
+    return this.resetPasswordForm.get('email')!;
+  }
+
+  get passwordControl() {
+    return this.resetPasswordForm.get('password')!;
+  }
+
+  get confirmPasswordControl() {
+    return this.resetPasswordForm.get('confirmPassword')!;
+  }
+
+  // Toggle password visibility
+  showPassword(): boolean {
+    return this.showPasswordField();
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPasswordField.set(!this.showPasswordField());
+  }
+
+  // Toggle confirm password visibility
+  showConfirmPassword(): boolean {
+    return this.showConfirmPasswordField();
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPasswordField.set(!this.showConfirmPasswordField());
+  }
+
+  // Handle form submission
   onSubmit(): void {
     this.submitted.set(true);
+    this.resetPasswordForm.markAllAsTouched();
 
     if (this.resetPasswordForm.invalid) {
       this.errorMessage.set('يرجى ملء جميع الحقول بشكل صحيح.');
@@ -93,7 +131,7 @@ export class ResetPasswordComponent {
 
     this.authService.resetPassword(password, email, token).subscribe({
       next: (response: { success: boolean; message?: string }) => {
-        console.log(password, email, token), this.isLoading.set(false);
+        this.isLoading.set(false);
         if (response.success) {
           this.submitted.set(true);
         } else {
@@ -103,7 +141,7 @@ export class ResetPasswordComponent {
         }
       },
       error: (err: HttpErrorResponse) => {
-        console.log(password, email, token), this.isLoading.set(false);
+        this.isLoading.set(false);
         let errorMsg = 'فشل إعادة تعيين كلمة المرور.';
         if (err.status === 400) {
           errorMsg = 'رمز إعادة التعيين غير صالح أو منتهي الصلاحية.';

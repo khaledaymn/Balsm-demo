@@ -28,6 +28,7 @@ import { EmployeeVacationsComponent } from './components/UserComponents/employee
 import { UserProfileComponent } from './components/UserComponents/user-profile/user-profile.component';
 import { SalaryDetailsComponent } from './components/UserComponents/salary-details/salary-details.component';
 import { AttendanceComponent } from './components/test';
+import { AttendanceLeaveComponent } from './components/disabled';
 
 export const appRoutes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
@@ -82,7 +83,6 @@ export const appRoutes: Routes = [
           { path: 'notification', component: NotificationsComponent },
 
           { path: 'payroll/list', component: EmployeeSalariesComponent },
-
         ],
       },
 
@@ -92,14 +92,19 @@ export const appRoutes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['User', 'Admin'] },
         children: [
-          {path: '', redirectTo: '/app/user/attendance-tracker', pathMatch:'full'},
+          {
+            path: '',
+            redirectTo: '/app/user/attendance-tracker',
+            pathMatch: 'full',
+          },
           { path: 'vacations', component: EmployeeVacationsComponent },
           { path: 'absence', component: AbsenceReportComponent },
           { path: 'vacations', component: EmployeeVacationsComponent },
           { path: 'profile', component: UserProfileComponent },
           { path: 'salary', component: SalaryDetailsComponent },
-          { path: 'attendance-tracker', component: AttendanceTrackerComponent },
-          {path :'test',component:AttendanceComponent}
+          { path: 'attendance', component: AttendanceTrackerComponent },
+          { path: 'test', component: AttendanceComponent },
+          { path: 'attendance-tracker', component: AttendanceLeaveComponent },
         ],
       },
       {
