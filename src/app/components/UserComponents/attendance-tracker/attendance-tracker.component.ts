@@ -95,7 +95,10 @@ export class AttendanceTrackerComponent implements OnInit {
     }
 
     this.isLoading = true;
-    this.attendanceService.checkIn(this.userId, new Date()).subscribe({
+    const localTime: Date = new Date();
+    console.log(localTime);
+
+    this.attendanceService.checkIn(this.userId,localTime).subscribe({
       next: (record) => {
         this.attendanceRecords = [...this.attendanceRecords, record];
         this.message = 'تم تسجيل الحضور بنجاح';

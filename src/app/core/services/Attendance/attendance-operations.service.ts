@@ -78,7 +78,7 @@ export class AttendanceOperationsService {
     );
 
     // Adjust timestamp for local time (same as findCurrentShift)
-    const adjustedTimestamp = new Date(timestamp);
+    const adjustedTimestamp = timestamp;
     adjustedTimestamp.setHours(adjustedTimestamp.getHours() + 3);
     console.log('Adjusted timestamp for check-in:', adjustedTimestamp); // Debug: Inspect adjusted timestamp
 

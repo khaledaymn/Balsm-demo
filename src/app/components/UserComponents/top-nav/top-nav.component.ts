@@ -15,12 +15,18 @@ export class TopNavComponent implements OnInit {
   isLoading = false
   isMenuOpen = false;
   isMobile = window.innerWidth <= 768;
+  isLogoutConfirmationVisible = false;
+  isOpen = false;
+
   constructor(
     private authService: AuthService,
     private router: Router,
   ) {}
 
   ngOnInit(): void {
+    if(this.authService.isAdmin() && this.authService.isEmployee()){
+      this.isOpen = true
+    }
     this.loadUserInfo()
   }
 
@@ -52,10 +58,28 @@ export class TopNavComponent implements OnInit {
     this.isMenuOpen = false;
   }
 
-  logout(): void {
-    if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
-      this.authService.logout()
-      this.router.navigate(["/login"])
-    }
+  // logout(): void {
+  //   if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+  //     this.authService.logout()
+  //     this.router.navigate(["/login"])
+  //   }
+  // }
+
+  showLogoutConfirmation(): void {
+    this.isLogoutConfirmationVisible = true;
+  }
+
+  confirmLogout(): void {
+    this.isLogoutConfirmationVisible = false;
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  cancelLogout(): void {
+    this.isLogoutConfirmationVisible = false;
+  }
+
+  onRoleSwitch() {
+    this.router.navigate(['app/role-select']);
   }
 }
