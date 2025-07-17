@@ -99,7 +99,7 @@
     </button>
     <button
       class="logout-button"
-      (click)="onLogout()"
+      (click)="showLogoutConfirmation()"
       type="button"
       title="تسجيل الخروج"
     >
@@ -120,6 +120,15 @@
     </button>
   </div>
 
+  <div class="confirmation-box" *ngIf="isLogoutConfirmationVisible">
+    <div class="confirmation-content">
+      <p>هل أنت متأكد من تسجيل الخروج؟</p>
+      <div class="confirmation-actions">
+        <button class="confirm-btn" (click)="confirmLogout()">نعم</button>
+        <button class="cancel-btn" (click)="cancelLogout()">لا</button>
+      </div>
+    </div>
+  </div>
   <!-- <button
     *ngIf="collapsed && !isMobile"
     class="expand-button"

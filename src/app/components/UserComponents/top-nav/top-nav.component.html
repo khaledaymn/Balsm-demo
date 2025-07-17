@@ -60,7 +60,17 @@
         <button class="menu-toggle-btn" (click)="toggleMenu()" title="فتح القائمة" *ngIf="isMobile">
           <span class="material-icons">menu</span>
         </button>
-        <button class="logout-btn" (click)="logout()" title="تسجيل الخروج">
+        <button
+        *ngIf="isOpen"
+      class="role-switch-button"
+      (click)="onRoleSwitch()"
+      type="button"
+      title="تغيير الدور"
+    >
+      <span class="material-icons">sync_alt</span>
+      <span>تغيير الدور</span>
+    </button>
+        <button class="logout-btn" (click)="showLogoutConfirmation()" title="تسجيل الخروج">
           <span class="material-icons">logout</span>
           خروج
         </button>
@@ -103,6 +113,15 @@
     </div>
   </nav>
 
+  <div class="confirmation-box" *ngIf="isLogoutConfirmationVisible">
+    <div class="confirmation-content">
+      <p>هل أنت متأكد من تسجيل الخروج؟</p>
+      <div class="confirmation-actions">
+        <button class="confirm-btn" (click)="confirmLogout()">نعم</button>
+        <button class="cancel-btn" (click)="cancelLogout()">لا</button>
+      </div>
+    </div>
+  </div>
   <div class="attendance-container">
     <!-- Attendance tracker will be included in specific pages -->
   </div>

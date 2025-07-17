@@ -7,9 +7,19 @@ $border-color: #E5E9F2;
 $background-color: #F8F9FC;
 $text-primary: #333333;
 $text-secondary: #666666;
+$sidebar-hover: #f8f9fc;
+$sidebar-text-muted: #666666;
+$role-switch-hover-bg: rgba(111, 66, 193, 0.1);
+$role-switch-hover: #6f42c1;
 $box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 $border-radius: 0.5rem;
 $transition-duration: 0.3s;
+$border-radius: 8px;
+$text-primary: #333333;
+$danger-color: #F44336;
+$background-color: #F8F9FC;
+$transition: all 0.3s ease;
+
 
 .top-nav-container {
   background-color: white;
@@ -34,9 +44,40 @@ $transition-duration: 0.3s;
   .nav-controls {
     display: flex;
     align-items: center;
-    gap: 1rem;
-  }
+    gap: 1.5rem;
 
+   .role-switch-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: $primary-color;
+      color: white;
+      border: none;
+      border-radius: $border-radius;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: $transition;
+      outline: none;
+
+      &:hover {
+        background-color: darken($primary-color, 10%);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+
+      .material-icons {
+        font-size: 1.125rem;
+      }
+    }
+}
+ 
+
+ 
   .menu-toggle-btn {
     display: none;
     background: none;
@@ -166,6 +207,70 @@ $transition-duration: 0.3s;
 
 .attendance-container {
   padding: 0 2rem;
+}
+
+.confirmation-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in-out;
+
+  .confirmation-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: $border-radius;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    animation: scaleIn 0.3s ease-in-out;
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      color: $text-primary;
+    }
+
+    .confirmation-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+
+      button {
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: $border-radius;
+        font-weight: 500;
+        cursor: pointer;
+        transition: $transition;
+
+        &.confirm-btn {
+          background-color: $danger-color;
+          color: white;
+
+          &:hover {
+            background-color: $danger-color;
+          }
+        }
+
+        &.cancel-btn {
+          background-color: $background-color;
+          color: $text-primary;
+
+          &:hover {
+            background-color: $background-color;
+          }
+        }
+      }
+    }
+  }
 }
 
 @media (max-width: 768px) {
