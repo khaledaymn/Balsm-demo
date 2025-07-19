@@ -97,7 +97,6 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.rolesKey);
-    // localStorage.removeItem(this.shiftsKey);
     localStorage.removeItem(this.userIdKey);
     localStorage.removeItem(this.branchNameKey);
     this.isLoggedInSubject.next(false);
