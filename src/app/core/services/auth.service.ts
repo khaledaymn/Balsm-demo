@@ -84,7 +84,7 @@ export class AuthService {
           this.setToken(response.token);
           this.setRoles(response.roles ?? 'User');
           this.setUserId(response.id);
-          this.setShifts(response.shift);
+          // this.setShifts(response.shift);
           this.setBranchName(response.branch);
           this.isLoggedInSubject.next(true);
         }),
@@ -97,7 +97,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.rolesKey);
-    localStorage.removeItem(this.shiftsKey);
+    // localStorage.removeItem(this.shiftsKey);
     localStorage.removeItem(this.userIdKey);
     localStorage.removeItem(this.branchNameKey);
     this.isLoggedInSubject.next(false);

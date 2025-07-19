@@ -3,9 +3,14 @@
   [class.collapsed]="collapsed"
   [class.mobile]="isMobile"
 >
-  <div class="sidebar-header" >
+  <div class="sidebar-header">
     <div class="logo-container">
-      <img src="balsm.png" alt="بلسم" class="logo" [class.logo-collapced]= "collapsed"  />
+      <img
+        src="balsm.png"
+        alt="بلسم"
+        class="logo"
+        [class.logo-collapced]="collapsed"
+      />
       <span class="logo-text" *ngIf="!collapsed || isMobile">بلسم</span>
     </div>
     <button
@@ -79,7 +84,7 @@
     </nav>
   </div>
 
-  <div class="sidebar-footer" *ngIf="true|| isMobile">
+  <div class="sidebar-footer" *ngIf="true || isMobile">
     <div class="user-info">
       <img src="/Profile.png" alt="صورة المستخدم" class="user-avatar" />
       <div class="user-details">

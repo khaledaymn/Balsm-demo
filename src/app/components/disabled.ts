@@ -75,7 +75,7 @@ interface LeaveRequest {
         <h2 class="status-label">الورديات</h2>
         <div *ngFor="let shift of shifts" class="status-checked-in">
           <p>
-            <span class="status-label">الوردية {{ shift.id }}:</span>
+            <span class="status-label">الوردية :</span>
             <span class="status-time"
               >{{ shift.startTime }} - {{ shift.endTime }}</span
             >
@@ -129,7 +129,6 @@ interface LeaveRequest {
         font-family: 'Tajawal', 'Arial', sans-serif;
       }
 
-      /* Variables converted to CSS */
       .attendance-tracker {
         direction: rtl;
         text-align: right;
@@ -492,7 +491,7 @@ interface LeaveRequest {
     `,
   ],
 })
-export class AttendanceLeaveComponent implements OnInit {
+export class AttendanceLeaveComponent2 implements OnInit {
   currentTime: Date = new Date();
   shifts: Shift[] = [];
   isAttendanceEnabled: boolean = false;
@@ -516,6 +515,13 @@ export class AttendanceLeaveComponent implements OnInit {
       this.currentTime = new Date();
       this.checkButtonStatus();
     }, 30000);
+  }
+
+  getFormattedDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   loadBranch() {
@@ -573,7 +579,7 @@ export class AttendanceLeaveComponent implements OnInit {
               localStorage.getItem(`shift_leave_${shift.id}`) === 'true',
           }));
           this.saveShifts();
-          this.statusMessage = 'تم تحميل الورديات بنجاح.';
+          this.statusMessage = 'شكرا لوجودك معنا.';
           this.statusMessageType = 'success';
           this.checkButtonStatus();
         },
@@ -596,7 +602,7 @@ export class AttendanceLeaveComponent implements OnInit {
           hasLeaveTaken:
             localStorage.getItem(`shift_leave_${shift.id}`) === 'true',
         }));
-        const today = new Date().toISOString().split('T')[0];
+        const today = this.getFormattedDate(new Date());
         const storedDate = localStorage.getItem('shiftDate');
         if (storedDate !== today) {
           this.shifts.forEach((shift) => {
@@ -642,20 +648,37 @@ export class AttendanceLeaveComponent implements OnInit {
         shift.hasLeaveTaken.toString()
       );
     });
-    localStorage.setItem('shiftDate', new Date().toISOString().split('T')[0]);
+    localStorage.setItem('shiftDate', this.getFormattedDate(new Date()));
   }
 
   getNextShiftStart(): Date | null {
     const now = this.currentTime;
-    const today = now.toISOString().split('T')[0];
+
     let nextShiftStart: Date | null = null;
 
     for (const shift of this.shifts) {
-      let startDateTime = new Date(`${today}T${shift.startTime}:00`);
-      if (shift.startTime < shift.endTime && startDateTime < now) {
-        startDateTime = new Date(`${today}T${shift.startTime}:00`);
+      let startDateTime = new Date(
+        this.currentTime.getFullYear(),
+        this.currentTime.getMonth(),
+        this.currentTime.getDate(),
+        ...shift.startTime.split(':').map(Number)
+      );
+      console.log(startDateTime, ' startDateTime');
+      let endDateTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        ...shift.endTime.split(':').map(Number)
+      );
+      const isMidnightShift = shift.endTime <= shift.startTime;
+
+      if (isMidnightShift) {
+        endDateTime.setDate(endDateTime.getDate() + 1);
+      }
+      if (startDateTime < now && !isMidnightShift) {
         startDateTime.setDate(startDateTime.getDate() + 1);
       }
+
       if (
         startDateTime > now &&
         (!nextShiftStart || startDateTime < nextShiftStart)
@@ -680,22 +703,35 @@ export class AttendanceLeaveComponent implements OnInit {
     if (this.shifts.length === 0) {
       this.isAttendanceEnabled = false;
       this.isLeaveEnabled = false;
-      this.statusMessage = this.statusMessage || 'لم يتم تعيين ورديات.';
+      this.statusMessage = this.statusMessage || 'يتم تحميل الورديات.';
       this.statusMessageType = 'warning';
       return;
     }
 
     const now = this.currentTime;
-    const today = now.toISOString().split('T')[0];
+    const today = this.getFormattedDate(now);
     let isWithinAnyShift = false;
     let isAfterAnyShiftWithAttendance = false;
     let currentShiftId: number | null = null;
     const nextShiftStart = this.getNextShiftStart();
 
     for (const shift of this.shifts) {
-      let startDateTime = new Date(`${today}T${shift.startTime}:00`);
-      let endDateTime = new Date(`${today}T${shift.endTime}:00`);
-      if (shift.endTime <= shift.startTime) {
+      let startDateTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        ...shift.startTime.split(':').map(Number)
+      );
+
+      let endDateTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        ...shift.endTime.split(':').map(Number)
+      );
+      const isMidnightShift = shift.endTime <= shift.startTime;
+
+      if (isMidnightShift) {
         endDateTime.setDate(endDateTime.getDate() + 1);
       }
 
@@ -804,21 +840,48 @@ export class AttendanceLeaveComponent implements OnInit {
     }
 
     const now = this.currentTime;
-    const today = now.toISOString().split('T')[0];
+
+    const timeToResquest = now;
+    timeToResquest.setHours(now.getHours() + 3);
+
+    const today = this.getFormattedDate(now);
     let selectedShift: Shift | null = null;
 
+    console.log(
+      `Current Time: ${now.toLocaleString('ar-SA', {
+        timeZone: 'Asia/Riyadh',
+      })}`
+    );
+    console.log(`Today: ${today}`);
+
     for (const shift of this.shifts) {
-      let startDateTime = new Date(`${today}T${shift.startTime}:00`);
-      let endDateTime = new Date(`${today}T${shift.endTime}:00`);
-      if (shift.endTime <= shift.startTime) {
+      let startDateTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        ...shift.startTime.split(':').map(Number)
+      );
+      let endDateTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        ...shift.endTime.split(':').map(Number)
+      );
+      const isMidnightShift = shift.endTime <= shift.startTime;
+
+      if (isMidnightShift) {
         endDateTime.setDate(endDateTime.getDate() + 1);
       }
+      console.log(now.toISOString(), 'nowWWWWWWWWWWWWWWWWWWWWWWW');
+      console.log(timeToResquest.toISOString(), 'timeToResquest');
+
       if (
         now >= startDateTime &&
         now <= endDateTime &&
         !shift.hasAttendanceTaken
       ) {
         selectedShift = shift;
+        console.log(`Selected Shift: ${shift.id}`);
         break;
       }
     }
@@ -829,7 +892,7 @@ export class AttendanceLeaveComponent implements OnInit {
     }
 
     const request: AttendanceRequest = {
-      timeOfAttend: now.toISOString(),
+      timeOfAttend: timeToResquest.toISOString(),
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
       employeeId: userId,
@@ -847,7 +910,9 @@ export class AttendanceLeaveComponent implements OnInit {
         localStorage.setItem(`shift_attendance_${selectedShift!.id}`, 'true');
         this.actionMessage = `تم تسجيل الحضور للوردية ${
           selectedShift!.id
-        } في ${now.toLocaleTimeString('ar-EG')}`;
+        } في ${now.toLocaleTimeString('ar-SA', {
+          timeZone: 'Asia/Riyadh',
+        })} جزاكم الله خيرا`;
         this.saveShifts();
         this.checkButtonStatus();
       },
@@ -872,15 +937,27 @@ export class AttendanceLeaveComponent implements OnInit {
     }
 
     const now = this.currentTime;
-    const today = now.toISOString().split('T')[0];
+    now.setHours(now.getHours() + 3);
+
+    const today = this.getFormattedDate(now);
     const nextShiftStart = this.getNextShiftStart();
     let selectedShift: Shift | null = null;
 
     for (const shift of this.shifts) {
-      let endDateTime = new Date(`${today}T${shift.endTime}:00`);
-      if (shift.endTime <= shift.startTime) {
+      let endDateTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        ...shift.endTime.split(':').map(Number)
+      );
+      console.log(now.toISOString(), 'nowfrom leave click');
+
+      const isMidnightShift = shift.endTime <= shift.startTime;
+
+      if (isMidnightShift) {
         endDateTime.setDate(endDateTime.getDate() + 1);
       }
+
       if (
         now > endDateTime &&
         shift.hasAttendanceTaken &&
@@ -896,7 +973,7 @@ export class AttendanceLeaveComponent implements OnInit {
       this.actionMessage = 'لم يتم العثور على وردية صالحة لتسجيل الانصراف.';
       return;
     }
-
+    console.log(now.toISOString(), 'nowfrom leave click');
     const request: LeaveRequest = {
       timeOfLeave: now.toISOString(),
       latitude: position.coords.latitude,
@@ -916,7 +993,9 @@ export class AttendanceLeaveComponent implements OnInit {
         localStorage.setItem(`shift_leave_${selectedShift!.id}`, 'true');
         this.actionMessage = `تم تسجيل الانصراف للوردية ${
           selectedShift!.id
-        } في ${now.toLocaleTimeString('ar-EG')}`;
+        } في ${now.toLocaleTimeString('ar-SA', {
+          timeZone: 'Asia/Riyadh',
+        })} في رعاية الله`;
         this.saveShifts();
         this.checkButtonStatus();
       },

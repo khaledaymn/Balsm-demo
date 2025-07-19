@@ -27,8 +27,8 @@ import { AbsenceReportComponent } from './components/UserComponents/absence-repo
 import { EmployeeVacationsComponent } from './components/UserComponents/employee-vacations/employee-vacations.component';
 import { UserProfileComponent } from './components/UserComponents/user-profile/user-profile.component';
 import { SalaryDetailsComponent } from './components/UserComponents/salary-details/salary-details.component';
-import { AttendanceComponent } from './components/test';
-import { AttendanceLeaveComponent } from './components/disabled';
+import { AttendanceLeaveComponent } from './components/test';
+import { AttendanceLeaveComponent2 } from './components/disabled';
 
 export const appRoutes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
@@ -103,7 +103,7 @@ export const appRoutes: Routes = [
           { path: 'profile', component: UserProfileComponent },
           { path: 'salary', component: SalaryDetailsComponent },
           { path: 'attendance', component: AttendanceTrackerComponent },
-          { path: 'test', component: AttendanceComponent },
+          { path: 'test', component: AttendanceLeaveComponent2 },
           { path: 'attendance-tracker', component: AttendanceLeaveComponent },
         ],
       },

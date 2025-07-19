@@ -1,8 +1,8 @@
 // Modern Color Palette
-$primary: #008D7F;
-$primary-light: #4DB6AC;
-$primary-dark: #00695C;
-$accent-color: #00BCD4;
+$primary: #008d7f;
+$primary-light: #4db6ac;
+$primary-dark: #00695c;
+$accent-color: #00bcd4;
 $secondary: #6b7280;
 $success: #059669;
 $warning: #d97706;
@@ -53,7 +53,7 @@ $transition-slow: 600ms cubic-bezier(0.4, 0, 0.2, 1);
   max-width: 1440px;
   margin: 0 auto;
   padding: 2.5rem;
-  font-family: 'Tajawal', 'Inter', -apple-system, sans-serif;
+  font-family: "Tajawal", "Inter", -apple-system, sans-serif;
   background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
   min-height: 100vh;
 
@@ -120,7 +120,11 @@ $transition-slow: 600ms cubic-bezier(0.4, 0, 0.2, 1);
         &:hover {
           transform: translateY(-3px);
           box-shadow: $shadow-md;
-          background: linear-gradient(135deg, $accent-color 0%, $primary-light 100%);
+          background: linear-gradient(
+            135deg,
+            $accent-color 0%,
+            $primary-light 100%
+          );
         }
 
         &:focus {
@@ -157,7 +161,7 @@ $transition-slow: 600ms cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
 
       &::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -297,7 +301,11 @@ $transition-slow: 600ms cubic-bezier(0.4, 0, 0.2, 1);
             &:hover {
               transform: translateY(-3px);
               box-shadow: $shadow-md;
-              background: linear-gradient(135deg, $accent-color 0%, $primary-light 100%);
+              background: linear-gradient(
+                135deg,
+                $accent-color 0%,
+                $primary-light 100%
+              );
             }
 
             &:focus {
@@ -344,7 +352,7 @@ $transition-slow: 600ms cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       &::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -643,11 +651,19 @@ $transition-slow: 600ms cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       &.employment {
-        --card-gradient: linear-gradient(135deg, $accent-color 0%, $primary-dark 100%);
+        --card-gradient: linear-gradient(
+          135deg,
+          $accent-color 0%,
+          $primary-dark 100%
+        );
       }
 
       &.branch-info {
-        --card-gradient: linear-gradient(135deg, $accent-color 0%, $primary-dark 100%);
+        --card-gradient: linear-gradient(
+          135deg,
+          $accent-color 0%,
+          $primary-dark 100%
+        );
       }
 
       &.shifts {
@@ -658,8 +674,12 @@ $transition-slow: 600ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 // Responsive Design
