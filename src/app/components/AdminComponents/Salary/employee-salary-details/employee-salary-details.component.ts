@@ -1,12 +1,22 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SalaryService } from '../../../../core/services/salary.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { EmployeeSalaryDetails } from '../../../../models/employee-salary.model';
+import {
+  EmployeeSalaryDetails,
+  UpdateSalesPercentageRequest,
+} from '../../../../models/employee-salary.model';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { EmployeeService } from '../../../../core/services/employee.service';
 
 interface Notification {
   type: 'success' | 'error' | 'info';
@@ -21,20 +31,26 @@ interface MonthOption {
 @Component({
   selector: 'app-employee-salary-details',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './employee-salary-details.component.html',
   styleUrls: ['./employee-salary-details.component.scss'],
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(20px)' }),
-        animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
+        animate(
+          '400ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0)' })
+        ),
       ]),
     ]),
     trigger('slideIn', [
       transition(':enter', [
         style({ transform: 'translateX(-100%)', opacity: 0 }),
-        animate('500ms ease-out', style({ transform: 'translateX(0)', opacity: 1 })),
+        animate(
+          '500ms ease-out',
+          style({ transform: 'translateX(0)', opacity: 1 })
+        ),
       ]),
     ]),
   ],
@@ -46,7 +62,24 @@ export class EmployeeSalaryDetailsComponent implements OnInit, OnDestroy {
   selectedMonth = signal<number>(new Date().getMonth() + 1);
   selectedYear = signal<number>(new Date().getFullYear());
   employeeId: string | null = null;
-
+  filterForm = new FormGroup({
+    year: new FormControl<number>(new Date().getFullYear(), {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.min(2000),
+        Validators.max(2100),
+      ],
+    }),
+    month: new FormControl<number>(new Date().getMonth() + 1, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(1), Validators.max(12)],
+    }),
+    salesPercentage: new FormControl<number>(0, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(0)],
+    }),
+  });
   private monthNames = [
     'يناير',
     'فبراير',
@@ -67,6 +100,7 @@ export class EmployeeSalaryDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private salaryService: SalaryService,
+    private userService: EmployeeService,
     private authService: AuthService,
     private router: Router
   ) {}
@@ -81,11 +115,21 @@ export class EmployeeSalaryDetailsComponent implements OnInit, OnDestroy {
     const monthParam = this.route.snapshot.queryParamMap.get('month');
     const yearParam = this.route.snapshot.queryParamMap.get('year');
 
-    if (monthParam) this.selectedMonth.set(+monthParam);
-    if (yearParam) this.selectedYear.set(+yearParam);
+    if (monthParam) {
+      this.selectedMonth.set(+monthParam);
+      this.filterForm.patchValue({ month: +monthParam });
+    }
+    if (yearParam) {
+      this.selectedYear.set(+yearParam);
+      this.filterForm.patchValue({ year: +yearParam });
+    }
 
     if (this.employeeId) {
-      this.loadSalaryDetails(this.employeeId, this.selectedMonth(), this.selectedYear());
+      this.loadSalaryDetails(
+        this.employeeId,
+        this.filterForm.get('month')!.value,
+        this.filterForm.get('year')!.value
+      );
     } else {
       this.showNotification('error', 'لم يتم العثور على معرف الموظف');
       this.isLoading.set(false);
@@ -99,28 +143,78 @@ export class EmployeeSalaryDetailsComponent implements OnInit, OnDestroy {
   loadSalaryDetails(employeeId: string, month: number, year: number): void {
     this.isLoading.set(true);
     this.subscription.add(
-      this.salaryService.getEmployeeSalaryDetails(employeeId, month, year).subscribe({
-        next: (response) => {
-          this.salaryDetails.set({
-            
-            employeeName: response.employeeName || '',
-            baseSalary: response.baseSalary || 0,
-            overTime: response.overTime || 0,
-            overTimeSalary: response.overTimeSalary || 0,
-            lateTime: response.lateTime || 0,
-            lateTimeSalary: response.lateTimeSalary || 0,
-            numberOfAbsentDays: response.numberOfAbsentDays || 0,
-            absentDaysSalary: response.absentDaysSalary || 0,
-            totalSalary: response.totalSalary || 0,
-            month: response.month || month,
-            year: response.year || year,
-          });
-          this.isLoading.set(false);
+      this.salaryService
+        .getEmployeeSalaryDetails(employeeId, month, year)
+        .subscribe({
+          next: (response) => {
+            this.salaryDetails.set({
+              employeeName: response.employeeName || '',
+              baseSalary: response.baseSalary || 0,
+              overTime: response.overTime || 0,
+              overTimeSalary: response.overTimeSalary || 0,
+              lateTime: response.lateTime || 0,
+              lateTimeSalary: response.lateTimeSalary || 0,
+              numberOfAbsentDays: response.numberOfAbsentDays || 0,
+              absentDaysSalary: response.absentDaysSalary || 0,
+              salesPresentage: response.salesPresentage || 0,
+              totalSalary: response.totalSalary || 0,
+              month: response.month || month,
+              year: response.year || year,
+            });
+            this.filterForm.patchValue({
+              salesPercentage: response.salesPresentage || 0,
+            });
+            this.isLoading.set(false);
+          },
+          error: (error) => {
+            console.error('Salary Details Error:', error);
+            this.showNotification(
+              'error',
+              error.message || 'حدث خطأ أثناء تحميل تفاصيل الراتب.'
+            );
+            this.salaryDetails.set(null);
+            this.isLoading.set(false);
+          },
+        })
+    );
+  }
+
+  updateSalesPercentage(): void {
+    if (!this.employeeId || !this.filterForm.valid) {
+      this.showNotification('error', 'يرجى التحقق من البيانات المدخلة');
+      return;
+    }
+
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      this.showNotification('error', 'لم يتم العثور على رمز التوثيق');
+      this.isLoading.set(false);
+      return;
+    }
+    const request: UpdateSalesPercentageRequest = {
+      employeeId: this.employeeId,
+      salesPercentage: this.filterForm.get('salesPercentage')!.value,
+      month: this.filterForm.get('month')!.value,
+      year: this.filterForm.get('year')!.value,
+    };
+    console.log('Update Sales Percentage Request:', request);
+
+    this.isLoading.set(true);
+    this.subscription.add(
+      this.userService.updateSalesPercentage(request).subscribe({
+        next: () => {
+          this.showNotification('success', 'تم تحديث نسبة المبيعات بنجاح');
+          this.loadSalaryDetails(
+            this.employeeId!,
+            this.filterForm.get('month')!.value,
+            this.filterForm.get('year')!.value
+          );
         },
         error: (error) => {
-          console.error('Salary Details Error:', error);
-          this.showNotification('error', error.message || 'حدث خطأ أثناء تحميل تفاصيل الراتب.');
-          this.salaryDetails.set(null);
+          this.showNotification(
+            'error',
+            error.message || 'حدث خطأ أثناء تحديث نسبة المبيعات'
+          );
           this.isLoading.set(false);
         },
       })
@@ -128,8 +222,14 @@ export class EmployeeSalaryDetailsComponent implements OnInit, OnDestroy {
   }
 
   onPeriodChange(): void {
-    if (this.employeeId) {
-      this.loadSalaryDetails(this.employeeId, this.selectedMonth(), this.selectedYear());
+    if (this.employeeId && this.filterForm.valid) {
+      this.selectedMonth.set(this.filterForm.get('month')!.value);
+      this.selectedYear.set(this.filterForm.get('year')!.value);
+      this.loadSalaryDetails(
+        this.employeeId,
+        this.filterForm.get('month')!.value,
+        this.filterForm.get('year')!.value
+      );
     }
   }
 
@@ -202,7 +302,8 @@ export class EmployeeSalaryDetailsComponent implements OnInit, OnDestroy {
 
     if (remainingMinutes > 0) {
       if (result) result += ' و ';
-      result += remainingMinutes === 1 ? 'دقيقة واحدة' : `${remainingMinutes} دقيقة`;
+      result +=
+        remainingMinutes === 1 ? 'دقيقة واحدة' : `${remainingMinutes} دقيقة`;
     }
 
     return result;

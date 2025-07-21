@@ -19,6 +19,7 @@ import {
   editEmployee,
 } from '../../models/employee.model';
 import { Holiday } from '../../models/holiday.model';
+import { UpdateSalesPercentageRequest } from '../../models/employee-salary.model';
 
 // Generic API response interface
 export interface ApiResponse<T> {
@@ -233,6 +234,21 @@ export class EmployeeService {
     );
   }
 
+  updateSalesPercentage(
+    request: UpdateSalesPercentageRequest
+  ): Observable<any> {
+    console.log('Update Sales Percentage Request:', request);
+    return this.http
+      .put(`${this.apiUrl}/users/UpdateSalesPercentage`, request, {
+        headers: this.getHeaders(),
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('Update Sales Percentage Error:', error);
+          return throwError(() => error);
+        })
+      );
+  }
   // Error handling
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Something went wrong; please try again later.';

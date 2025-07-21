@@ -15,11 +15,17 @@ export interface EmployeeSalaryDetails {
   lateTimeSalary: number;
   numberOfAbsentDays: number;
   absentDaysSalary: number;
+  salesPresentage: number;
   totalSalary: number;
   month: number;
   year: number;
 }
-
+export interface UpdateSalesPercentageRequest {
+  employeeId: string;
+  salesPercentage: number;
+  month: number;
+  year: number;
+}
 // export interface EmployeeSalaryResponse {
 //   success: boolean;
 //   data: EmployeeSalary[];
