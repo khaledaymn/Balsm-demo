@@ -493,6 +493,8 @@ export class AttendanceLeaveComponent implements OnInit {
   shifts: Shift[] = [];
   isAttendanceEnabled: boolean = false;
   isLeaveEnabled: boolean = false;
+  isMidShift = false;
+
   statusMessage: string = '';
   statusMessageType: 'success' | 'error' | 'warning' | 'info' = 'info';
   actionMessage: string = '';
@@ -594,8 +596,8 @@ export class AttendanceLeaveComponent implements OnInit {
             };
           });
           this.saveShifts();
-          this.statusMessage = 'شكرا لوجودك معنا.';
           this.statusMessageType = 'success';
+          this.statusMessage = 'شكرا لوجودك معنا.';
           this.checkButtonStatus();
         },
         error: () => {
@@ -711,6 +713,7 @@ export class AttendanceLeaveComponent implements OnInit {
     if (this.shifts.length === 0) {
       this.isAttendanceEnabled = false;
       this.isLeaveEnabled = false;
+      this.isMidShift = false;
       this.statusMessage = this.statusMessage || 'يتم تحميل الورديات.';
       this.statusMessageType = 'warning';
       return;
@@ -723,6 +726,8 @@ export class AttendanceLeaveComponent implements OnInit {
     const nextShiftStart = this.getNextShiftStart();
 
     for (const shift of this.shifts) {
+      this.isMidShift = false;
+
       let startDateTime = new Date(
         now.getFullYear(),
         now.getMonth(),
@@ -735,15 +740,25 @@ export class AttendanceLeaveComponent implements OnInit {
         now.getDate(),
         ...shift.endTime.split(':').map(Number)
       );
+      console.log('is mid shift');
 
       if (this.isMidnightShift(shift.startTime, shift.endTime)) {
+        console.log('is mid shift');
+        this.isMidShift = true;
+        console.log(this.isMidShift);
         endDateTime.setDate(endDateTime.getDate() + 1);
+      } else {
+        this.isMidShift = false;
       }
-
+      console.log(this.isMidShift, 'before if con');
       if (
-        now >= startDateTime &&
-        now <= endDateTime &&
-        !shift.hasAttendanceTaken
+        (!shift.hasLeaveTaken &&
+          this.isMidShift &&
+          now >= startDateTime &&
+          now <= endDateTime) ||
+        (now >= startDateTime &&
+          now <= endDateTime &&
+          !shift.hasAttendanceTaken)
       ) {
         isWithinAnyShift = true;
         isAfterAnyShiftWithAttendance = false;
@@ -751,13 +766,29 @@ export class AttendanceLeaveComponent implements OnInit {
       }
 
       if (
-        now > endDateTime &&
-        shift.hasAttendanceTaken &&
-        !isWithinAnyShift &&
-        !shift.hasLeaveTaken &&
-        (!nextShiftStart || now < nextShiftStart)
+        (!shift.hasLeaveTaken && this.isMidShift) ||
+        (now > endDateTime &&
+          shift.hasAttendanceTaken &&
+          !isWithinAnyShift &&
+          !shift.hasLeaveTaken &&
+          (!nextShiftStart || now < nextShiftStart))
       ) {
         isAfterAnyShiftWithAttendance = true;
+        isWithinAnyShift = false;
+
+        currentShiftId = shift.id;
+      } else {
+        console.log(
+          'check',
+          now,
+          'now',
+          endDateTime,
+          shift.hasAttendanceTaken,
+          'attanen',
+          shift.hasLeaveTaken,
+          'leave',
+          this.isMidShift
+        );
       }
     }
 
@@ -834,6 +865,7 @@ export class AttendanceLeaveComponent implements OnInit {
 
   async onAttendanceClick() {
     const position = await this.checkLocation();
+
     if (!position) return;
 
     const userId = localStorage.getItem('auth_userId');
@@ -869,9 +901,10 @@ export class AttendanceLeaveComponent implements OnInit {
       }
 
       if (
-        now >= startDateTime &&
-        now <= endDateTime &&
-        !shift.hasAttendanceTaken
+        (now >= startDateTime &&
+          now <= endDateTime &&
+          !shift.hasAttendanceTaken) ||
+        this.isMidShift
       ) {
         selectedShift = shift;
         break;
@@ -913,6 +946,7 @@ export class AttendanceLeaveComponent implements OnInit {
           this.actionMessage = 'فشل في تسجيل الحضور. يرجى المحاولة مرة أخرى.';
         },
       });
+    this.currentTime = new Date();
   }
 
   async onLeaveClick() {
@@ -943,14 +977,20 @@ export class AttendanceLeaveComponent implements OnInit {
       );
 
       if (this.isMidnightShift(shift.startTime, shift.endTime)) {
+        selectedShift = shift;
+
         endDateTime.setDate(endDateTime.getDate() + 1);
       }
 
       if (
-        now > endDateTime &&
-        shift.hasAttendanceTaken &&
-        !shift.hasLeaveTaken &&
-        (!nextShiftStart || now < nextShiftStart)
+        (now > endDateTime &&
+          !shift.hasLeaveTaken &&
+          (!nextShiftStart || now < nextShiftStart) &&
+          this.isMidShift) ||
+        (now > endDateTime &&
+          shift.hasAttendanceTaken &&
+          !shift.hasLeaveTaken &&
+          (!nextShiftStart || now < nextShiftStart))
       ) {
         selectedShift = shift;
         break;
@@ -991,5 +1031,6 @@ export class AttendanceLeaveComponent implements OnInit {
         this.actionMessage = 'فشل في تسجيل الانصراف. يرجى المحاولة مرة أخرى.';
       },
     });
+    this.currentTime = new Date();
   }
 }
