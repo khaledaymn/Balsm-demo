@@ -26,7 +26,7 @@ export class AdminSidebarComponent implements OnInit {
   isLogoutConfirmationVisible = false;
 
   navItems: NavItem[] = [
-    { label: 'لوحة القيادة', icon: 'dashboard', route: '/app/admin' },
+    // { label: 'لوحة القيادة', icon: 'dashboard', route: '/app/admin' },
     {
       label: 'الموظفين',
       icon: 'people',
@@ -51,11 +51,11 @@ export class AdminSidebarComponent implements OnInit {
       icon: 'schedule',
       route: '/app/admin/attendance',
       children: [
-        {
-          label: 'سجل الحضور',
-          icon: 'fact_check',
-          route: '/app/admin/attendance/log',
-        },
+        // {
+        //   label: 'سجل الحضور',
+        //   icon: 'fact_check',
+        //   route: '/app/admin/attendance/log',
+        // },
         {
           label: 'التقارير',
           icon: 'bar_chart',
@@ -74,11 +74,11 @@ export class AdminSidebarComponent implements OnInit {
           icon: 'receipt_long',
           route: '/app/admin/payroll/list',
         },
-        {
-          label: 'إعدادات الرواتب',
-          icon: 'settings',
-          route: '/app/admin/payroll/settings',
-        },
+        // {
+        //   label: 'إعدادات الرواتب',
+        //   icon: 'settings',
+        //   route: '/app/admin/payroll/settings',
+        // },
       ],
       expanded: false,
     },

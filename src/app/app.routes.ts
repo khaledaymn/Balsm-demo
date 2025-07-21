@@ -53,8 +53,8 @@ export const appRoutes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['Admin'] },
         children: [
-          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-          { path: 'dashboard', component: AdminDashboardComponent },
+          { path: '', redirectTo: 'employees', pathMatch: 'full' },
+          { path: 'dashboard', component: EmployeeListComponent },
           { path: 'employees', component: EmployeeListComponent },
           { path: 'add-employee', component: AddEmployeeComponent },
           { path: 'edit-employee/:id', component: EditEmployeeComponent },
