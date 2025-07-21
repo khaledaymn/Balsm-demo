@@ -10,13 +10,7 @@ import { catchError, finalize, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { environment } from '../../../../environments/environments';
 import { CommonModule } from '@angular/common';
-// import { environment } from "../../../../../environments/environment"
-
-interface GeneralSettings {
-  numberOfVacationsInYear: number;
-  rateOfExtraAndLateHour: number;
-  numberOfDayWorkingHours: number;
-}
+import { GeneralSettings } from '../../../models/general-settings.model';
 
 @Component({
   selector: 'app-general-settings',
@@ -43,6 +37,7 @@ export class GeneralSettingsComponent implements OnInit {
         null,
         [Validators.required, Validators.min(1), Validators.max(24)],
       ],
+      fridaySalary: [null, [Validators.required, Validators.min(0)]],
     });
   }
 
@@ -69,9 +64,9 @@ export class GeneralSettingsComponent implements OnInit {
           );
           // For demo purposes, set default values if API fails
           this.settingsForm.patchValue({
-            numberOfVacationsInYear: 10,
-            rateOfExtraAndLateHour: 10,
-            numberOfDayWorkingHours: 10,
+            numberOfVacationsInYear: 0,
+            rateOfExtraAndLateHour: 0,
+            numberOfDayWorkingHours: 0,
           });
           return of(null);
         }),
