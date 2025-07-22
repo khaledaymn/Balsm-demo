@@ -7,7 +7,16 @@ $primary-600: #2563eb;
 $primary-700: #1d4ed8;
 $primary-200: #93c5fd;
 $primary-300: #60a5fa;
-
+// Variables (aligned with salary-details.component.scss for consistency)
+$primary-color: #008D7F;
+$primary-light: rgba($primary-color, 0.1);
+$error-color: #F44336;
+$error-light: rgba($error-color, 0.1);
+$info-color: #2196F3; // New color for export button
+$info-light: rgba($info-color, 0.1);
+$border-gray: #E5E9F2;
+$light-gray: #F8F9FC;
+$text-dark: #333333;
 $secondary: #6b7280;
 $secondary-50: #f8fafc;
 $secondary-100: #f1f5f9;
@@ -80,7 +89,8 @@ $shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-
+$box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+$shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
 // Border Radius
 $rounded-sm: 0.125rem;
 $rounded: 0.25rem;
@@ -93,6 +103,7 @@ $rounded-full: 9999px;
 // Transitions
 $transition: all 0.15s ease-in-out;
 $transition-colors: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+$transition-duration: 0.2s;
 
 // Breakpoints
 $sm: 640px;
@@ -107,16 +118,16 @@ $xl: 1280px;
   // max-width: 100%;
   // margin: 0 auto;
   // padding: 0 $space-4;
-  
+
   @media (min-width: $sm) {
     padding: 0 $space-6;
   }
-  
+
   @media (min-width: $lg) {
     max-width: 1200px;
     padding: 0 $space-8;
   }
-  
+
   @media (min-width: $xl) {
     max-width: 1400px;
   }
@@ -142,12 +153,12 @@ $xl: 1280px;
   border: none;
   text-decoration: none;
   font-size: $text-sm;
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
   &:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba($primary, 0.1);
@@ -159,7 +170,7 @@ $xl: 1280px;
   background: $primary;
   color: white;
   padding: $space-3 $space-4;
-  
+
   &:hover:not(:disabled) {
     background: $primary-700;
     transform: translateY(-1px);
@@ -173,7 +184,7 @@ $xl: 1280px;
   color: $gray-700;
   border: 1px solid $gray-300;
   padding: $space-3 $space-4;
-  
+
   &:hover:not(:disabled) {
     background: $gray-50;
     border-color: $gray-400;
@@ -189,13 +200,13 @@ $xl: 1280px;
   font-size: $text-sm;
   background: white;
   transition: $transition-colors;
-  
+
   &:focus {
     outline: none;
     border-color: $primary;
     box-shadow: 0 0 0 3px rgba($primary, 0.1);
   }
-  
+
   &::placeholder {
     color: $gray-400;
   }
@@ -208,11 +219,11 @@ $xl: 1280px;
   direction: rtl;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 1rem;
-  
+
   @media (min-width: $md) {
     padding: 1.5rem;
   }
-  
+
   @include container;
 }
 
@@ -898,27 +909,147 @@ $xl: 1280px;
     align-items: center;
     gap: 0.5rem;
     margin: 0;
+
+    .material-icons {
+      font-size: 1.5rem;
+      color: $primary;
+    }
   }
 
-  .modal-close {
+  .modal-actions {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    border: none;
-    background: rgba($error, 0.1);
-    color: $error;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: all 0.2s;
+    gap: 0.75rem; // Increased gap for better spacing
 
-    &:hover {
-      background: rgba($error, 0.2);
+    .modal-print {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem; // Slightly larger for better click area
+      height: 2.5rem;
+      border: none;
+      border-radius: 0.5rem; // Slightly larger radius for modern look
+      cursor: pointer;
+      transition: all $transition-duration ease;
+      background: linear-gradient(135deg, $primary-light 0%, rgba($primary-color, 0.15) 100%);
+      color: $primary-color;
+      box-shadow: $box-shadow;
+
+      .material-icons {
+        font-size: 1.25rem; // Consistent icon size
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, rgba($primary-color, 0.2) 0%, rgba($primary-color, 0.3) 100%);
+        transform: translateY(-2px); // Subtle lift effect
+        box-shadow: $shadow-medium;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($primary-color, 0.2); // Focus ring for accessibility
+      }
+
+      &:active {
+        transform: translateY(0); // Pressed effect
+        box-shadow: $box-shadow;
+      }
+    }
+
+    .modal-export {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all $transition-duration ease;
+      background: linear-gradient(135deg, $info-light 0%, rgba($info-color, 0.15) 100%);
+      color: $info-color;
+      box-shadow: $box-shadow;
+
+      .material-icons {
+        font-size: 1.25rem;
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, rgba($info-color, 0.2) 0%, rgba($info-color, 0.3) 100%);
+        transform: translateY(-2px);
+        box-shadow: $shadow-medium;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($info-color, 0.2);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: $box-shadow;
+      }
+    }
+
+    .modal-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all $transition-duration ease;
+      background: linear-gradient(135deg, $error-light 0%, rgba($error-color, 0.15) 100%);
+      color: $error-color;
+      box-shadow: $box-shadow;
+
+      .material-icons {
+        font-size: 1.25rem;
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, rgba($error-color, 0.2) 0%, rgba($error-color, 0.3) 100%);
+        transform: translateY(-2px);
+        box-shadow: $shadow-medium;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($error-color, 0.2);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: $box-shadow;
+      }
     }
   }
 }
+@media print {
+  .modal-header {
+    background: #ffffff; // White background for print
+    border-bottom: 1px solid #000000; // Black border for clarity
+    padding: 1rem; // Slightly reduced padding for print
+    display: block; // Stack elements vertically for print
 
+    .modal-title {
+      font-size: 14pt; // Print-friendly font size
+      color: #000000; // Black text for readability
+      font-weight: bold;
+      margin: 0;
+      text-align: center; // Center title for professional look
+
+      .material-icons {
+        display: none; // Hide icon in print
+      }
+    }
+
+    .modal-actions {
+      display: none; // Hide all buttons (print, export, close) in print
+    }
+  }
+}
 .modal-body {
   flex: 1;
   overflow-y: auto;
@@ -1109,13 +1240,17 @@ $xl: 1280px;
   .attendance-container {
     background: white !important;
     padding: 0 !important;
+    height: 100vh !important;
   }
+
 
   .header-actions,
   .filters-section,
   .pagination,
   .notification-overlay,
-  .action-btn {
+  .action-btn,
+  .main-content
+  {
     display: none !important;
   }
 
@@ -1126,5 +1261,8 @@ $xl: 1280px;
   .medium-screen-cards,
   .small-screen-cards {
     display: none !important;
+  }
+  .modal-overlay{
+    height: 100vh !important;
   }
 }

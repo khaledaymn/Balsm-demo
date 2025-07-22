@@ -124,7 +124,11 @@
         <div class="card-content">
           <h3>العمل الإضافي</h3>
           <p class="amount">
-            {{ salaryDetails()!.overTimeSalary | number : "1.2-2" }} ريال
+            {{
+              salaryDetails()!.overTimeSalary + salaryDetails()!.salesPresentage
+                | number : "1.2-2"
+            }}
+            ريال
           </p>
         </div>
       </div>

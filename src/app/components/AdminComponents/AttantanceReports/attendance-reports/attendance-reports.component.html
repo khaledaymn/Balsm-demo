@@ -1,21 +1,21 @@
 <div class="attendance-container" dir="rtl">
   <!-- Notification -->
   @if (notification()) {
-    <div class="notification-overlay">
-      <div class="notification" [class]="'notification-' + notification()!.type">
-        <span class="material-icons notification-icon">
-          {{ getNotificationIcon(notification()!.type) }}
-        </span>
-        <span class="notification-message">{{ notification()!.message }}</span>
-        <button 
-          class="notification-close" 
-          (click)="dismissNotification()"
-          aria-label="إغلاق الإشعار"
-        >
-          <span class="material-icons">close</span>
-        </button>
-      </div>
+  <div class="notification-overlay">
+    <div class="notification" [class]="'notification-' + notification()!.type">
+      <span class="material-icons notification-icon">
+        {{ getNotificationIcon(notification()!.type) }}
+      </span>
+      <span class="notification-message">{{ notification()!.message }}</span>
+      <button
+        class="notification-close"
+        (click)="dismissNotification()"
+        aria-label="إغلاق الإشعار"
+      >
+        <span class="material-icons">close</span>
+      </button>
     </div>
+  </div>
   }
 
   <div class="main-content">
@@ -24,9 +24,9 @@
       <div class="header-content">
         <h1 class="page-title">
           <span class="material-icons">info</span>
-          تقارير الحضور - {{ getMonthLabel(filterForm.value.month!) }} {{ filterForm.value.year }}
+          تقارير الحضور - {{ getMonthLabel(filterForm.value.month!) }}
+          {{ filterForm.value.year }}
         </h1>
-        
       </div>
     </div>
 
@@ -48,7 +48,7 @@
           <label for="month">الشهر</label>
           <select id="month" formControlName="month" class="filter-select">
             @for (month of months; track month.value) {
-              <option [value]="month.value">{{ month.label }}</option>
+            <option [value]="month.value">{{ month.label }}</option>
             }
           </select>
         </div>
@@ -64,11 +64,7 @@
           />
         </div>
         <div class="filter-item">
-          <button
-            type="button"
-            class="reset-btn"
-            (click)="resetFilters()"
-          >
+          <button type="button" class="reset-btn" (click)="resetFilters()">
             إعادة تعيين
           </button>
         </div>
@@ -77,380 +73,449 @@
 
     <!-- Loading State -->
     @if (isLoading()) {
-      <div class="loading-container">
-        <div class="loading-spinner"></div>
-        <p>جاري تحميل تقارير الحضور...</p>
-      </div>
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>جاري تحميل تقارير الحضور...</p>
+    </div>
     }
 
     <!-- Empty State -->
     @if (!isLoading() && filteredReports().length === 0) {
-      <div class="empty-state">
-        <span class="material-icons">person_search</span>
-        <h3>لا توجد تقارير متاحة</h3>
-        <p>لا توجد تقارير حضور متاحة للفترة المحددة</p>
-        <button class="btn-primary" (click)="resetFilters()">
-          إعادة تعيين الفلاتر
-        </button>
-      </div>
+    <div class="empty-state">
+      <span class="material-icons">person_search</span>
+      <h3>لا توجد تقارير متاحة</h3>
+      <p>لا توجد تقارير حضور متاحة للفترة المحددة</p>
+      <button class="btn-primary" (click)="resetFilters()">
+        إعادة تعيين الفلاتر
+      </button>
+    </div>
     }
 
     <!-- Reports Content -->
     @if (!isLoading() && filteredReports().length > 0) {
-      <!-- Large Screen Table -->
-      <div class="large-screen-table">
-        <table class="attendance-table">
-          <thead>
-            <tr>
-              <th>الموظف</th>
-              <th>البريد الإلكتروني</th>
-              <th>ساعات العمل</th>
-              <th>ساعات التأخير</th>
-              <th>أيام الغياب</th>
-              <th>أيام الإجازة</th>
-              <th>ساعات إضافية</th>
-              <th>الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (report of filteredReports(); track report.employeeId) {
-              <tr>
-                <td>{{ report.name }}</td>
-                <td>{{ report.email }}</td>
-                <td>{{ formatHoursAndMinutes(report.numberOfMonthlyWorkingHours) }}</td>
-                <td>
-                  <span class="badge" [class]="report.numberOfLateHours > 2 ? 'badge-danger' : 'badge-success'">
-                    {{ formatHoursAndMinutes(report.numberOfLateHours) }}
-                  </span>
-                </td>
-                <td>
-                  <span class="badge" [class]="report.numberOfAbsentDays > 1 ? 'badge-danger' : 'badge-success'">
-                    {{ formatDaysAndHours(report.numberOfAbsentDays) }}
-                  </span>
-                </td>
-                <td>{{ formatDaysAndHours(report.numberOfVacationDays) }}</td>
-                <td>
-                  <span class="badge" [class]="report.numberOfOverTime > 10 ? 'badge-success' : 'badge-secondary'">
-                    {{ formatHoursAndMinutes(report.numberOfOverTime) }}
-                  </span>
-                </td>
-                <td class="actions-cell">
-                  <button
-                    class="action-btn view-btn"
-                    (click)="loadEmployeeAttendance(report.employeeId )"
-                    title="عرض"
-                  >
-                    <span class="material-icons">visibility</span>
-                  </button>
-                  <button
-                    class="action-btn vacation-btn"
-                    (click)="showVacations(report.employeeId)"
-                    title="الإجازات"
-                  >
-                    <span class="material-icons">beach_access</span>
-                  </button>
-                  <button
-                    class="action-btn absence-btn"
-                    (click)="showAbsenceReport(report.employeeId)"
-                    title="الغياب"
-                  >
-                    <span class="material-icons">event_busy</span>
-                  </button>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+    <!-- Large Screen Table -->
+    <div class="large-screen-table">
+      <table class="attendance-table">
+        <thead>
+          <tr>
+            <th>الموظف</th>
+            <th>البريد الإلكتروني</th>
+            <th>ساعات العمل</th>
+            <th>ساعات التأخير</th>
+            <th>أيام الغياب</th>
+            <th>أيام الإجازة</th>
+            <th>ساعات إضافية</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (report of filteredReports(); track report.employeeId) {
+          <tr>
+            <td>{{ report.name }}</td>
+            <td>{{ report.email }}</td>
+            <td>
+              {{ formatHoursAndMinutes(report.numberOfMonthlyWorkingHours) }}
+            </td>
+            <td>
+              <span
+                class="badge"
+                [class]="
+                  report.numberOfLateHours > 2
+                    ? 'badge-danger'
+                    : 'badge-success'
+                "
+              >
+                {{ formatHoursAndMinutes(report.numberOfLateHours) }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="badge"
+                [class]="
+                  report.numberOfAbsentDays > 1
+                    ? 'badge-danger'
+                    : 'badge-success'
+                "
+              >
+                {{ formatDaysAndHours(report.numberOfAbsentDays) }}
+              </span>
+            </td>
+            <td>{{ formatDaysAndHours(report.numberOfVacationDays) }}</td>
+            <td>
+              <span
+                class="badge"
+                [class]="
+                  report.numberOfOverTime > 10
+                    ? 'badge-success'
+                    : 'badge-secondary'
+                "
+              >
+                {{ formatHoursAndMinutes(report.numberOfOverTime) }}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <button
+                class="action-btn view-btn"
+                (click)="loadEmployeeAttendance(report.employeeId)"
+                title="عرض"
+              >
+                <span class="material-icons">visibility</span>
+              </button>
+              <button
+                class="action-btn vacation-btn"
+                (click)="showVacations(report.employeeId)"
+                title="الإجازات"
+              >
+                <span class="material-icons">beach_access</span>
+              </button>
+              <button
+                class="action-btn absence-btn"
+                (click)="showAbsenceReport(report.employeeId)"
+                title="الغياب"
+              >
+                <span class="material-icons">event_busy</span>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 
-      <!-- Medium Screen Cards -->
-      <div class="medium-screen-cards">
-        @for (report of filteredReports(); track report.employeeId) {
-          <div class="medium-card">
-            <div class="card-header">
-              <div class="employee-info">
-                <h3>{{ report.name }}</h3>
-                <p>{{ report.email }}</p>
-              </div>
-              <div class="card-actions">
-                <button
-                  class="action-btn view-btn"
-                  (click)="loadEmployeeAttendance(report.employeeId )"
-                >
-                  <span class="material-icons">visibility</span>
-                </button>
-                <button
-                  class="action-btn vacation-btn"
-                  (click)="showVacations(report.employeeId)"
-                >
-                  <span class="material-icons">beach_access</span>
-                </button>
-                <button
-                  class="action-btn absence-btn"
-                  (click)="showAbsenceReport(report.employeeId)"
-                >
-                  <span class="material-icons">event_busy</span>
-                </button>
-              </div>
+    <!-- Medium Screen Cards -->
+    <div class="medium-screen-cards">
+      @for (report of filteredReports(); track report.employeeId) {
+      <div class="medium-card">
+        <div class="card-header">
+          <div class="employee-info">
+            <h3>{{ report.name }}</h3>
+            <p>{{ report.email }}</p>
+          </div>
+          <div class="card-actions">
+            <button
+              class="action-btn view-btn"
+              (click)="loadEmployeeAttendance(report.employeeId)"
+            >
+              <span class="material-icons">visibility</span>
+            </button>
+            <button
+              class="action-btn vacation-btn"
+              (click)="showVacations(report.employeeId)"
+            >
+              <span class="material-icons">beach_access</span>
+            </button>
+            <button
+              class="action-btn absence-btn"
+              (click)="showAbsenceReport(report.employeeId)"
+            >
+              <span class="material-icons">event_busy</span>
+            </button>
+          </div>
+        </div>
+        <div class="card-stats">
+          <div class="stat-row">
+            <span class="stat-label">ساعات العمل:</span>
+            <span class="stat-value">{{
+              formatHoursAndMinutes(report.numberOfMonthlyWorkingHours)
+            }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">ساعات التأخير:</span>
+            <span
+              class="badge"
+              [class]="
+                report.numberOfLateHours > 2 ? 'badge-danger' : 'badge-success'
+              "
+            >
+              {{ formatHoursAndMinutes(report.numberOfLateHours) }}
+            </span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">أيام الغياب:</span>
+            <span
+              class="badge"
+              [class]="
+                report.numberOfAbsentDays > 1 ? 'badge-danger' : 'badge-success'
+              "
+            >
+              {{ formatDaysAndHours(report.numberOfAbsentDays) }}
+            </span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">أيام الإجازة:</span>
+            <span class="stat-value">{{
+              formatDaysAndHours(report.numberOfVacationDays)
+            }}</span>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Small Screen Cards -->
+    <div class="small-screen-cards">
+      @for (report of filteredReports(); track report.employeeId) {
+      <div class="small-card">
+        <div class="card-header">
+          <div class="employee-info">
+            <h3>{{ report.name }}</h3>
+            <p>{{ report.email }}</p>
+          </div>
+          <div class="card-actions">
+            <button
+              class="action-btn view-btn"
+              (click)="loadEmployeeAttendance(report.employeeId)"
+            >
+              <span class="material-icons">visibility</span>
+            </button>
+            <button
+              class="action-btn vacation-btn"
+              (click)="showVacations(report.employeeId)"
+            >
+              <span class="material-icons">beach_access</span>
+            </button>
+            <button
+              class="action-btn absence-btn"
+              (click)="showAbsenceReport(report.employeeId)"
+            >
+              <span class="material-icons">event_busy</span>
+            </button>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="stat-grid">
+            <div class="stat-item">
+              <span class="stat-label">ساعات العمل:</span>
+              <span class="stat-value">{{
+                formatHoursAndMinutes(report.numberOfMonthlyWorkingHours)
+              }}</span>
             </div>
-            <div class="card-stats">
-              <div class="stat-row">
-                <span class="stat-label">ساعات العمل:</span>
-                <span class="stat-value">{{ formatHoursAndMinutes(report.numberOfMonthlyWorkingHours) }}</span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">ساعات التأخير:</span>
-                <span class="badge" [class]="report.numberOfLateHours > 2 ? 'badge-danger' : 'badge-success'">
-                  {{ formatHoursAndMinutes(report.numberOfLateHours) }}
-                </span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">أيام الغياب:</span>
-                <span class="badge" [class]="report.numberOfAbsentDays > 1 ? 'badge-danger' : 'badge-success'">
-                  {{ formatDaysAndHours(report.numberOfAbsentDays) }}
-                </span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">أيام الإجازة:</span>
-                <span class="stat-value">{{ formatDaysAndHours(report.numberOfVacationDays) }}</span>
-              </div>
+            <div class="stat-item">
+              <span class="stat-label">ساعات التأخير:</span>
+              <span
+                class="badge"
+                [class]="
+                  report.numberOfLateHours > 2
+                    ? 'badge-danger'
+                    : 'badge-success'
+                "
+              >
+                {{ formatHoursAndMinutes(report.numberOfLateHours) }}
+              </span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">أيام الغياب:</span>
+              <span
+                class="badge"
+                [class]="
+                  report.numberOfAbsentDays > 1
+                    ? 'badge-danger'
+                    : 'badge-success'
+                "
+              >
+                {{ formatDaysAndHours(report.numberOfAbsentDays) }}
+              </span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">أيام الإجازة:</span>
+              <span class="stat-value">{{
+                formatDaysAndHours(report.numberOfVacationDays)
+              }}</span>
             </div>
           </div>
-        }
+        </div>
       </div>
+      }
+    </div>
 
-      <!-- Small Screen Cards -->
-      <div class="small-screen-cards">
-        @for (report of filteredReports(); track report.employeeId) {
-          <div class="small-card">
-            <div class="card-header">
-              <div class="employee-info">
-                <h3>{{ report.name }}</h3>
-                <p>{{ report.email }}</p>
-              </div>
-              <div class="card-actions">
-                <button
-                  class="action-btn view-btn"
-                  (click)="loadEmployeeAttendance(report.employeeId )"
-                >
-                  <span class="material-icons">visibility</span>
-                </button>
-                <button
-                  class="action-btn vacation-btn"
-                  (click)="showVacations(report.employeeId)"
-                >
-                  <span class="material-icons">beach_access</span>
-                </button>
-                <button
-                  class="action-btn absence-btn"
-                  (click)="showAbsenceReport(report.employeeId)"
-                >
-                  <span class="material-icons">event_busy</span>
-                </button>
-              </div>
-            </div>
-            <div class="card-content">
-              <div class="stat-grid">
-                <div class="stat-item">
-                  <span class="stat-label">ساعات العمل:</span>
-                  <span class="stat-value">{{ formatHoursAndMinutes(report.numberOfMonthlyWorkingHours) }}</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">ساعات التأخير:</span>
-                  <span class="badge" [class]="report.numberOfLateHours > 2 ? 'badge-danger' : 'badge-success'">
-                    {{ formatHoursAndMinutes(report.numberOfLateHours) }}
-                  </span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">أيام الغياب:</span>
-                  <span class="badge" [class]="report.numberOfAbsentDays > 1 ? 'badge-danger' : 'badge-success'">
-                    {{ formatDaysAndHours(report.numberOfAbsentDays) }}
-                  </span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-label">أيام الإجازة:</span>
-                  <span class="stat-value">{{ formatDaysAndHours(report.numberOfVacationDays) }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-
-      <!-- Pagination -->
-      <div class="pagination">
-        <button
-          class="pagination-btn"
-          [disabled]="pageNumber() === 1"
-          (click)="changePage(pageNumber() - 1)"
-        >
-          السابق
-        </button>
-        <span class="page-info">الصفحة {{ pageNumber() }}</span>
-        <button
-          class="pagination-btn"
-          [disabled]="filteredReports().length < pageSize()"
-          (click)="changePage(pageNumber() + 1)"
-        >
-          التالي
-        </button>
-      </div>
+    <!-- Pagination -->
+    <div class="pagination">
+      <button
+        class="pagination-btn"
+        [disabled]="pageNumber() === 1"
+        (click)="changePage(pageNumber() - 1)"
+      >
+        السابق
+      </button>
+      <span class="page-info">الصفحة {{ pageNumber() }}</span>
+      <button
+        class="pagination-btn"
+        [disabled]="filteredReports().length < pageSize()"
+        (click)="changePage(pageNumber() + 1)"
+      >
+        التالي
+      </button>
+    </div>
     }
   </div>
 
   <!-- Employee Attendance Modal -->
   @if (showEmployeeModal()) {
-    <div class="modal-overlay" (click)="closeEmployeeModal()">
-      <div class="modal-content large-modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2 class="modal-title">
-            <span class="material-icons">person</span>
-            تفاصيل حضور {{ selectedEmployeeName() }}
-          </h2>
+  <div class="modal-overlay" (click)="closeEmployeeModal()">
+    <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span class="material-icons">person</span>
+          تفاصيل حضور {{ selectedEmployeeName() }}
+        </h2>
+        <div class="modal-actions">
+          <button class="modal-print" (click)="printEmployeeAttendance()">
+            <span class="material-icons">print</span>
+          </button>
+          <button class="modal-export" (click)="exportToExcel()">
+            <span class="material-icons">file_download</span>
+          </button>
           <button class="modal-close" (click)="closeEmployeeModal()">
             <span class="material-icons">close</span>
           </button>
         </div>
+      </div>
 
-        <div class="modal-body">
-          <!-- Employee Filters -->
-          <div class="modal-filters">
-            <form [formGroup]="employeeFilterForm">
-              <div class="filter-row">
-                <!-- <div class="filter-item">
-                  <label for="reportType">نوع التقرير</label>
-                  <select id="reportType" formControlName="reportType" class="filter-select">
-                    <option value="0">تقرير يومي</option>
-                    <option value="1">تقرير شهري</option>
-                  </select>
-                </div> -->
-
-                @if (employeeFilterForm.controls.reportType.value === 0) {
-                  <div class="filter-item">
-                    <label for="dayDate">التاريخ</label>
-                    <input
-                      type="date"
-                      id="dayDate"
-                      formControlName="dayDate"
-                      class="filter-input"
-                    />
-                  </div>
-                } @else {
-                  <div class="filter-item">
-                    <label for="fromDate">من تاريخ</label>
-                    <input
-                      type="date"
-                      id="fromDate"
-                      formControlName="fromDate"
-                      class="filter-input"
-                    />
-                  </div>
-                  <div class="filter-item">
-                    <label for="toDate">إلى تاريخ</label>
-                    <input
-                      type="date"
-                      id="toDate"
-                      formControlName="toDate"
-                      class="filter-input"
-                    />
-                  </div>
-                }
+      <div class="modal-body">
+        <!-- Employee Filters -->
+        <div class="modal-filters">
+          <form [formGroup]="employeeFilterForm">
+            <div class="filter-row">
+              @if (employeeFilterForm.controls.reportType.value === 0) {
+              <div class="filter-item">
+                <label for="dayDate">التاريخ</label>
+                <input
+                  type="date"
+                  id="dayDate"
+                  formControlName="dayDate"
+                  class="filter-input"
+                />
               </div>
-            </form>
-          </div>
-
-          <!-- Employee Attendance Data -->
-          @if (employeeAttendance().length > 0) {
-            <div class="attendance-data">
-              <h3>سجل الحضور والانصراف</h3>
-              <div class="attendance-table-container">
-                <table class="attendance-detail-table">
-                  <thead>
-                    <tr>
-                      <th>التاريخ</th>
-                      <th>وقت الحضور</th>
-                      <th>وقت المغادرة</th>
-                      <th>الفرع</th>
-                      <th>ساعات إضافية</th>
-                      <th>ساعات التأخير</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (record of employeeAttendance(); track record.date) {
-                      <tr>
-                        <td>{{ record.date |date}}</td>
-                        <td>{{ record.timeOfAttend }}</td>
-                        <td>{{ record.timeOfLeave }}</td>
-                        <td>{{ record.branchName }}</td>
-                        <td>
-                          <span class="badge" [class]="record.numberOfOverTime > 0 ? 'badge-success' : 'badge-secondary'">
-                            {{ formatHoursAndMinutes(record.numberOfOverTime) }}
-                          </span>
-                        </td>
-                        <td>
-                          <span class="badge" [class]="record.numberOfLateHour > 0 ? 'badge-danger' : 'badge-success'">
-                            {{ formatHoursAndMinutes(record.numberOfLateHour) }}
-                          </span>
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
+              } @else {
+              <div class="filter-item">
+                <label for="fromDate">من تاريخ</label>
+                <input
+                  type="date"
+                  id="fromDate"
+                  formControlName="fromDate"
+                  class="filter-input"
+                />
               </div>
+              <div class="filter-item">
+                <label for="toDate">إلى تاريخ</label>
+                <input
+                  type="date"
+                  id="toDate"
+                  formControlName="toDate"
+                  class="filter-input"
+                />
+              </div>
+              }
             </div>
-          } @else {
-            <div class="empty-state">
-              <span class="material-icons">event_note</span>
-              <h3>لا توجد سجلات حضور</h3>
-              <p>لا توجد سجلات حضور متاحة للفترة المحددة</p>
-            </div>
-          }
+          </form>
         </div>
+
+        <!-- Employee Attendance Data -->
+        @if (employeeAttendance().length > 0) {
+        <div class="attendance-data">
+          <h3>سجل الحضور والانصراف</h3>
+          <div class="attendance-table-container">
+            <table class="attendance-detail-table">
+              <thead>
+                <tr>
+                  <th>التاريخ</th>
+                  <th>وقت الحضور</th>
+                  <th>وقت المغادرة</th>
+                  <th>الفرع</th>
+                  <th>ساعات إضافية</th>
+                  <th>ساعات التأخير</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (record of employeeAttendance(); track record.date) {
+                <tr>
+                  <td>{{ record.date | date }}</td>
+                  <td>{{ record.timeOfAttend }}</td>
+                  <td>{{ record.timeOfLeave }}</td>
+                  <td>{{ record.branchName }}</td>
+                  <td>
+                    <span
+                      class="badge"
+                      [class]="
+                        record.numberOfOverTime > 0
+                          ? 'badge-success'
+                          : 'badge-secondary'
+                      "
+                    >
+                      {{ formatHoursAndMinutes(record.numberOfOverTime) }}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      class="badge"
+                      [class]="
+                        record.numberOfLateHour > 0
+                          ? 'badge-danger'
+                          : 'badge-success'
+                      "
+                    >
+                      {{ formatHoursAndMinutes(record.numberOfLateHour) }}
+                    </span>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        } @else {
+        <div class="empty-state">
+          <span class="material-icons">event_note</span>
+          <h3>لا توجد سجلات حضور</h3>
+          <p>لا توجد سجلات حضور متاحة للفترة المحددة</p>
+        </div>
+        }
       </div>
     </div>
+  </div>
   }
 
   <!-- Vacations Modal -->
   @if (showVacationsModal()) {
-    <div class="modal-overlay" (click)="closeVacationsModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2 class="modal-title">
-            <span class="material-icons">beach_access</span>
-            تقرير الإجازات
-          </h2>
-          <button class="modal-close" (click)="closeVacationsModal()">
-            <span class="material-icons">close</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <app-employee-vacations
-            [employeeId]="selectedEmployeeId()!"
-          ></app-employee-vacations>
-        </div>
+  <div class="modal-overlay" (click)="closeVacationsModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span class="material-icons">beach_access</span>
+          تقرير الإجازات
+        </h2>
+        <button class="modal-close" (click)="closeVacationsModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <app-employee-vacations
+          [employeeId]="selectedEmployeeId()!"
+        ></app-employee-vacations>
       </div>
     </div>
+  </div>
   }
 
   <!-- Absence Modal -->
   @if (showAbsenceModal()) {
-    <div class="modal-overlay" (click)="closeAbsenceModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2 class="modal-title">
-            <span class="material-icons">event_busy</span>
-            تقرير الغياب
-          </h2>
-          <button class="modal-close" (click)="closeAbsenceModal()">
-            <span class="material-icons">close</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <app-absence-report
-            [employeeId]="selectedEmployeeId()!"
-          ></app-absence-report>
-        </div>
+  <div class="modal-overlay" (click)="closeAbsenceModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span class="material-icons">event_busy</span>
+          تقرير الغياب
+        </h2>
+        <button class="modal-close" (click)="closeAbsenceModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <app-absence-report
+          [employeeId]="selectedEmployeeId()!"
+        ></app-absence-report>
       </div>
     </div>
+  </div>
   }
 </div>
