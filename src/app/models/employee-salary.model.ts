@@ -15,7 +15,8 @@ export interface EmployeeSalaryDetails {
   lateTimeSalary: number;
   numberOfAbsentDays: number;
   absentDaysSalary: number;
-  salesPresentage: number;
+  salesPercentage: number;
+  fridaySalary: number; // Optional, if not applicable
   totalSalary: number;
   month: number;
   year: number;
@@ -23,6 +24,7 @@ export interface EmployeeSalaryDetails {
 export interface UpdateSalesPercentageRequest {
   employeeId: string;
   salesPercentage: number;
+  fridaySalary: number; // Optional, if not applicable
   month: number;
   year: number;
 }

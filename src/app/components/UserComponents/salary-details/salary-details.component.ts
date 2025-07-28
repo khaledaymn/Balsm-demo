@@ -122,7 +122,8 @@ export class SalaryDetailsComponent implements OnInit, OnDestroy {
               lateTimeSalary: response.lateTimeSalary || 0,
               numberOfAbsentDays: response.numberOfAbsentDays || 0,
               absentDaysSalary: response.absentDaysSalary || 0,
-              salesPresentage: response.salesPresentage || 0, // Fixed typo: salesPresentage -> salesPercentage
+              salesPercentage: response.salesPercentage || 0, // Fixed typo: salesPresentage -> salesPercentage
+              fridaySalary: response.fridaySalary || 0, // Optional, if not applicable
               totalSalary: response.totalSalary || 0,
               month: response.month || month,
               year: response.year || year,

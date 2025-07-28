@@ -37,7 +37,6 @@ export class GeneralSettingsComponent implements OnInit {
         null,
         [Validators.required, Validators.min(1), Validators.max(24)],
       ],
-      fridaySalary: [null, [Validators.required, Validators.min(0)]],
     });
   }
 

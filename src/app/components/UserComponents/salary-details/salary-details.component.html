@@ -125,8 +125,10 @@
           <h3>العمل الإضافي</h3>
           <p class="amount">
             {{
-              salaryDetails()!.overTimeSalary + salaryDetails()!.salesPresentage
-                | number : "1.2-2"
+              salaryDetails()!.totalSalary -
+                salaryDetails()!.baseSalary +
+                salaryDetails()!.lateTimeSalary +
+                salaryDetails()!.absentDaysSalary | number : "1.2-2"
             }}
             ريال
           </p>
@@ -207,7 +209,33 @@
             <div class="info-details">
               <span class="label">نسبة المبيعات</span>
               <span class="value positive">
-                {{ salaryDetails()!.salesPresentage | number : "1.2-2" }} ريال
+                {{ salaryDetails()!.salesPercentage | number : "1.2-2" }} ريال
+              </span>
+            </div>
+          </div>
+          <div class="info-item">
+            <span class="material-icons">percent</span>
+            <div class="info-details">
+              <span class="label">سعر عمل يوم الجمعة </span>
+              <span class="value">
+                {{ salaryDetails()!.fridaySalary | number : "1.2-2" }} ريال
+              </span>
+            </div>
+          </div>
+          <div class="info-item">
+            <span class="material-icons">percent</span>
+            <div class="info-details">
+              <span class="label">راتب يوم الجمعة </span>
+              <span class="value positive">
+                {{
+                  salaryDetails()!.totalSalary -
+                    salaryDetails()!.baseSalary +
+                    salaryDetails()!.lateTimeSalary +
+                    salaryDetails()!.absentDaysSalary -
+                    salaryDetails()!.overTimeSalary -
+                    salaryDetails()!.salesPercentage | number : "1.2-2"
+                }}
+                ريال
               </span>
             </div>
           </div>

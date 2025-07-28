@@ -68,24 +68,7 @@
           يجب أن تكون القيمة 365 أو أقل
         </div>
       </div>
-      <div class="form-group">
-        <label for="fridaySalary">سعر عمل يوم الجمعة</label>
-        <div class="input-container">
-          <input
-            type="number"
-            id="fridaySalary"
-            formControlName="fridaySalary"
-            min="0"
-          />
-          <div class="unit">ريال</div>
-        </div>
-        <div class="error-text" *ngIf="hasError('fridaySalary', 'required')">
-          هذا الحقل مطلوب
-        </div>
-        <div class="error-text" *ngIf="hasError('fridaySalary', 'min')">
-          يجب أن تكون القيمة 0 أو أكثر
-        </div>
-      </div>
+
 
       <div class="form-group">
         <label for="extraRate">معدل ساعات العمل الإضافية والتأخير</label>

@@ -125,7 +125,7 @@
           <h3>العمل الإضافي</h3>
           <p class="amount">
             {{
-              salaryDetails()!.overTimeSalary + salaryDetails()!.salesPresentage
+              salaryDetails()!.overTimeSalary + salaryDetails()!.salesPercentage
                 | number : "1.2-2"
             }}
             ريال
@@ -207,7 +207,7 @@
             <div class="info-details">
               <span class="label">نسبة المبيعات</span>
               <span class="value positive">
-                {{ salaryDetails()!.salesPresentage | number : "1.2-2" }} ريال
+                {{ salaryDetails()!.salesPercentage | number : "1.2-2" }} ريال
               </span>
             </div>
           </div>
@@ -232,6 +232,43 @@
                   class="update-btn"
                   (click)="updateSalesPercentage()"
                   [disabled]="!filterForm.controls.salesPercentage.valid"
+                >
+                  <span class="material-icons">save</span>
+                  تحديث
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="info-item">
+            <span class="material-icons">percent</span>
+            <div class="info-details">
+              <span class="label">يوم الجمعة</span>
+              <span class="value positive">
+                {{ salaryDetails()!.fridaySalary | number : "1.2-2" }} ريال
+              </span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <span class="material-icons">edit</span>
+            <div class="info-details">
+              <span class="label">تحديث سعر يوم الجمعة</span>
+              <form
+                class="update-sales"
+                [formGroup]="filterForm"
+                (ngSubmit)="updateSalesPercentage()"
+              >
+                <input
+                  type="number"
+                  formControlName="fridaySalary"
+                  min="0"
+                  class="form-control"
+                  aria-label="نسبة المبيعات"
+                />
+                <button
+                  class="update-btn"
+                  (click)="updateSalesPercentage()"
+                  [disabled]="!filterForm.controls.fridaySalary.valid"
                 >
                   <span class="material-icons">save</span>
                   تحديث

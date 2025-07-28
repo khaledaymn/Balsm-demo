@@ -79,6 +79,10 @@ export class EmployeeSalaryDetailsComponent implements OnInit, OnDestroy {
       nonNullable: true,
       validators: [Validators.required, Validators.min(0)],
     }),
+    fridaySalary: new FormControl<number>(0, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(0)],
+    }),
   });
   private monthNames = [
     'يناير',
@@ -156,13 +160,17 @@ export class EmployeeSalaryDetailsComponent implements OnInit, OnDestroy {
               lateTimeSalary: response.lateTimeSalary || 0,
               numberOfAbsentDays: response.numberOfAbsentDays || 0,
               absentDaysSalary: response.absentDaysSalary || 0,
-              salesPresentage: response.salesPresentage || 0,
+              salesPercentage: response.salesPercentage || 0,
+              fridaySalary: response.fridaySalary || 0, // Optional, if not applicable
               totalSalary: response.totalSalary || 0,
               month: response.month || month,
               year: response.year || year,
             });
             this.filterForm.patchValue({
-              salesPercentage: response.salesPresentage || 0,
+              salesPercentage: response.salesPercentage || 0,
+            });
+            this.filterForm.patchValue({
+              fridaySalary: response.fridaySalary || 0,
             });
             this.isLoading.set(false);
           },
@@ -194,6 +202,7 @@ export class EmployeeSalaryDetailsComponent implements OnInit, OnDestroy {
     const request: UpdateSalesPercentageRequest = {
       employeeId: this.employeeId,
       salesPercentage: this.filterForm.get('salesPercentage')!.value,
+      fridaySalary: this.filterForm.get('fridaySalary')!.value,
       month: this.filterForm.get('month')!.value,
       year: this.filterForm.get('year')!.value,
     };
@@ -203,7 +212,7 @@ export class EmployeeSalaryDetailsComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.userService.updateSalesPercentage(request).subscribe({
         next: () => {
-          this.showNotification('success', 'تم تحديث نسبة المبيعات بنجاح');
+          this.showNotification('success', 'تم تحديث بنجاح');
           this.loadSalaryDetails(
             this.employeeId!,
             this.filterForm.get('month')!.value,
