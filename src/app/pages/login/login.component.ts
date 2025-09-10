@@ -27,9 +27,9 @@ interface LoginForm {
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
-  let password ="P@ssword123"
-  let email ="admin@gmail.com"
-  let contactemail ="mariamelgazzar42@gmail.com"
+  password ="P@ssword123"
+  email ="admin@gmail.com"
+  contactemail ="mariamelgazzar42@gmail.com"
   loginForm: FormGroup<LoginForm>;
   showPassword = signal(false);
   isLoading = signal(false);
