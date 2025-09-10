@@ -10,7 +10,7 @@
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <div class="form-group">
-        <label for="email">البريد الإلكتروني</label>
+        <label for="email">admin@gmail.com:البريد الإلكتروني</label>
         <input
           type="email"
           id="email"
@@ -32,7 +32,7 @@
       </div>
 
       <div class="form-group">
-        <label for="password">كلمة المرور</label>
+        <label for="password"> P@ssword123:كلمة المرور</label>
         <div class="password-input-container">
           <input
             [type]="showPassword() ? 'text' : 'password'"
@@ -87,7 +87,7 @@
 
     <div class="login-footer">
       <p>
-        ليس لديك حساب؟ <a routerLink="/contact-admin">اتصل بمسؤول النظام</a>
+        ليس لديك حساب؟ <a href="mailto:mariamelgazzar42@gmail.com">اتصل بمسؤول النظام</a>
       </p>
     </div>
   </div>
