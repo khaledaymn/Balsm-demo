@@ -921,7 +921,7 @@ export class AttendanceLeaveComponent implements OnInit {
 
     if (!selectedShift) {
       this.actionMessage = 'لم يتم العثور على وردية صالحة لتسجيل الحضور.';
-      return;
+      //return;
     }
     console.log(timeToRequest.toISOString());
     const request: AttendanceRequest = {
