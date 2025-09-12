@@ -102,8 +102,6 @@ export const appRoutes: Routes = [
           { path: 'vacations', component: EmployeeVacationsComponent },
           { path: 'profile', component: UserProfileComponent },
           { path: 'salary', component: SalaryDetailsComponent },
-          { path: 'attendance', component: AttendanceTrackerComponent },
-          { path: 'test', component: AttendanceLeaveComponent2 },
           { path: 'attendance-tracker', component: AttendanceLeaveComponent },
         ],
       },
