@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../core/services/auth.service';
-import { environment } from '../../environments/environments';
 
 interface Shift {
   id: number;
@@ -500,10 +499,10 @@ export class AttendanceLeaveComponent implements OnInit {
   statusMessageType: 'success' | 'error' | 'warning' | 'info' = 'info';
   actionMessage: string = '';
   branch: Branch | null = null;
-  private apiUrl = environment.apiUrl;
-  private shiftApiUrl = ${this.apiUrl}/Shifts/GetByEmployeeId;
-  private attendanceApiUrl = ${this.apiUrl}/Attendance/TakeAttendance;
-  private leaveApiUrl = ${this.apiUrl}/Attendance/TakeLeave;
+  private apiUrl = 'https://hrtest.runasp.net';
+  private shiftApiUrl = `${this.apiUrl}/Shifts/GetByEmployeeId`;
+  private attendanceApiUrl = `${this.apiUrl}/Attendance/TakeAttendance`;
+  private leaveApiUrl = `${this.apiUrl}/Attendance/TakeLeave`;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -521,7 +520,7 @@ export class AttendanceLeaveComponent implements OnInit {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return ${year}-${month}-${day};
+    return `${year}-${month}-${day}`;
   }
 
   loadBranch() {
@@ -563,8 +562,8 @@ export class AttendanceLeaveComponent implements OnInit {
     }
 
     const headers = new HttpHeaders({
-      Authorization: Bearer ${token},
-      Accept: '/',
+      Authorization: `Bearer ${token}`,
+      Accept: '*/*',
     });
 
     // Load existing shifts from localStorage to preserve attendance/leave status
@@ -582,7 +581,7 @@ export class AttendanceLeaveComponent implements OnInit {
     }
 
     this.http
-      .get<Shift[]>(${this.shiftApiUrl}/${userId}, { headers })
+      .get<Shift[]>(`${this.shiftApiUrl}/${userId}`, { headers })
       .subscribe({
         next: (shifts) => {
           // Merge server shifts with stored attendance/leave status
@@ -766,21 +765,26 @@ export class AttendanceLeaveComponent implements OnInit {
         currentShiftId = shift.id;
       }
 
-      if (!shift.hasLeaveTaken && this.isMidShift) {
-        isAfterAnyShiftWithAttendance = true;
-        isWithinAnyShift = true;
-        currentShiftId = shift.id;
-      } else if (
-        now > endDateTime &&
-        shift.hasAttendanceTaken &&
-        !isWithinAnyShift &&
-        !shift.hasLeaveTaken &&
-        (!nextShiftStart || now < nextShiftStart)
+      if (
+        (!shift.hasLeaveTaken && this.isMidShift)
+
       ) {
         isAfterAnyShiftWithAttendance = true;
-        isWithinAnyShift = false;
+        isWithinAnyShift = true;
+
         currentShiftId = shift.id;
-      } else {
+      } else if((now > endDateTime &&
+          shift.hasAttendanceTaken &&
+          !isWithinAnyShift &&
+          !shift.hasLeaveTaken &&
+          (!nextShiftStart || now < nextShiftStart)))
+          {
+          isAfterAnyShiftWithAttendance = true;
+          isWithinAnyShift = false;
+
+        currentShiftId = shift.id;
+          } 
+      else {
         console.log(
           'check',
           now,
@@ -799,7 +803,7 @@ export class AttendanceLeaveComponent implements OnInit {
     this.isLeaveEnabled = isAfterAnyShiftWithAttendance;
 
     this.statusMessage = this.isAttendanceEnabled
-      ? تمكين تسجيل الحضور (خلال الوردية ${currentShiftId}).
+      ? `تمكين تسجيل الحضور (خلال الوردية ${currentShiftId}).`
       : this.isLeaveEnabled
       ? 'تمكين تسجيل الانصراف (بعد الوردية مع الحضور، وقبل الوردية التالية).'
       : this.statusMessage ||
@@ -927,8 +931,8 @@ export class AttendanceLeaveComponent implements OnInit {
     };
 
     const headers = new HttpHeaders({
-      Authorization: Bearer ${token},
-      Accept: '/',
+      Authorization: `Bearer ${token}`,
+      Accept: '*/*',
       'Content-Type': 'application/json',
     });
 
@@ -1014,8 +1018,8 @@ export class AttendanceLeaveComponent implements OnInit {
     };
 
     const headers = new HttpHeaders({
-      Authorization: Bearer ${token},
-      Accept: '/',
+      Authorization: `Bearer ${token}`,
+      Accept: '*/*',
       'Content-Type': 'application/json',
     });
 
