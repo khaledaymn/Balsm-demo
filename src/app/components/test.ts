@@ -97,17 +97,18 @@ interface LeaveRequest {
       <div class="actions">
         <button
           class="check-in-btn"
-          [disabled]="!isAttendanceEnabled"
+         
           (click)="onAttendanceClick()"
         >
+          <!--  [disabled]="!isAttendanceEnabled" --> 
           <span class="material-icons">login</span>
           تسجيل الحضور
         </button>
         <button
           class="check-out-btn"
-          [disabled]="!isLeaveEnabled"
           (click)="onLeaveClick()"
-        >
+          >
+          <!-- [disabled]="!isLeaveEnabled"-->
           <span class="material-icons">logout</span>
           تسجيل الانصراف
         </button>
